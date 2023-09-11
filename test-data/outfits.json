@@ -1,0 +1,30 @@
+{
+  "outfit_id": "00000001",
+  "date": "20220908",
+  "user": "admin",
+  "title": "",
+  "model": "Steph Hui",
+  "picture_urls": ["https://previews.123rf.com/images/virinka/virinka1302/virinka130200059/17870600-cartoon-character-model.jpg"],
+  "description": "",
+  "style_tags": [],
+  "items": [
+    {
+      "brand": "alice and olivia",
+      "link": "",
+      "description": "blue burret",
+      "price": "25 USD"
+    },
+    {
+      "brand": "alice and olivia",
+      "link": "",
+      "description": "blue tube dress",
+      "price": "100 USD"
+    },
+    {
+      "brand": "alice and olivia",
+      "link": "",
+      "description": "plum fur trench coat",
+      "price": "200 USD"
+    }
+  ]
+}
