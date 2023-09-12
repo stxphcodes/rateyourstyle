@@ -1,0 +1,85 @@
+[
+  {
+    "id": "00000001",
+    "date": "20220908",
+    "user": "admin",
+    "title": "Wedding guest outfit",
+    "model": "stxphcodes",
+    "picture_urls": [
+      "http://localhost:8000/imgs/IMG_6811.jpeg"
+    ],
+    "description": "favorite look i've ever worn. was apprehensive about the flower necklace at first but ended up loving it",
+    "style_tags": [
+      "#mididress #wedding #burnt_orange #flower_choker"
+    ],
+    "overall_rating": 4.2,
+    "audience_rating": 3.8,
+    "audience_rating_count": 20,
+    "items": [
+      {
+        "brand": "banana republic",
+        "link": "",
+        "description": "burnt orange midi dress",
+        "size": "xs",
+        "price": "78 USD",
+        "review": "mini flare at the bottom of the dress made it super flattering and easy to move around. not much stretch around the torso area though and the material was thin so wasn't good at hiding the 'belly'",
+        "rating": "4.8"
+      },
+      {
+        "brand": "ludilove",
+        "link": "",
+        "description": "sandal heels with gold hardware",
+        "price": "115 USD",
+        "review": "great pair of heels! i have wider feet so it got a little painful for me but i could see this being a super comfortable pair of heels for someone with normal feet. also there's padding on the sole",
+        "rating": "4.5",
+        "size": "7"
+      },
+      {
+        "brand": "amazon",
+        "link": "",
+        "description": "flower choker necklace",
+        "price": "8 USD",
+        "review": "such a cute and unique necklace. like how the string was long enough to tie a bowtie in the back. flower is pretty too. overall though seems to be made of cheaper materials.",
+        "rating": "4.0",
+        "size": "n/a"
+      }
+    ]
+  },
+  {
+    "id": "00000002",
+    "date": "20220908",
+    "user": "admin",
+    "title": "Outdoors camping/hiking outfit",
+    "model": "stxphcodes",
+    "picture_urls": [
+      "http://localhost:8000/imgs/IMG_3929.jpeg"
+    ],
+    "description": "such a comfy outfit to walk explore nature in!",
+    "style_tags": [
+      "#mididress #wedding #burnt_orange"
+    ],
+    "overall_rating": 4.2,
+    "audience_rating": 3.8,
+    "audience_rating_count": 20,
+    "items": [
+      {
+        "brand": "veracity",
+        "link": "",
+        "description": "light yellow sweatshirt",
+        "size": "lg",
+        "price": "40 USD",
+        "review": "not too heavy of a sweatshirt. material is lightweight.",
+        "rating": "5.0"
+      },
+      {
+        "brand": "express",
+        "link": "",
+        "description": "washed black straight leg jeans",
+        "price": "n/a",
+        "review": "one of my favorite pair of jeans. i'm short and they hit right at the ankles. also not too skinny and not too baggy either.",
+        "rating": "4.5",
+        "size": ""
+      }
+    ]
+  }
+]

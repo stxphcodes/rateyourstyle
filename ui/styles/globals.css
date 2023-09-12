@@ -2,20 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family:'Courier'
+.emerald {
+  background-color: "bg-emerald-500";
 }
+
+body {
+  font-family:'Cambria';
+}
+
 
 h1 {
   font-size: 40px;
   font-weight: 600;
+  font-family: 'Arial';
+  text-transform: uppercase;
+
 }
 
 h2 {
   font-size: 30px;
+  font-family: 'Arial';
+}
+
+h5 {
+  font-family: 'Arial';
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+h6 {
+  font-weight: 600;
 }
 
 p {
-  font-size: 14px;
+  font-size: 16px;
 }
 

@@ -2,6 +2,7 @@ export type OutfitItem = {
   brand: string;
   link: string;
   description: string;
+  size: string;
   price: string;
   rating: string;
   review: string;

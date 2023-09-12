@@ -1,91 +1,71 @@
-import type {NextPage} from "next";
+import type { NextPage } from "next";
 import Head from 'next/head';
 import useSWR from 'swr';
 
-import {Navbar} from '../components/navarbar';
+import { Navbar } from '../components/navarbar';
 import styles from '../styles/Home.module.css';
-import {Outfit, ResponseError} from './api/types';
+import { Outfit, ResponseError } from './api/types';
+import { GetServerSideProps } from "next";
+import { OutfitCard } from "../components/outfitcard";
 
-const fetcher = async (url: string) => {
-  const res = await fetch(url);
-  const data = await res.json();
 
-  if (res.status !== 200) {
-    throw new Error(data.message);
-  }
-  return data;
-};
-
-function FeaturedSection(props: {data: Outfit}) {
-  return (
-    <div className="w-fit shadow-md p-4 bg-off-white rounded-md my-2 max-h-card overflow-auto">
-      <div className="grid grid-cols-5 gap-4 object-contain">
-        {/* <div className="col-span-2 max-h-20"> */}
-        {/* <ChevronLeftIcon /> */}
-        <img className="col-span-1 object-contain" src={props.data.picture_urls[0]} />
-        {/* <ChevronRightIcon /> */}
-        {/* </div> */}
-
-        <div className="col-span-2 bg-white p-2 rounded-md">
-
-          <h6>
-            {props.data.title} <br />
-            date: {props.data.date} <br />
-            modeled by: {props.data.model}
-          </h6>
-          <div className="mt-4">
-            {props.data.description}
-          </div>
-
-          <div className="mt-4">
-            <div>Audience score:</div>
-            <div className="px-2 py-2.5 border border-black inline-block rounded-full">
-              {props.data.audience_rating}
-            </div>
-            <div className="mx-2 inline-block">
-              {props.data.audience_rating_count} ratings submitted
-            </div>
-          </div>
-
-        </div>
-        <div className="col-span-2 bg-white p-2 rounded-md">
-          <h6>Breakdown</h6>
-          <ul className="">
-            {props.data.items.map((item) => (
-              <li className="mt-3">
-                {item.description}
-                <br />
-                {item.brand}
-                <br />
-                {item.price}
-                <div>
-                  <div className="px-2 py-2 border inline-block rounded-full">
-                    {item.rating}/5
-                  </div>
-                  <div className="mx-2 inline-block">
-                    {item.review}
-                  </div>
-
-                </div>
-              </li>
-            ))}
-          </ul>
-
-        </div>
-      </div>
-    </div>
-  );
+type Props = {
+  data: Outfit[] | null;
+  error: Error | null;
 }
 
-const Home: NextPage = () => {
-  const {data, error, isLoading, isValidating} = useSWR<
-    Outfit[],
-    ResponseError
-  >(`/api/featured_lists`, fetcher);
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  let props: Props = {
+    data: null,
+    error: null,
+  };
 
-  if (error) return <div>{error.message}</div>;
-  if (isLoading) return <div>Loading...</div>;
-  if (!data) return null;
+  let cookie = context.req.cookies['rys_user_id'];
+  if (!cookie) {
+    let resp = await fetch("http://localhost:8000/cookie").then(response => {
+      console.log("this is repsonse")
+      console.log(response)
+      if (response.ok) {
+        return null
+      }
+
+      return Error("cookie not set")
+    })
+
+    context.res.setHeader('set-cookie', ['rys_user_id=test'])
+
+    if (resp === null) {
+      console.log("good")
+    }
+  }
+
+  let resp = await fetch("http://localhost:8000/outfits")
+    .then((response) => {
+
+      if (!response.ok) {
+        throw new Error("response not ok")
+      }
+
+      return response.json()
+    })
+    .then((data: Outfit[]) => {
+
+      return data
+
+    }).catch((err) => {
+      return err
+    })
+
+  props.data = resp
+
+  return { props };
+};
+
+function Home({
+  data,
+  error,
+}: Props) {
+
 
   return (
     <div className={styles.container}>
@@ -102,16 +82,15 @@ const Home: NextPage = () => {
         <section>
           <h1>Welcome to Rate Your Style</h1>
           <p>
-            We are creating a fashion database ranging from looks model-ed on
-            the runway to fits worn by celebrities to everyday wear worn by
-            fashion enthuisiasts. Use the database to find inspo, read reviews,
+            Creating a fashion database ranging from everyday wear worn by fashion enthusiasts, to outfits worn by celebrities/influencers, to looks model-ed on the runway.
+            Use the database to find inspo, read reviews,
             and upload your own outfit reviews.
           </p>
         </section>
         <section>
           <h1>Featured</h1>
-          {data.map((item) => (
-            <FeaturedSection data={item} />
+          {data && data.map((item) => (
+            <OutfitCard data={item} key={item.id} />
           ))}
         </section>
       </main>
