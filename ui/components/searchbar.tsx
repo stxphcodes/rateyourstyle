@@ -1,21 +1,21 @@
 type Props = {
-    handleInputChange: any;
-    handleSubmit: any;
-    inputValue: string;
-  };
-  
-  export default function Searchbar({
-    handleInputChange,
-    handleSubmit,
-    inputValue,
-  }: Props) {
-    return (
-        <div className="p-2 bg-pink rounded-lg">
+  handleInputChange: any;
+  handleSubmit: any;
+  inputValue: string;
+};
+
+export default function Searchbar({
+  handleInputChange,
+  handleSubmit,
+  inputValue,
+}: Props) {
+  return (
+    <div className="p-2 bg-black rounded-lg">
       <form className="flex items-center">
         <label className="sr-only">Search</label>
         <div className="relative w-full">
           <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-     
+
             {/* <SearchIcon /> */}
           </div>
           <input
@@ -36,6 +36,6 @@ type Props = {
           Search
         </button>
       </form>
-      </div>
-    );
-  }
+    </div>
+  );
+}

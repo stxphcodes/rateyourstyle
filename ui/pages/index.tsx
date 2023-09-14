@@ -1,18 +1,16 @@
-import type { NextPage } from "next";
+import type {NextPage} from "next";
+import {GetServerSideProps} from 'next';
 import Head from 'next/head';
-import useSWR from 'swr';
 
-import { Navbar } from '../components/navarbar';
+import {Navbar} from '../components/navarbar';
+import {OutfitCard} from '../components/outfitcard';
 import styles from '../styles/Home.module.css';
-import { Outfit, ResponseError } from './api/types';
-import { GetServerSideProps } from "next";
-import { OutfitCard } from "../components/outfitcard";
-
+import {Outfit} from './api/types';
 
 type Props = {
   data: Outfit[] | null;
-  error: Error | null;
-}
+  error: string | null;
+};
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   let props: Props = {
@@ -20,52 +18,55 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     error: null,
   };
 
-  let cookie = context.req.cookies['rys_user_id'];
+  let cookie = context.req.cookies["rys_user_id"];
   if (!cookie) {
-    let resp = await fetch("http://localhost:8000/cookie").then(response => {
-      console.log("this is repsonse")
-      console.log(response)
-      if (response.ok) {
-        return null
-      }
+    await fetch("http://localhost:8000/cookie")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("response not ok");
+        }
 
-      return Error("cookie not set")
-    })
+        let newCookie = response.headers.get("set-cookie")
+        if (newCookie) {
+          newCookie = newCookie.split("; ")[0] + "; " + newCookie.split("; ")[2]
+          context.res.setHeader('set-cookie', [newCookie])
+        }
+      })
+      .catch((err: Error) => {
+        props.error = err.message;
+      });
 
-    context.res.setHeader('set-cookie', ['rys_user_id=test'])
-
-    if (resp === null) {
-      console.log("good")
+    if (props.error) {
+      return {props};
     }
   }
 
-  let resp = await fetch("http://localhost:8000/outfits")
+  await fetch("http://localhost:8000/outfits")
     .then((response) => {
-
       if (!response.ok) {
-        throw new Error("response not ok")
+        throw new Error("response not ok");
       }
 
-      return response.json()
+      return response.json();
     })
     .then((data: Outfit[]) => {
-
-      return data
-
-    }).catch((err) => {
-      return err
+      props.data = data
     })
+    .catch((err: Error) => {
+      props.error = err.message
+    });
 
-  props.data = resp
+  if (props.error) {
+    return {props}
+  }
 
-  return { props };
+  return {props};
 };
 
-function Home({
-  data,
-  error,
-}: Props) {
-
+function Home({data, error}: Props) {
+  if (error) {
+    return <div className={styles.container}>Error {error}</div>;
+  }
 
   return (
     <div className={styles.container}>
@@ -82,20 +83,19 @@ function Home({
         <section>
           <h1>Welcome to Rate Your Style</h1>
           <p>
-            Creating a fashion database ranging from everyday wear worn by fashion enthusiasts, to outfits worn by celebrities/influencers, to looks model-ed on the runway.
-            Use the database to find inspo, read reviews,
-            and upload your own outfit reviews.
+            Creating a fashion database ranging from everyday wear worn by
+            fashion enthusiasts, to outfits worn by celebrities/influencers, to
+            looks model-ed on the runway. Use the database to find inspo, read
+            reviews, and upload your own outfit reviews.
           </p>
         </section>
         <section>
           <h1>Featured</h1>
-          {data && data.map((item) => (
-            <OutfitCard data={item} key={item.id} />
-          ))}
+          {data && data.map((item) => <OutfitCard data={item} key={item.id} />)}
         </section>
       </main>
     </div>
   );
-};
+}
 
 export default Home;
