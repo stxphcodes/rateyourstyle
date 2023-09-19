@@ -11,16 +11,12 @@ export type OutfitItem = {
 export type Outfit = {
   id: string;
   date: string;
-  user: string;
+  user_id: string;
   title: string;
-  model: string;
-  picture_urls: string[];
+  picture_url: string;
   description: string;
   style_tags: string[];
   items: OutfitItem[];
-  overall_rating: number;
-  audience_rating: number;
-  audience_rating_count: number;
 };
 
 export type List = {

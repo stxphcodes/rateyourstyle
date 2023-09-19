@@ -5,35 +5,40 @@ export function OutfitCard(props: { data: Outfit }) {
         <div className="w-fit shadow-md p-4 bg-off-white rounded-md my-4 max-h-card overflow-auto">
             <div className="grid grid-cols-4 gap-4 object-contain">
                 <div className="col-span-1">
-                    <img className="object-contain" src={props.data.picture_urls[0]} />
+                    <img className="object-contain" src={props.data.picture_url} />
                 </div>
 
                 <div className="col-span-3">
-                    <div className="bg-white p-2 rounded-md">
+                    <div className="bg-white p-4 rounded-md">
 
-                        <div className="grid grid-cols-3 mb-8">
+                        <div className="grid grid-cols-3 gap-4 mb-8">
                             <div className="col-span-1">
-                                <h5>
+                                <h3>
                                     {props.data.title}
-                                </h5>
-                                <p>date: {props.data.date} <br />
-                                    modeled by: {props.data.model}</p>
-                             
+                                </h3>
+                                <p>date: {props.data.date}</p>
+                                <p>modeled by: {props.data.user_id}</p>
+
+
                             </div>
                             <div className="col-span-2">
+
                                 <div className="flex items-center">
-                                    <div className="px-2 py-1 border border-pink text-pink rounded-full text-lg">
+
+                                    {/* <div className="px-2 py-1 border border-pink text-pink rounded-full text-lg">
                                         {props.data.audience_rating}
-                                    </div>
+                                    </div> */}
+                                    <h3 className="text-pink">4.2</h3>
                                     <div className="mx-2">
-                                        from {props.data.audience_rating_count} ratings
+                                        from 20 ratings
                                     </div>
                                 </div>
 
                                 <div className="flex my-2">
-                                    <div className="px-4 py-1 border border-pink text-pink rounded-full text-lg">
+                                    <h3 className="text-pink">?</h3>
+                                    {/* <div className="px-4 py-1 border border-pink text-pink rounded-full text-lg">
                                         ?
-                                    </div>
+                                    </div> */}
                                     <div className="mx-2">
                                         submit your rating
                                     </div>
@@ -49,22 +54,22 @@ export function OutfitCard(props: { data: Outfit }) {
                                 <h5 className="col-span-2">Review</h5>
                             </div>
                             {props.data.items.map((item) => (
-                                <li className="mt-4 grid grid-cols-3">
+                                <li className="mt-4 grid grid-cols-3 gap-4">
                                     <div className="col-span-1">
-                                        <h6>{item.description}</h6>
-                                        <p> <span className="italic">from: {item.brand}</span>
-                                            <br />
-                                            size: {item.size} <br />
-                                            price: {item.price}
+                                        <h6 className="underline">{item.description}</h6>
+                                        <p><span className="font-bold">from: </span>{item.brand}</p>
+                                        <p><span className="font-bold">size: </span>{item.size}</p>
+                                        <p><span className="font-bold">price: </span>{item.price}</p>
 
-                                        </p>
+
                                     </div>
 
                                     <div className="col-span-2">
-                                        <div className="flex items-center">
-                                            <div className="px-2 py-1.5 border rounded-full text-pink border-pink">
-                                                {item.rating}
-                                            </div>
+                                        <div className="flex items-start">
+                                            {/* <div className="px-2 py-1.5 border rounded-full text-pink border-pink"> */}
+                                            <h3 className="text-pink ">{item.rating}</h3>
+                                            {/* </div> */}
+
                                             <div className="mx-2">
                                                 <span className="">"</span>{item.review}"
                                             </div>

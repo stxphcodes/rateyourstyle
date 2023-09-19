@@ -9,37 +9,19 @@ import {Outfit} from './api/types';
 
 type Props = {
   data: Outfit[] | null;
+  cookie: string;
   error: string | null;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   let props: Props = {
     data: null,
+    cookie: "",
     error: null,
   };
 
   let cookie = context.req.cookies["rys_user_id"];
-  if (!cookie) {
-    await fetch("http://localhost:8000/cookie")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("response not ok");
-        }
-
-        let newCookie = response.headers.get("set-cookie")
-        if (newCookie) {
-          newCookie = newCookie.split("; ")[0] + "; " + newCookie.split("; ")[2]
-          context.res.setHeader('set-cookie', [newCookie])
-        }
-      })
-      .catch((err: Error) => {
-        props.error = err.message;
-      });
-
-    if (props.error) {
-      return {props};
-    }
-  }
+  props.cookie = cookie ? cookie : ""
 
   await fetch("http://localhost:8000/outfits")
     .then((response) => {
@@ -63,7 +45,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {props};
 };
 
-function Home({data, error}: Props) {
+function Home({data, cookie, error}: Props) {
+
   if (error) {
     return <div className={styles.container}>Error {error}</div>;
   }
@@ -78,7 +61,7 @@ function Home({data, error}: Props) {
 
       <main>
         <header>
-          <Navbar />
+          <Navbar  cookie={cookie}  />
         </header>
         <section>
           <h1>Welcome to Rate Your Style</h1>

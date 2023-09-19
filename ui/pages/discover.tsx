@@ -10,42 +10,24 @@ type DiscoverItem = {
     description: string;
     background_img: any;
     outfit_ids: string[];
+    cookie: string | null;
 };
 
 type Props = {
     data: DiscoverItem[] | null;
+    cookie: string;
     error: string | null;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
         data: null,
+        cookie: "",
         error: null,
     };
 
     let cookie = context.req.cookies["rys_user_id"];
-    if (!cookie) {
-        await fetch("http://localhost:8000/cookie")
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("response not ok");
-                }
-
-                let newCookie = response.headers.get("set-cookie");
-                if (newCookie) {
-                    newCookie =
-                        newCookie.split("; ")[0] + "; " + newCookie.split("; ")[2];
-                    context.res.setHeader("set-cookie", [newCookie]);
-                }
-            })
-            .catch((err: Error) => {
-                props.error = err.message;
-            });
-
-        if (props.error) {
-            return {props};
-        }
-    }
+    props.cookie = cookie ? cookie : ""
 
     await fetch("http://localhost:8000/discover")
         .then((response) => {
@@ -69,9 +51,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {props};
 };
 
-function Discover({data, error}: Props) {
+function Discover({data, cookie, error}: Props) {
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
     const [searchInput, setSearchInput] = useState<string>("");
+
+
 
     function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
         setSearchInput(event.target.value);
@@ -79,7 +63,7 @@ function Discover({data, error}: Props) {
 
     return (
         <main className="p-4">
-            <Navbar />
+            <Navbar cookie={cookie} />
             <h1>Discover</h1>
             <Searchbar
                 inputValue={searchInput}

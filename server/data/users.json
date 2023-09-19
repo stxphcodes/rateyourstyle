@@ -1,8 +1,8 @@
-{
-    "cookie": "",
-    "height": "",
-    "weight": "",
-    "size": "",
-    "shoe_size": ""
-
-}
+[
+    {
+        "username": "test",
+        "password": "test",
+        "email": "test@gmail.com",
+        "cookie": "abcdefghijkl"
+    }
+]
