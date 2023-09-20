@@ -119,9 +119,11 @@ func run() error {
 		return ctx.JSON(200, a)
 	})
 
-	mux.POST("/username", handler.GetUsername())
+	mux.GET("/username", handler.GetUsername())
 
 	mux.POST("/user", handler.PostUser())
+
+	mux.POST("/image", handler.PostImage())
 
 	return mux.Start(cfg.HttpAddr)
 }

@@ -32,9 +32,9 @@ export function Navbar(props: { cookie: string }) {
 		[])
 
 	return (
-		<div className="m-4">
-			<a href="/" className="mx-2">Home</a>
-			<a href="/discover" >Discover</a>
+		<div className="">
+			<a href="/" className="">Home</a>
+			
 			<div className="float-right">
 				{
 					props.cookie && error ?
@@ -69,7 +69,7 @@ export function Navbar(props: { cookie: string }) {
 				<CreateAccount handleClose={() => setShowCreateAccountModal(false)} />
 			}
 			{
-				showPostOutfitModal && <PostOutfit handleClose={() => setShowPostOutfitModal(false)} />
+				showPostOutfitModal && <PostOutfit cookie={props.cookie} handleClose={() => setShowPostOutfitModal(false)} />
 			}
 		</div>
 	)

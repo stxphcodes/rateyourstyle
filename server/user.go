@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 
 	gcs "cloud.google.com/go/storage"
@@ -14,12 +13,15 @@ type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Cookie   string `json:"cookie"`
+	Id       string `json:"id"`
 }
 
 type UserIndices struct {
 	Emails         map[string]struct{}
 	Usernames      map[string]struct{}
 	CookieUsername map[string]string // cookie to username
+	CookieId       map[string]string // cookie to user id
+	IdUsername     map[string]string // id to username
 }
 
 func getAllUsers(ctx context.Context, bucket *gcs.BucketHandle) ([]User, error) {
@@ -37,7 +39,6 @@ func getAllUsers(ctx context.Context, bucket *gcs.BucketHandle) ([]User, error) 
 
 	var users []User
 	if err := json.Unmarshal(bytes, &users); err != nil {
-		fmt.Println("line 45")
 		return nil, err
 	}
 
@@ -54,12 +55,16 @@ func createUserIndices(ctx context.Context, client *gcs.Client, bucket *gcs.Buck
 		Emails:         make(map[string]struct{}),
 		Usernames:      make(map[string]struct{}),
 		CookieUsername: make(map[string]string),
+		CookieId:       make(map[string]string),
+		IdUsername:     make(map[string]string),
 	}
 
 	for _, user := range users {
 		indices.Emails[user.Email] = struct{}{}
 		indices.Usernames[user.Username] = struct{}{}
 		indices.CookieUsername[user.Cookie] = user.Username
+		indices.CookieId[user.Cookie] = user.Id
+		indices.IdUsername[user.Id] = user.Username
 	}
 
 	return indices, nil

@@ -3,10 +3,10 @@ export async function GetUsername(cookie: string): Promise<string | Error> {
     let username: string = ""
 
     await fetch("http://localhost:8000/username", {
-        method: "POST",
-        body: cookie,
+        method: "GET",
         headers: {
-            'content-type': "text/plain"
+            'content-type': "text/plain",
+            'rys-login': cookie,
         },
     })
         .then((response) => {
@@ -19,17 +19,12 @@ export async function GetUsername(cookie: string): Promise<string | Error> {
             username = data
         })
         .catch((err: Error) => {
-            console.log("in error")
-            console.log(err)
             error = err
         });
 
     if (error) {
         return error
     }
-
-    console.log("this is username")
-    console.log(username)
 
     return username
 }

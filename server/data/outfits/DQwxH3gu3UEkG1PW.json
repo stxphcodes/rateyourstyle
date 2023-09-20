@@ -1,9 +1,9 @@
 {
     "id": "DQwxH3gu3UEkG1PW",
     "date": "20220908",
-    "user_id": "test",
+    "user_id": "CF76hbjZdCmpsVLC",
     "title": "Wedding guest outfit",
-    "picture_url": "https://storage.googleapis.com/rateyourstyle/imgs/outfits/DQwxH3gu3UEkG1PW.jpeg",
+    "picture_url": "https://storage.googleapis.com/rateyourstyle/imgs/outfits/CF76hbjZdCmpsVLC/DQwxH3gu3UEkG1PW.jpeg",
     "description": "favorite look i've ever worn. was apprehensive about the flower necklace at first but ended up loving it",
     "style_tags": [
       "#wedding_guest"
@@ -20,8 +20,8 @@
         "rating": 4.8
       },
       {
-        "brand": "ludilove",
-        "link": "",
+        "brand": "lodi love",
+        "link": "https://www.lodistore.com/en/women-shoes/4197-59801-sandal-lor3201-flexy-black-shoes-women-online.html#/6-size-35/38-colour-negro",
         "description": "sandal heels with gold hardware",
         "price": "115 USD",
         "review": "great pair of heels! i have wider feet so it got a little painful for me but i could see this being a super comfortable pair of heels for someone with normal feet. also there's padding on the sole",
@@ -30,7 +30,7 @@
       },
       {
         "brand": "amazon",
-        "link": "",
+        "link": "https://www.amazon.com/dp/B0C27KR5VM?psc=1&ref=ppx_yo2ov_dt_b_product_details",
         "description": "flower choker necklace",
         "price": "8 USD",
         "review": "such a cute and unique necklace. like how the string was long enough to tie a bowtie in the back. flower is pretty too. overall though seems to be made of cheaper materials.",

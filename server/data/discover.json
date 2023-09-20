@@ -18,34 +18,10 @@
         "outfit_ids": []
     },
     {
-        "tag": "barbie",
-        "description": "outfits inspired by barbie",
-        "background_img": "#f0789e",
-        "outfit_ids": []
-    },
-    {
         "tag": "wedding_guest",
         "description": "wedding guest fits",
         "background_img": "#e63b2f",
         "outfit_ids": []
 
-    },
-    {
-        "tag": "beach",
-        "description": "outfits worn on the beach",
-        "background_img": "#00aaff",
-        "outfit_ids": []
-    },
-    {
-        "tag": "vacation",
-        "description": "vaction outfits",
-        "background_img": "#ec994a",
-        "outfit_ids": []
-    },
-    {
-        "tag": "picnic",
-        "description": "picnic outfits",
-        "background_img": "#e1625a",
-        "outfit_ids": []
     }
 ]

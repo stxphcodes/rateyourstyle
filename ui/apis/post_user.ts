@@ -12,7 +12,6 @@ export async function PostUser(
             username: username,
             email: email,
             password: password
-
         }),
         headers: { "content-type": "application/json" },
     })
