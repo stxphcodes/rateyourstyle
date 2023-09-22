@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -75,9 +76,35 @@ func GetImage() {
 
 }
 
+func (h Handler) PostSignIn() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		var u User
+		if err := ctx.Bind(&u); err != nil {
+			return ctx.String(500, "")
+		}
+
+		users, err := getAllUsers(ctx.Request().Context(), h.Gcs.Bucket)
+		if err != nil {
+			return ctx.String(500, "")
+		}
+
+		for _, user := range users {
+			if strings.ToLower(user.Username) == strings.ToLower(u.Username) {
+				ok := user.Password == u.Password
+				if !ok {
+					return ctx.String(403, "wrong password")
+				} else {
+					return ctx.String(200, createCookieStr(user.Cookie))
+				}
+			}
+		}
+
+		return ctx.String(403, "no username")
+	}
+}
+
 func (h Handler) PostImage() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		fmt.Println("line 80")
 		cookie, err := getCookie(ctx.Request())
 		if err != nil {
 			log.Println(err.Error())
@@ -204,8 +231,7 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 
 		// return user cookie in response
 
-		return ctx.String(201,
-			fmt.Sprintf("rys-login=%s;expires=%s", data.Cookie, time.Now().Add(time.Minute*525600).String()))
+		return ctx.String(201, createCookieStr(data.Cookie))
 
 	}
 }

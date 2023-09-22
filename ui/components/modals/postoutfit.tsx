@@ -1,161 +1,160 @@
-import { useState, useEffect } from "react";
-import { PostImage } from "../../apis/post_image";
-import { OutfitItem } from "../../apis/get_outfits";
-import { Rating } from "../rating";
+import {useEffect, useState} from 'react';
 
+import {OutfitItem} from '../../apis/get_outfits';
+import {PostImage} from '../../apis/post_image';
 
-export function PostOutfit(props: { cookie: string, handleClose: any }) {
-  const [file, setFile] = useState<File | null>(null);
-  const [imageURL, setImageURL] = useState<string | null>(null);
-  const [fileError, setFileError] = useState<string | null>(null);
+export function PostOutfit(props: {cookie: string, handleClose: any}) {
+    const [file, setFile] = useState<File | null>(null);
+    const [imageURL, setImageURL] = useState<string | null>(null);
+    const [fileError, setFileError] = useState<string | null>(null);
 
-  const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([{
-    brand: "",
-    description: "",
-    size: "",
-    price: "",
-    review: "",
-    rating: "",
-    link: "",
-  },
-  {
-    brand: "",
-    description: "",
-    size: "",
-    price: "",
-    review: "",
-    rating: "",
-    link: "",
-  }])
+    const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([{
+        brand: "",
+        description: "",
+        size: "",
+        price: "",
+        review: "",
+        rating: "",
+        link: "",
+    },
+    {
+        brand: "",
+        description: "",
+        size: "",
+        price: "",
+        review: "",
+        rating: "",
+        link: "",
+    }])
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
 
-      setFile(e.target.files[0]);
-    }
-  };
+            setFile(e.target.files[0]);
+        }
+    };
 
-  useEffect(() => {
-    async function upload(formData: any) {
-      const resp = await PostImage(formData, props.cookie)
-      if (resp instanceof Error) {
-        setFileError(resp.message)
-        return
-      }
-
-      setImageURL(resp)
-    }
-
-    if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      upload(formData)
-    }
-
-  }, [file])
-
-  if (fileError) {
-    return (
-      <div id="staticModal" data-modal-backdrop="static" className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-3/4 z-50  bg-white p-12 shadow-lg  border-2 w-2/3 overflow-y-auto">
-        <div>
-          <button type="button" className="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-4 float-right" onClick={props.handleClose}>
-            <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-            </svg>
-            <span className="sr-only">Close modal</span>
-          </button>
-        </div>
-
-        <h1>{fileError}</h1>
-      </div>
-    )
-  }
-
-  return (
-    <>
-      {/* <!-- Main modal --> */}
-      <div id="staticModal" data-modal-backdrop="static" className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50  bg-white p-12 shadow-lg  border-2 w-2/3 overflow-scroll h-full">
-
-        {/* <!-- Modal body --> */}
-        <div>
-          <button type="button" className="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-4 float-right" onClick={props.handleClose}>
-            <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-            </svg>
-            <span className="sr-only">Close modal</span>
-          </button>
-          <h2 className="mb-8">Outfit Post</h2>
-          <form className="">
-
-            {
-              imageURL ? <img src={imageURL} className="w-40" /> :
-                <>
-                  <label htmlFor="file" className="sr-only">
-                    Choose an image
-                  </label>
-                  <input id="file" type="file" accept="image/*" onChange={handleFileChange} />
-                </>
+    useEffect(() => {
+        async function upload(formData: any) {
+            const resp = await PostImage(formData, props.cookie)
+            if (resp instanceof Error) {
+                setFileError(resp.message)
+                return
             }
 
+            setImageURL(resp)
+        }
 
+        if (file) {
+            const formData = new FormData();
+            formData.append("file", file);
 
+            upload(formData)
+        }
 
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="caption">
-                Outfit Caption
-              </label>
-              <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="caption" type="text" placeholder="Caption"></input>
+    }, [file])
+
+    if (fileError) {
+        return (
+            <div id="staticModal" data-modal-backdrop="static" className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-3/4 z-50  bg-white p-12 shadow-lg  border-2 w-2/3 overflow-y-auto">
+                <div>
+                    <button type="button" className="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-4 float-right" onClick={props.handleClose}>
+                        <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span className="sr-only">Close modal</span>
+                    </button>
+                </div>
+
+                <h1>{fileError}</h1>
             </div>
+        )
+    }
 
-            <div className="mb-4">
-              <h5>Outfit Items</h5>
-              <ul>
-                {
-                  outfitItems.map((item, index) => {
-                    index++
-                    return (
-                      <li className="shadow-lg border-2 border-off-white my-2 rounded-lg p-4 flex items-start">
-                        <h6 className="mx-2">{index}.</h6>
+    return (
+        <>
+            {/* <!-- Main modal --> */}
+            <div id="staticModal" data-modal-backdrop="static" className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50  bg-white p-12 shadow-lg  border-2 w-2/3 overflow-scroll h-full">
 
+                {/* <!-- Modal body --> */}
+                <div>
+                    <button type="button" className="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-4 float-right" onClick={props.handleClose}>
+                        <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span className="sr-only">Close modal</span>
+                    </button>
+                    <h2 className="mb-8">Outfit Post</h2>
+                    <form className="">
 
-                        <div className="w-full">
-                          <input className="border rounded w-full py-2 px-3 text-gray-700 my-1" id="caption" type="text" placeholder="Description"></input>
-                          <label className="block text-gray-700 text-xs font-sans font-bold mb-2">Please describe the outfit item in a few words.</label>
-
-                          <input className="border rounded w-full py-2 px-3 text-gray-700 my-1" id="brand" type="text" placeholder="Brand" ></input>
-
-                          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-4" id="caption" type="text" placeholder="Link"></input>
-
-                          <div className="flex">
-
-                            <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-4" id="caption" type="text" placeholder="Size"></input>
-
-                            <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-4" id="caption" type="text" placeholder="Price"></input>
-                          </div>
-
-                          <div className="flex">
-                            <div className="">
-                              <input id="default-range" type="range" min="0" max="5" step="0.5" className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700  p-0" onChange={() => true} list="default-range" />
+                        {
+                            imageURL ? <img src={imageURL} className="w-40" /> :
+                                <>
+                                    <label htmlFor="file" className="sr-only">
+                                        Choose an image
+                                    </label>
+                                    <input id="file" type="file" accept="image/*" onChange={handleFileChange} />
+                                </>
+                        }
 
 
-                              
-                              <datalist className="flex text-pink w-full -mt-2 p-0 justify-between items-start" id="default-range">
-                                <option className="text-xl">|</option>
-                                <option className="text-xs">|</option>
-                                <option className="text-xl">|</option>
-                                <option className="text-xs">|</option>
 
-                                <option className="text-xl">|</option>
-                                <option className="text-xs">|</option>
 
-                                <option className="text-xl">|</option>
-                                <option className="text-xs">|</option>
+                        <div className="mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="caption">
+                                Outfit Caption
+                            </label>
+                            <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="caption" type="text" placeholder="Caption"></input>
+                        </div>
 
-                                <option className="text-xl">|</option>
+                        <div className="mb-4">
+                            <h5>Outfit Items</h5>
+                            <ul>
+                                {
+                                    outfitItems.map((item, index) => {
+                                        index++
+                                        return (
+                                            <li className="shadow-lg border-2 border-off-white my-2 rounded-lg p-4 flex items-start">
+                                                <h6 className="mx-2">{index}.</h6>
 
-                              </datalist>
-                              {/* <datalist className="flex text-pink w-full"id="default-range">
+
+                                                <div className="w-full">
+                                                    <input className="border rounded w-full py-2 px-3 text-gray-700 my-1" id="caption" type="text" placeholder="Description"></input>
+                                                    <label className="block text-gray-700 text-xs font-sans font-bold mb-2">Please describe the outfit item in a few words.</label>
+
+                                                    <input className="border rounded w-full py-2 px-3 text-gray-700 my-1" id="brand" type="text" placeholder="Brand" ></input>
+
+                                                    <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-4" id="caption" type="text" placeholder="Link"></input>
+
+                                                    <div className="flex">
+
+                                                        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-4" id="caption" type="text" placeholder="Size"></input>
+
+                                                        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-4" id="caption" type="text" placeholder="Price"></input>
+                                                    </div>
+
+                                                    <div className="flex">
+                                                        <div className="">
+                                                            <input id="default-range" type="range" min="0" max="5" step="0.5" className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700  p-0" onChange={() => true} list="default-range" />
+
+
+
+                                                            <datalist className="flex text-pink w-full -mt-2 p-0 justify-between items-start" id="default-range">
+                                                                <option className="text-xl">|</option>
+                                                                <option className="text-xs">|</option>
+                                                                <option className="text-xl">|</option>
+                                                                <option className="text-xs">|</option>
+
+                                                                <option className="text-xl">|</option>
+                                                                <option className="text-xs">|</option>
+
+                                                                <option className="text-xl">|</option>
+                                                                <option className="text-xs">|</option>
+
+                                                                <option className="text-xl">|</option>
+
+                                                            </datalist>
+                                                            {/* <datalist className="flex text-pink w-full"id="default-range">
                               <option>0</option>
                               <option>1</option>
                               <option>1.5</option>
@@ -167,13 +166,34 @@ export function PostOutfit(props: { cookie: string, handleClose: any }) {
                               <option>2.5</option>
                               <option>2.5</option>
                             </datalist> */}
-                            </div>
+                                                        </div>
 
-                       
 
-                            <textarea className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-4" id="brand" placeholder="Review" ></textarea>
 
-                          </div>
+                                                        <textarea className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-4" id="brand" placeholder="Review" ></textarea>
+
+                                                    </div>
+
+
+
+
+
+                                                </div>
+
+
+
+
+
+
+
+                                            </li>
+                                        )
+
+                                    })
+                                }
+                            </ul>
+
+
 
 
 
@@ -181,38 +201,17 @@ export function PostOutfit(props: { cookie: string, handleClose: any }) {
 
                         </div>
 
-
-
-
-
-
-
-                      </li>
-                    )
-
-                  })
-                }
-              </ul>
-
-
-
-
-
-
-
+                        <div className="flex items-center justify-between">
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                                Sign In
+                            </button>
+                            <button className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" >
+                                Create an Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-
-            <div className="flex items-center justify-between">
-              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-                Sign In
-              </button>
-              <button className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" >
-                Create an Account
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </>
-  )
+        </>
+    )
 }

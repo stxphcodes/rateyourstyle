@@ -14,14 +14,10 @@ export default function Searchbar({
       <form className="flex items-center">
         <label className="sr-only">Search</label>
         <div className="relative w-full">
-          <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-
-            {/* <SearchIcon /> */}
-          </div>
           <input
             type="text"
             id="simple-search"
-            className="focus:outline-theme-yt-red rounded-lg pl-10 p-2 text-sm md:text-lg w-full"
+            className="pl-10 p-2 text-sm md:text-lg w-full"
             placeholder="Search"
             required
             onChange={handleInputChange}

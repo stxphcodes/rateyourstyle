@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strings"
+	"time"
 )
 
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -31,4 +32,12 @@ func getCookie(request *http.Request) (string, error) {
 	}
 
 	return cookie, nil
+}
+
+func createCookieStr(cookie string) string {
+	return fmt.Sprintf(
+		"rys-login=%s;expires=%s",
+		cookie,
+		time.Now().Add(time.Minute*525600).String(),
+	)
 }

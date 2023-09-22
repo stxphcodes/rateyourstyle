@@ -121,6 +121,8 @@ func run() error {
 
 	mux.GET("/username", handler.GetUsername())
 
+	mux.POST("/signin", handler.PostSignIn())
+
 	mux.POST("/user", handler.PostUser())
 
 	mux.POST("/image", handler.PostImage())

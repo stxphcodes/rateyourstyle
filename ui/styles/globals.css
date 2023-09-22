@@ -2,7 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: block;
+}
 
+input {
+  padding: 8px;
+  border: 2px solid black;
+  color: grey;
+  border-radius: 5px;
+}
+
+input:focus {
+  border: 2px solid #f0789e;
+  color: black;
+  outline: none;
+}
 
 body {
   font-family:'Cambria';

@@ -1,11 +1,11 @@
-import type { NextPage } from "next";
-import { GetServerSideProps } from 'next';
-import { useState } from 'react';
+import type {NextPage} from "next";
+import {GetServerSideProps} from 'next';
+import {useState} from 'react';
 
-import { Navbar } from '../components/navarbar';
+import {GetOutfits, Outfit} from '../apis/get_outfits';
+import {Navbar} from '../components/navarbar';
+import {OutfitCard} from '../components/outfitcard';
 import Searchbar from '../components/searchbar';
-import { Outfit, GetOutfits } from "../apis/get_outfits";
-import { OutfitCard } from "../components/outfitcard";
 
 type DiscoverItem = {
     tag: string;
@@ -31,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
 
     let cookie = context.req.cookies["rys-login"];
-    props.cookie = cookie ? cookie : ""
+    props.cookie = cookie ? cookie : "";
 
     await fetch("http://localhost:8000/discover")
         .then((response) => {
@@ -49,21 +49,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         });
 
     if (props.error) {
-        return { props };
+        return {props};
     }
 
-    const resp = await GetOutfits()
+    const resp = await GetOutfits();
     if (resp instanceof Error) {
-        props.error = resp.message
-        return { props }
+        props.error = resp.message;
+        return {props};
     }
 
-    props.outfits = resp
+    props.outfits = resp;
 
-    return { props };
+    return {props};
 };
 
-function Home({ data, cookie, outfits, error }: Props) {
+function Home({data, cookie, outfits, error}: Props) {
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
     const [searchInput, setSearchInput] = useState<string>("");
 
@@ -72,80 +72,78 @@ function Home({ data, cookie, outfits, error }: Props) {
     }
 
     return (
-        <main className="p-4">
-            <header>
-                <Navbar cookie={cookie} />
-            </header>
+        <>
+            <Navbar cookie={cookie} />
 
-            <section className="my-4">
-                <h1>Welcome to Rate Your Style</h1>
-                <div className="">
-                    Creating a fashion database ranging from everyday wear worn by
-                    fashion enthusiasts, to outfits worn by celebrities/influencers, to
-                    looks model-ed on the runway. Use the database to find inspo, read
-                    reviews, and upload your own outfit reviews.
-                </div>
-            </section>
-
-
-            <section className="my-8">
-                <h1>Discover</h1>
-                <div className="mb-4">
-                    Click on a card below or enter something in the searchbar to see
-                    matching outfits.
-                </div>
-                <Searchbar
-                    inputValue={searchInput}
-                    handleInputChange={handleInputChange}
-                    handleSubmit={() => { }}
-                />
-              
-
-
-                <div className="grid grid-cols-4 gap-4 mt-4">
-                    {data?.map((item) => (
-                        <div
-                            className={`w-full h-40 text-white p-4 rounded-lg`}
-                            style={{ backgroundColor: `${item.background_img}` }}
-                            key={item.tag}
-                            onClick={() => {
-                                setSearchTerms([...searchTerms, item.tag]);
-                            }}
-                        >
-                            <h2>#{item.tag}</h2>
-                            <p>{item.description}</p>
-                        </div>
-                    ))}
-                </div>
-
-                {searchTerms.length > 0 && (
-                    <div>
-                        <h2>Applied:</h2>
-                        <div className="flex gap-4">
-                            {searchTerms.map((term) => (
-                                <div className="bg-pink p-2 rounded-lg text-white">
-                                    <span className="inline-block">{term}</span>
-                                    <button
-                                        className="ml-2 rounded-sm bg-white text-pink shadow-lg font-sans px-2 font-bold"
-                                        onClick={() => {
-                                            setSearchTerms(searchTerms.filter((item) => item !== term));
-                                        }}
-                                    >
-                                        X
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
+            <main className="mt-6 p-8">
+                <section className="my-4">
+                    <h1>Welcome to Rate Your Style</h1>
+                    <div className="">
+                        Creating a fashion database ranging from everyday wear worn by
+                        fashion enthusiasts, to outfits worn by celebrities/influencers, to
+                        looks model-ed on the runway. Use the database to find inspo, read
+                        reviews, and upload your own outfit reviews.
                     </div>
-                )}
-            </section>
+                </section>
 
+                <section className="my-8">
+                    <h1>Discover</h1>
+                    <div className="mb-4">
+                        Click on a card below or enter something in the searchbar to see
+                        matching outfits.
+                    </div>
+                    <Searchbar
+                        inputValue={searchInput}
+                        handleInputChange={handleInputChange}
+                        handleSubmit={() => { }}
+                    />
 
-            <section>
+                    <div className="grid grid-cols-4 gap-4 mt-4">
+                        {data?.map((item) => (
+                            <div
+                                className={`w-full h-40 text-white p-4 rounded-lg`}
+                                style={{backgroundColor: `${item.background_img}`}}
+                                key={item.tag}
+                                onClick={() => {
+                                    setSearchTerms([...searchTerms, item.tag]);
+                                }}
+                            >
+                                <h2>#{item.tag}</h2>
+                                <p>{item.description}</p>
+                            </div>
+                        ))}
+                    </div>
 
-                {outfits && outfits.map((item) => <OutfitCard data={item} key={item.id} />)}
-            </section>
-        </main>
+                    {searchTerms.length > 0 && (
+                        <div>
+                            <h2>Applied:</h2>
+                            <div className="flex gap-4">
+                                {searchTerms.map((term) => (
+                                    <div className="bg-pink p-2 rounded-lg text-white">
+                                        <span className="inline-block">{term}</span>
+                                        <button
+                                            className="ml-2 rounded-sm bg-white text-pink shadow-lg font-sans px-2 font-bold"
+                                            onClick={() => {
+                                                setSearchTerms(
+                                                    searchTerms.filter((item) => item !== term)
+                                                );
+                                            }}
+                                        >
+                                            X
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </section>
+
+                <section>
+                    {outfits &&
+                        outfits.map((item) => <OutfitCard data={item} key={item.id} />)}
+                </section>
+            </main>
+        </>
     );
 }
 
