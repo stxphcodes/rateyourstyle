@@ -2,216 +2,319 @@ import {useEffect, useState} from 'react';
 
 import {OutfitItem} from '../../apis/get_outfits';
 import {PostImage} from '../../apis/post_image';
+import {Modal, XButton} from './';
 
-export function PostOutfit(props: {cookie: string, handleClose: any}) {
+export function PostOutfit(props: {cookie: string; handleClose: any}) {
     const [file, setFile] = useState<File | null>(null);
-    const [imageURL, setImageURL] = useState<string | null>(null);
+    const [imageURL, setImageURL] = useState<string | null>("some");
     const [fileError, setFileError] = useState<string | null>(null);
 
-    const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([{
-        brand: "",
-        description: "",
-        size: "",
-        price: "",
-        review: "",
-        rating: "",
-        link: "",
-    },
-    {
-        brand: "",
-        description: "",
-        size: "",
-        price: "",
-        review: "",
-        rating: "",
-        link: "",
-    }])
+    const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([
+        {
+            brand: "",
+            description: "",
+            size: "",
+            price: "",
+            review: "",
+            rating: 2.5,
+            link: "",
+        },
+    ]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault()
         if (e.target.files) {
-
             setFile(e.target.files[0]);
         }
     };
 
+    const handleItemChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+        index: number
+    ) => {
+        let item = outfitItems[index];
+
+        if (e.target.id == "description") {
+            item.description = e.target.value;
+        }
+
+        if (e.target.id == "rating") {
+            item.rating = Number(e.target.value);
+        }
+
+        setOutfitItems([
+            ...outfitItems.slice(0, index),
+            item,
+            ...outfitItems.slice(index + 1),
+        ]);
+    };
+
+    const handleAddItem = (e) => {
+        e.preventDefault();
+        setOutfitItems([
+            ...outfitItems,
+            {
+                brand: "",
+                description: "",
+                size: "",
+                price: "",
+                review: "",
+                rating: 2.5,
+                link: "",
+            },
+        ]);
+    };
+
+    const handleRemoveItem = (e: any, index: number) => {
+        e.preventDefault();
+        setOutfitItems([
+            ...outfitItems.splice(0, index),
+            ...outfitItems.splice(index + 1),
+        ]);
+    };
+
+    const handleSubmit = (e: any) => {
+        e.preventDefault();
+        console.log("this is outfit item");
+        console.log(outfitItems);
+    };
+
     useEffect(() => {
         async function upload(formData: any) {
-            const resp = await PostImage(formData, props.cookie)
+            const resp = await PostImage(formData, props.cookie);
             if (resp instanceof Error) {
-                setFileError(resp.message)
-                return
+                setFileError(resp.message);
+                return;
             }
 
-            setImageURL(resp)
+            setImageURL(resp);
         }
 
         if (file) {
             const formData = new FormData();
             formData.append("file", file);
 
-            upload(formData)
+            upload(formData);
         }
-
-    }, [file])
+    }, [file]);
 
     if (fileError) {
         return (
-            <div id="staticModal" data-modal-backdrop="static" className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-3/4 z-50  bg-white p-12 shadow-lg  border-2 w-2/3 overflow-y-auto">
-                <div>
-                    <button type="button" className="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-4 float-right" onClick={props.handleClose}>
-                        <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                        </svg>
-                        <span className="sr-only">Close modal</span>
-                    </button>
-                </div>
-
+            <Modal handleClose={props.handleClose}>
                 <h1>{fileError}</h1>
-            </div>
-        )
+            </Modal>
+        );
     }
 
     return (
-        <>
-            {/* <!-- Main modal --> */}
-            <div id="staticModal" data-modal-backdrop="static" className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50  bg-white p-12 shadow-lg  border-2 w-2/3 overflow-scroll h-full">
+        <Modal
+            handleClose={props.handleClose}
+            fullHeight={imageURL ? true : false}
+            wideScreen={true}
+        >
+            <>
+                <h2 className="mb-8">Outfit Post</h2>
+                <form className="">
+                    {imageURL ? (
+                        <>
+                            <img src={imageURL} className="w-40" />
 
-                {/* <!-- Modal body --> */}
-                <div>
-                    <button type="button" className="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-4 float-right" onClick={props.handleClose}>
-                        <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                        </svg>
-                        <span className="sr-only">Close modal</span>
-                    </button>
-                    <h2 className="mb-8">Outfit Post</h2>
-                    <form className="">
+                            <button onClick={(e) => {
+                                e.preventDefault()
+                                setFile(null)
+                                setImageURL("")
+                            }}> remove</button>
 
-                        {
-                            imageURL ? <img src={imageURL} className="w-40" /> :
-                                <>
-                                    <label htmlFor="file" className="sr-only">
-                                        Choose an image
-                                    </label>
-                                    <input id="file" type="file" accept="image/*" onChange={handleFileChange} />
-                                </>
-                        }
-
-
-
-
-                        <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="caption">
-                                Outfit Caption
+                        </>
+                    ) : (
+                        <>
+                            <label htmlFor="file" className="sr-only">
+                                Choose an image
                             </label>
-                            <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="caption" type="text" placeholder="Caption"></input>
-                        </div>
+                            <input
+                                id="file"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                            />
+                        </>
+                    )}
 
-                        <div className="mb-4">
-                            <h5>Outfit Items</h5>
-                            <ul>
-                                {
-                                    outfitItems.map((item, index) => {
-                                        index++
+                    {imageURL && (
+                        <>
+                            <div className="mb-4">
+                                <label className="" htmlFor="caption">
+                                    Outfit Caption
+                                </label>
+                                <input
+                                    className="w-full mb-4"
+                                    id="caption"
+                                    type="text"
+                                    placeholder="Caption"
+                                ></input>
+                                <label>Select a tag from the options below or enter your own. Start tags with '#'</label>
+                                <input className="w-full" id="tags" type="text" placeholder="Ex. #athleisure #loungewear"></input>
+                                <div className="flex gap-2 mt-2">
+                                    <button className="bg-pink text-white p-2 rounded">
+                                        #nyfw
+                                    </button>
+                                    <button className="bg-pink text-white p-2 rounded">
+                                        #nyfw
+                                    </button>
+                                    <button className="bg-pink text-white p-2 rounded">
+                                        #nyfw
+                                    </button>
+                                    <button className="bg-pink text-white p-2 rounded">
+                                        #nyfw
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="mb-4">
+                                <h5>Outfit Items</h5>
+                                <ul>
+                                    {outfitItems.map((item, index) => {
+                                        let displayCount = index + 1;
                                         return (
-                                            <li className="shadow-lg border-2 border-off-white my-2 rounded-lg p-4 flex items-start">
-                                                <h6 className="mx-2">{index}.</h6>
-
-
-                                                <div className="w-full">
-                                                    <input className="border rounded w-full py-2 px-3 text-gray-700 my-1" id="caption" type="text" placeholder="Description"></input>
-                                                    <label className="block text-gray-700 text-xs font-sans font-bold mb-2">Please describe the outfit item in a few words.</label>
-
-                                                    <input className="border rounded w-full py-2 px-3 text-gray-700 my-1" id="brand" type="text" placeholder="Brand" ></input>
-
-                                                    <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-4" id="caption" type="text" placeholder="Link"></input>
-
-                                                    <div className="flex">
-
-                                                        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-4" id="caption" type="text" placeholder="Size"></input>
-
-                                                        <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-4" id="caption" type="text" placeholder="Price"></input>
-                                                    </div>
-
-                                                    <div className="flex">
-                                                        <div className="">
-                                                            <input id="default-range" type="range" min="0" max="5" step="0.5" className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700  p-0" onChange={() => true} list="default-range" />
-
-
-
-                                                            <datalist className="flex text-pink w-full -mt-2 p-0 justify-between items-start" id="default-range">
-                                                                <option className="text-xl">|</option>
-                                                                <option className="text-xs">|</option>
-                                                                <option className="text-xl">|</option>
-                                                                <option className="text-xs">|</option>
-
-                                                                <option className="text-xl">|</option>
-                                                                <option className="text-xs">|</option>
-
-                                                                <option className="text-xl">|</option>
-                                                                <option className="text-xs">|</option>
-
-                                                                <option className="text-xl">|</option>
-
-                                                            </datalist>
-                                                            {/* <datalist className="flex text-pink w-full"id="default-range">
-                              <option>0</option>
-                              <option>1</option>
-                              <option>1.5</option>
-                              <option>2</option>
-                              <option>2.5</option>
-                              <option>2.5</option>
-                              <option>2.5</option>
-                              <option>2.5</option>
-                              <option>2.5</option>
-                              <option>2.5</option>
-                            </datalist> */}
-                                                        </div>
-
-
-
-                                                        <textarea className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline my-4" id="brand" placeholder="Review" ></textarea>
-
-                                                    </div>
-
-
-
-
-
+                                            <li className="shadow-lg border-2 border-off-white my-2 rounded-lg p-4">
+                                                <div className="flex items-start justify-between">
+                                                    <h6 className="mx-2">Item #{displayCount}.</h6>
+                                                    <XButton
+                                                        onClick={(e: any) => handleRemoveItem(e, index)}
+                                                    />
                                                 </div>
-
-
-
-
-
-
-
+                                                <OutfitItemForm
+                                                    item={item}
+                                                    index={index}
+                                                    handleItemChange={handleItemChange}
+                                                />
                                             </li>
-                                        )
+                                        );
+                                    })}
+                                </ul>
+                                <button
+                                    onClick={handleAddItem}
+                                    className="p-2 bg-pink text-white rounded float-right"
+                                >
+                                    add item
+                                </button>
+                            </div>
 
-                                    })
-                                }
-                            </ul>
-
-
-
-
-
-
-
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-                                Sign In
+                            <button
+                                className="bg-pink hover:bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mt-8"
+                                type="button"
+                                onClick={handleSubmit}
+                            >
+                                Submit
                             </button>
-                            <button className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" >
-                                Create an Account
-                            </button>
-                        </div>
-                    </form>
+                        </>
+                    )}
+                </form>
+            </>
+        </Modal>
+    );
+}
+
+function OutfitItemForm(props: {
+    item: OutfitItem;
+    index: number;
+    handleItemChange: any;
+}) {
+    return (
+        <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-1">
+                <label>Please describe the item in a few words.</label>
+                <input
+                    className="w-full"
+                    id="description"
+                    type="text"
+                    placeholder="Description"
+                    onChange={(e) => props.handleItemChange(e, props.index)}
+                    value={props.item.description}
+                ></input>
+                <label htmlFor="Email" className="text-pink italic font-normal">
+                    Required
+                </label>
+
+                <label className="mt-2">
+                    What brand is the item or where is it from?
+                </label>
+                <input
+                    className="w-full"
+                    id="brand"
+                    type="text"
+                    placeholder="Brand"
+                ></input>
+                <label htmlFor="Email" className="text-pink italic font-normal">
+                    Required
+                </label>
+
+                <label className="mt-2">Link to the item</label>
+                <input
+                    className="w-full mb-2"
+                    id="caption"
+                    type="text"
+                    placeholder="Link"
+                ></input>
+
+                <div className="flex gap-4">
+                    <div>
+                        <label>Item Size</label>
+                        <input
+                            className="w-full"
+                            id="caption"
+                            type="text"
+                            placeholder="Size"
+                        ></input>
+                    </div>
+
+                    <div>
+                        <label>Purchased Price</label>
+                        <input
+                            className="w-full"
+                            id="caption"
+                            type="text"
+                            placeholder="Price"
+                        ></input>
+                    </div>
                 </div>
             </div>
-        </>
-    )
+
+            <div className="col-span-1">
+                <div className="flex gap-4 items-center">
+                    <div className="w-fit">
+                        <label>Your rating</label>
+                        <input
+                            id="rating"
+                            type="range"
+                            min="1"
+                            max="5"
+                            step="0.5"
+                            className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer  p-0 m-0"
+                            onChange={(e) => props.handleItemChange(e, props.index)}
+                            list="rating"
+                            value={props.item.rating}
+                        />
+                        <datalist
+                            className="flex text-pink -mt-2 p-0 justify-between items-start"
+                            id="rating"
+                        >
+                            <option className="text-xs">|</option>
+                            <option className="text-xs">|</option>
+                            <option className="text-xs">|</option>
+                            <option className="text-xs">|</option>
+                            <option className="text-xs">|</option>
+                        </datalist>
+                    </div>
+                    <h1 className="text-pink">{props.item.rating}</h1>
+                </div>
+
+                <label className="mt-2">Your Review</label>
+                <textarea className="w-full" id="brand" placeholder="Review"></textarea>
+                <label htmlFor="Email" className="text-pink italic font-normal">
+                    Required
+                </label>
+            </div>
+        </div>
+    );
 }

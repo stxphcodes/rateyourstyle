@@ -51,6 +51,7 @@ export function SignIn(props: {handleClose: any}) {
                             Username
                         </label>
                         <input
+                            className="w-full"
                             id="username"
                             type="text"
                             placeholder="Username"
@@ -62,7 +63,7 @@ export function SignIn(props: {handleClose: any}) {
                             Password
                         </label>
                         <input
-                            className=""
+                            className="w-full"
                             id="password"
                             type="password"
                             placeholder="******************"

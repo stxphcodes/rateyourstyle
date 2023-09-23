@@ -19,41 +19,40 @@ export function CreateAccount(props: {handleClose: any}) {
         }
 
         if (event.target.id == "email") {
-            setEmail(event.target.value)
+            setEmail(event.target.value);
         }
     }
 
     async function handleSubmit(event: React.FormEvent<HTMLButtonElement>) {
-        event.preventDefault()
+        event.preventDefault();
 
-        const resp = await PostUser(username, email, password)
+        const resp = await PostUser(username, email, password);
         if (resp instanceof Error) {
-            setError(resp.message)
-            return
+            setError(resp.message);
+            return;
         }
 
-        document.cookie = resp
+        document.cookie = resp;
         location.reload();
         return;
     }
 
     if (error) {
         return (
-            <div><h1>Error</h1><p>{error}</p></div>
-        )
+            <div>
+                <h1>Error</h1>
+                <p>{error}</p>
+            </div>
+        );
     }
 
-
     return (
-
         <Modal handleClose={props.handleClose}>
             <>
                 <h2 className="mb-8">Create an Account</h2>
                 <form className="">
                     <div className="mb-4">
-                        <label htmlFor="Email">
-                            Email
-                        </label>
+                        <label htmlFor="Email">Email</label>
                         <input
                             className="w-full"
                             id="email"
@@ -62,6 +61,9 @@ export function CreateAccount(props: {handleClose: any}) {
                             onChange={handleInputChange}
                             value={email}
                         />
+                        <label htmlFor="Email" className="text-pink italic font-normal">
+                            Required
+                        </label>
                     </div>
                     <div className="mb-4">
                         <label className="" htmlFor="username">
@@ -75,6 +77,9 @@ export function CreateAccount(props: {handleClose: any}) {
                             onChange={handleInputChange}
                             value={username}
                         />
+                        <label htmlFor="Email" className="text-pink italic font-normal">
+                            Required
+                        </label>
                     </div>
                     <div className="mb-6">
                         <label className="" htmlFor="password">
@@ -88,24 +93,23 @@ export function CreateAccount(props: {handleClose: any}) {
                             onChange={handleInputChange}
                             value={password}
                         />
-                        <p className="text-red-500 text-xs italic">Please choose a password.</p>
+                        <label htmlFor="Email" className="text-pink italic font-normal">
+                            Required
+                        </label>
                     </div>
 
                     <div className="flex items-center justify-between">
-                        <button className="bg-pink hover:bg-black text-white font-bold py-2 px-4 rounded" type="submit"
-                            onClick={handleSubmit}>
+                        <button
+                            className="bg-pink hover:bg-black text-white font-bold py-2 px-4 rounded"
+                            type="submit"
+                            onClick={handleSubmit}
+                        >
                             Create Account
                         </button>
                     </div>
                 </form>
-
-
             </>
-
-
-
         </Modal>
-
 
         // <>
         //     {/* <!-- Main modal --> */}
@@ -171,5 +175,5 @@ export function CreateAccount(props: {handleClose: any}) {
         //         </div>
         //     </div>
         // </>
-    )
+    );
 }

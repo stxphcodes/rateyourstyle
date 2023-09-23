@@ -3,24 +3,26 @@
 @tailwind utilities;
 
 label {
-  font-size: 14px;
+  font-family: 'Arial';
+  font-size: 12px;
   font-weight: 600;
   margin-bottom: 4px;
   display: block;
 }
 
-input {
+input, textarea {
   padding: 8px;
-  border: 2px solid black;
+  border: 1.5px solid black;
   color: grey;
   border-radius: 5px;
 }
 
-input:focus {
+input:focus, textarea:focus {
   border: 2px solid #f0789e;
   color: black;
   outline: none;
 }
+
 
 body {
   font-family:'Cambria';

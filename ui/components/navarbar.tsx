@@ -47,9 +47,7 @@ export function Navbar(props: {cookie: string}) {
 					</button>
 				</div>
 				<div className="float-right">
-					{props.cookie && error ? (
-						<div>Error userinfo </div>
-					) : username ? (
+					{username ? (
 						<>
 							<button
 								onClick={() => setShowPostOutfitModal(true)}

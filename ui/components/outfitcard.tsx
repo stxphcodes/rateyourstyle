@@ -8,7 +8,7 @@ export function OutfitCard(props: {data: Outfit}) {
 
     return (
         <>
-            <div className="w-fit shadow-md p-4 bg-off-white rounded-md my-4 max-h-card overflow-auto">
+            <div className="w-fit shadow-md p-4 bg-off-white rounded-md my-4 max-h-card overflow-auto border-2 border-off-white">
                 <div className="grid grid-cols-4 gap-4 object-contain">
                     <div className="col-span-1">
                         <div className="relative">
@@ -97,7 +97,7 @@ export function OutfitCard(props: {data: Outfit}) {
             </div>
 
             {expandImage && (
-                <Modal handleClose={() => setExpandImage(false)}>
+                <Modal handleClose={() => setExpandImage(false)} fullHeight={true}>
                     <img src={props.data.picture_url}></img>
                 </Modal>
             )}
