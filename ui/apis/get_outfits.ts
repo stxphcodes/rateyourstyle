@@ -17,6 +17,7 @@ export type Outfit = {
   description: string;
   style_tags: string[];
   items: OutfitItem[];
+  private: boolean;
 };
 
 export async function GetOutfits(): Promise<Outfit[] | Error> {

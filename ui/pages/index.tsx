@@ -6,6 +6,7 @@ import {GetOutfits, Outfit} from '../apis/get_outfits';
 import {Navbar} from '../components/navarbar';
 import {OutfitCard} from '../components/outfitcard';
 import Searchbar from '../components/searchbar';
+import { Campaign, GetCampaigns } from "../apis/get_campaigns";
 
 type DiscoverItem = {
     tag: string;
@@ -16,7 +17,7 @@ type DiscoverItem = {
 };
 
 type Props = {
-    data: DiscoverItem[] | null;
+    data: Campaign[] | null;
     cookie: string;
     error: string | null;
     outfits: Outfit[] | null;
@@ -33,24 +34,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let cookie = context.req.cookies["rys-login"];
     props.cookie = cookie ? cookie : "";
 
-    await fetch("http://localhost:8000/discover")
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("response not ok");
-            }
-
-            return response.json();
-        })
-        .then((data: DiscoverItem[]) => {
-            props.data = data;
-        })
-        .catch((err: Error) => {
-            props.error = err.message;
-        });
-
-    if (props.error) {
+    const campaignResp = await GetCampaigns();
+    if (campaignResp instanceof Error) {
+        props.error = campaignResp.message;
         return {props};
     }
+
+    props.data = campaignResp;
 
     const resp = await GetOutfits();
     if (resp instanceof Error) {
@@ -64,11 +54,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 function Home({data, cookie, outfits, error}: Props) {
+    console.log("this is outfits")
+    console.log(outfits)
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
     const [searchInput, setSearchInput] = useState<string>("");
 
     function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
         setSearchInput(event.target.value);
+    }
+
+    if (error) {
+        return (
+            <div>error {error} </div>
+        )
     }
 
     return (
@@ -101,14 +99,15 @@ function Home({data, cookie, outfits, error}: Props) {
                     <div className="grid grid-cols-4 gap-4 mt-4">
                         {data?.map((item) => (
                             <div
-                                className={`w-full h-40 text-white p-4 rounded-lg`}
+                                className={`w-full h-40 text-white p-4 rounded-lg overflow-y-scroll`}
                                 style={{backgroundColor: `${item.background_img}`}}
                                 key={item.tag}
                                 onClick={() => {
                                     setSearchTerms([...searchTerms, item.tag]);
                                 }}
                             >
-                                <h2>#{item.tag}</h2>
+                                <h2>{item.tag}</h2>
+                                <p>Ends: {item.date_ending}</p>
                                 <p>{item.description}</p>
                             </div>
                         ))}

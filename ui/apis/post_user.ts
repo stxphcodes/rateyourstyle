@@ -14,8 +14,7 @@ export async function PostUser(
             password: password
         }),
         headers: { "content-type": "application/json" },
-    })
-        .then((response) => {
+    }).then((response) => {
             if (!response.ok) {
                 throw new Error("response not ok");
             }

@@ -105,8 +105,8 @@ func run() error {
 
 	mux.GET("/cookie", handler.GetCookie())
 
-	mux.GET("/discover", func(ctx echo.Context) error {
-		bytes, err := os.ReadFile("data/discover.json")
+	mux.GET("/campaigns", func(ctx echo.Context) error {
+		bytes, err := os.ReadFile("data/campaigns.json")
 		if err != nil {
 			return ctx.JSON(500, err.Error())
 		}

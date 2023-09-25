@@ -1,6 +1,6 @@
 import {useState} from 'react';
 
-import {Outfit} from '../pages/api/types';
+import {Outfit} from '../apis/get_outfits';
 import {Modal} from './modals';
 
 export function OutfitCard(props: {data: Outfit}) {

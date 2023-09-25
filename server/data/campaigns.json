@@ -1,0 +1,35 @@
+[
+    {
+        "tag": "#nike_dunks",
+        "date_starting": "20231001",
+        "date_ending": "20231031",
+        "ended": false,
+        "description": "The Nike Dunks are one of the most popular and multifaceted pair of sneakers this year. To apply to this campaign, post an outfit wearing your Nike Dunks and tag it with #nike_dunk. The 3 outfits with the highest number of reviews at the end of this campaign will receive $100 Nike gift cards.",
+        "background_img": "#039776"
+    },
+    {
+        "tag": "#wedding_guest",
+        "date_starting": "20231001",
+        "date_ending": "20231201",
+        "ended": false,
+        "description": "We love celebrating love, and we also love an opportunity to dress to the nines. To apply to this campaign, post the outfit that you wore as a wedding guest! One outfit will be selected at random to win a $100 gift card to one of the brands listed in their Outfit.",
+        "background_img": "#3870b6"
+    },
+    {
+        "tag": "#fall_fit",
+        "date_starting": "20231001",
+        "date_ending": "20231201",
+        "ended": false,
+        "description": "outfits from love is blind season 4",
+        "background_img": "#691383"
+    },
+    {
+        "tag": "#halloween",
+        "date_starting": "20231001",
+        "date_ending": "20231107",
+        "ended": false,
+        "description": "wedding guest fits",
+        "background_img": "#e63b2f"
+
+    }
+]

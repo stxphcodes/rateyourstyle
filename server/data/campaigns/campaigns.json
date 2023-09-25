@@ -1,0 +1,39 @@
+[
+    {
+        "tag": "#nike_dunks",
+        "date_starting": "",
+        "date_ending": "",
+        "ended": false,
+        "description": "posts with the highest rating count",
+        "background_img": "#039776",
+        "outfit_ids": []
+    },
+    {
+        "tag": "#wedding_guest",
+        "date_starting": "",
+        "date_ending": "",
+        "ended": false,
+        "description": "new york fashion week 2023",
+        "background_img": "#3870b6",
+        "outfit_ids": []
+    },
+    {
+        "tag": "#fall_fit",
+        "date_starting": "",
+        "date_ending": "",
+        "ended": false,
+        "description": "outfits from love is blind season 4",
+        "background_img": "#691383",
+        "outfit_ids": []
+    },
+    {
+        "tag": "#loungewear",
+        "date_starting": "",
+        "date_ending": "",
+        "ended": false,
+        "description": "wedding guest fits",
+        "background_img": "#e63b2f",
+        "outfit_ids": []
+
+    }
+]
