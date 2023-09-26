@@ -13,7 +13,7 @@ import (
 
 type OutfitItem struct {
 	Brand       string      `json:"brand"`
-	URL         string      `json:"url"`
+	Link        string      `json:"link"`
 	Description string      `json:"description"`
 	Size        string      `json:"size"`
 	Price       string      `json:"price"`

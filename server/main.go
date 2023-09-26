@@ -98,11 +98,6 @@ func run() error {
 
 	mux.GET("/outfits", handler.GetOutfits())
 
-	mux.GET("/imgs/:path", func(ctx echo.Context) error {
-		img := ctx.Param("path")
-		return ctx.File(`data/imgs/` + img)
-	})
-
 	mux.GET("/cookie", handler.GetCookie())
 
 	mux.GET("/campaigns", func(ctx echo.Context) error {
@@ -126,6 +121,8 @@ func run() error {
 	mux.POST("/user", handler.PostUser())
 
 	mux.POST("/image", handler.PostImage())
+
+	mux.POST("/outfit", handler.PostOutfit())
 
 	return mux.Start(cfg.HttpAddr)
 }

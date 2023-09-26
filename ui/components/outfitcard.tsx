@@ -32,7 +32,7 @@ export function OutfitCard(props: {data: Outfit}) {
                                 <div className="col-span-1">
                                     <h3>{props.data.title}</h3>
                                     <p>date: {props.data.date}</p>
-                                    <p>modeled by: {props.data.user_id}</p>
+                                    <p>uploaded by: {props.data.user_id}</p>
                                 </div>
                                 <div className="col-span-2">
                                     <div className="flex items-center">

@@ -178,13 +178,13 @@ function Home({data, cookie, username, outfits, error}: Props) {
                     )}
                 </section>
 
-                <section>
+                <section >
                     {outfits &&
                         outfits.map((item) => <OutfitCard data={item} key={item.id} />)}
                 </section>
             </main>
             <Footer />
-        </>
+            </>
     );
 }
 

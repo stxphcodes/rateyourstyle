@@ -3,10 +3,12 @@ import {GetServerSideProps} from 'next';
 import {Campaign, GetCampaigns} from '../apis/get_campaigns';
 import {Footer} from '../components/footer';
 import {Navbar} from '../components/navarbar';
+import { GetUsername } from '../apis/get_user';
 
 type Props = {
     campaigns: Campaign[] | null;
     cookie: string;
+    username: string;
     error: string | null;
 };
 
@@ -14,6 +16,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
         campaigns: null,
         cookie: "",
+        username: "",
         error: null,
     };
 
@@ -28,13 +31,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     props.campaigns = resp;
 
+    if (cookie) {
+        const usernameResp = await GetUsername(cookie);
+        if (!(usernameResp instanceof Error)) {
+            props.username = usernameResp;
+        }
+    }
+
     return {props};
 };
 
-function Campaigns({campaigns, cookie, error}: Props) {
+function Campaigns({campaigns, cookie, username, error}: Props) {
     return (
         <>
-            <Navbar cookie={cookie} />
+            <Navbar cookie={cookie} username={username}/>
 
             <main className="mt-6 p-8">
                 <section className="my-4">
@@ -58,7 +68,31 @@ function Campaigns({campaigns, cookie, error}: Props) {
                 <section className="my-8">
                     <h1>Active Campaigns</h1>
 
-                    <div className="grid grid-cols-2 gap-4 mt-4">
+                    {/* {campaigns?.map((item) => (
+                            <div
+                                className={`w-3/4  shadow rounded-lg h-fit my-2 `}
+                                // style={{color: `${item.background_img}`}}
+                                key={item.tag}
+                            >
+                                <h2 className="p-2 text-white rounded" style={{backgroundColor: `${item.background_img}`}}>{item.tag}</h2>
+                                <p className="p-2"> Ends on: {item.date_ending}</p>
+                                <p className="mt-4 p-2">{item.description}</p>
+                            </div>
+                        ))} */}
+
+                    {campaigns?.map((item) => (
+                            <div
+                                className={`w-3/4 h-40 text-white p-4 rounded-lg h-fit my-2`}
+                                style={{backgroundColor: `${item.background_img}`}}
+                                key={item.tag}
+                            >
+                                <h2>{item.tag}</h2>
+                                <p>Ends on: {item.date_ending}</p>
+                                <p className="mt-4">{item.description}</p>
+                            </div>
+                        ))}
+
+                    {/* <div className="grid grid-cols-2 gap-4 mt-4">
                         {campaigns?.map((item) => (
                             <div
                                 className={`w-full h-40 text-white p-4 rounded-lg h-fit`}
@@ -70,7 +104,7 @@ function Campaigns({campaigns, cookie, error}: Props) {
                                 <p className="mt-4">{item.description}</p>
                             </div>
                         ))}
-                    </div>
+                    </div> */}
                 </section>
                 <section>
                     <h1>Create a Campaign</h1>

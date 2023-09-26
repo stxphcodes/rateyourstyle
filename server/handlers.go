@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"math/rand"
@@ -60,8 +59,7 @@ func (h Handler) GetCookie() echo.HandlerFunc {
 		}
 
 		ctx.SetCookie(&http.Cookie{
-			Domain:   ".app.localhost",
-			Name:     "rys_user_id",
+			Name:     "rys-login",
 			Value:    string(b),
 			Expires:  expiry,
 			HttpOnly: false,
@@ -89,7 +87,7 @@ func (h Handler) PostSignIn() echo.HandlerFunc {
 		}
 
 		for _, user := range users {
-			if strings.ToLower(user.Username) == strings.ToLower(u.Username) {
+			if strings.EqualFold(user.Username, u.Username) {
 				ok := user.Password == u.Password
 				if !ok {
 					return ctx.String(403, "wrong password")
@@ -149,7 +147,6 @@ func (h Handler) PostImage() echo.HandlerFunc {
 		// make image public
 		if err := obj.ACL().Set(ctx.Request().Context(), storage.AllUsers, storage.RoleReader); err != nil {
 			log.Println(err.Error())
-			fmt.Println("line 124")
 			return ctx.String(500, err.Error())
 		}
 
@@ -160,14 +157,44 @@ func (h Handler) PostImage() echo.HandlerFunc {
 
 func (h Handler) PostOutfit() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.String(500, err.Error())
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println(err.Error())
+			return ctx.String(500, err.Error())
+		}
+
 		var data Outfit
 		if err := ctx.Bind(&data); err != nil {
+			log.Println(err.Error())
 			return ctx.String(500, "")
 		}
 
-		// bucketHandler := h.gcs.client.Bucket(h.gcs.bucket)
+		data.UserId = userId
+		data.Date = time.Now().String()
 
-		return nil
+		obj := h.Gcs.Bucket.Object(filepath.Join("data", "outfits", data.Id+".json"))
+
+		writer := obj.NewWriter(ctx.Request().Context())
+		defer writer.Close()
+
+		if err := json.NewEncoder(writer).Encode(data); err != nil {
+			log.Println(err.Error())
+			return ctx.String(500, "")
+		}
+
+		writer.Close()
+
+		// update indices
+		h.OutfitIndices.Outfits[data.Id] = struct{}{}
+		h.OutfitIndices.UserOutfit[userId] = append(h.OutfitIndices.UserOutfit[userId], data.Id)
+
+		return ctx.NoContent(201)
 	}
 }
 

@@ -4,36 +4,35 @@ import {GetUsername} from '../apis/get_user';
 import {CreateAccount} from './modals/createaccount';
 import {SignIn} from './modals/signin';
 
-export function Navbar(props: {cookie: string, username?: string}) {
+export function Navbar(props: {cookie: string, username: string}) {
 	const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
 	const [showCreateAccountModal, setShowCreateAccountModal] =
 		useState<boolean>(false);
 	const [showPostOutfitModal, setShowPostOutfitModal] =
 		useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
-	const [username, setUsername] = useState<string | null>(null);
 
-	useEffect(() => {
-		if (!props.cookie || props.username) {
-			return;
-		}
+	// useEffect(() => {
+	// 	if (!props.cookie || props.username) {
+	// 		return;
+	// 	}
 
-		async function fetchData() {
-			const resp = await GetUsername(props.cookie);
-			if (resp instanceof Error) {
-				setError(resp.message);
-				return;
-			}
+	// 	async function fetchData() {
+	// 		const resp = await GetUsername(props.cookie);
+	// 		if (resp instanceof Error) {
+	// 			setError(resp.message);
+	// 			return;
+	// 		}
 
-			setUsername(resp);
-		}
+	// 		setUsername(resp);
+	// 	}
 
-		fetchData();
-	}, []);
+	// 	fetchData();
+	// }, []);
 
 	return (
 		<>
-			<div className="mb-20 shadow-md px-4 py-2 fixed top-0 w-screen bg-white flex flex-wrap items-center justify-between">
+			<div className="mb-20 shadow-md px-4 py-2  top-0 w-screen bg-white flex flex-wrap items-center justify-between fixed">
 				<div>
 					<a href="/" className="mx-2">
 						Home
@@ -48,7 +47,7 @@ export function Navbar(props: {cookie: string, username?: string}) {
 					</button> */}
 				</div>
 				<div className="float-right">
-					{username ? (
+					{props.username ? (
 						<>
 							<button
 								onClick={() => setShowPostOutfitModal(true)}
@@ -56,7 +55,7 @@ export function Navbar(props: {cookie: string, username?: string}) {
 							>
 								Post an Outfit
 							</button>
-							<a href="/">{username}</a>
+							<a href="/">{props.username}</a>
 						</>
 					) : (
 						<>
