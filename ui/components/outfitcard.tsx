@@ -5,6 +5,9 @@ import {Modal} from './modals';
 
 export function OutfitCard(props: {data: Outfit}) {
     const [expandImage, setExpandImage] = useState<boolean>(false);
+    const [submitRating, setSubmitRating] = useState<boolean>(false);
+
+    const [userItemRating, setUserItemRating] = useState<number>(2.5);
 
     return (
         <>
@@ -33,19 +36,63 @@ export function OutfitCard(props: {data: Outfit}) {
                                 </div>
                                 <div className="col-span-2">
                                     <div className="flex items-center">
-                                        {/* <div className="px-2 py-1 border border-pink text-pink rounded-full text-lg">
-                                        {props.data.audience_rating}
-                                    </div> */}
-                                        <h3 className="text-pink">4.2</h3>
+                                        <h1 className="text-pink">4.2</h1>
                                         <div className="mx-2">from 20 ratings</div>
                                     </div>
 
                                     <div className="flex my-2">
-                                        <h3 className="text-pink">?</h3>
-                                        {/* <div className="px-4 py-1 border border-pink text-pink rounded-full text-lg">
-                                        ?
-                                    </div> */}
-                                        <div className="mx-2">submit your rating</div>
+                                        {!submitRating ? (
+                                            <div className="flex items-center gap-4">
+                                                <h1 className="text-pink">?</h1>
+                                                <div
+                                                    className="hover:cursor-pointer underline"
+                                                    onClick={() => setSubmitRating(true)}
+                                                >
+                                                    submit your rating
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="flex gap-4 items-center">
+                                                    <h1 className="text-pink">{userItemRating}</h1>
+                                                    <div className="w-fit">
+                                                        <label>Your rating</label>
+                                                        <input
+                                                            id="rating"
+                                                            type="range"
+                                                            min="1"
+                                                            max="5"
+                                                            step="0.5"
+                                                            className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer  p-0 m-0"
+                                                            onChange={(e) =>
+                                                                setUserItemRating(Number(e.target.value))
+                                                            }
+                                                            list="rating"
+                                                            value={userItemRating}
+                                                        />
+                                                        <datalist
+                                                            className="flex text-pink -mt-2 p-0 justify-between items-start"
+                                                            id="rating"
+                                                        >
+                                                            <option className="text-xs">|</option>
+                                                            <option className="text-xs">|</option>
+                                                            <option className="text-xs">|</option>
+                                                            <option className="text-xs">|</option>
+                                                            <option className="text-xs">|</option>
+                                                        </datalist>
+                                                    </div>
+                                                    <button
+                                                        className="bg-pink text-white p-1 rounded hover:bg-black"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setSubmitRating(false);
+                                                        }}
+                                                    >
+                                                        submit
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -78,9 +125,7 @@ export function OutfitCard(props: {data: Outfit}) {
 
                                         <div className="col-span-2">
                                             <div className="flex items-start">
-                                                {/* <div className="px-2 py-1.5 border rounded-full text-pink border-pink"> */}
                                                 <h3 className="text-pink ">{item.rating}</h3>
-                                                {/* </div> */}
 
                                                 <div className="mx-2">
                                                     <span className="">"</span>

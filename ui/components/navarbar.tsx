@@ -2,10 +2,9 @@ import {useEffect, useState} from 'react';
 
 import {GetUsername} from '../apis/get_user';
 import {CreateAccount} from './modals/createaccount';
-import {PostOutfit} from './modals/postoutfit';
 import {SignIn} from './modals/signin';
 
-export function Navbar(props: {cookie: string}) {
+export function Navbar(props: {cookie: string, username?: string}) {
 	const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
 	const [showCreateAccountModal, setShowCreateAccountModal] =
 		useState<boolean>(false);
@@ -15,7 +14,7 @@ export function Navbar(props: {cookie: string}) {
 	const [username, setUsername] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (!props.cookie) {
+		if (!props.cookie || props.username) {
 			return;
 		}
 
@@ -39,13 +38,14 @@ export function Navbar(props: {cookie: string}) {
 					<a href="/" className="mx-2">
 						Home
 					</a>
-					<a href="/campaigns" className="">Campaigns</a>
-					<button
+					<a href="/campaigns" className="mx-2">Campaigns</a>
+					<a href="/post-outfit" className="">Post an Outfit</a>
+					{/* <button
 						onClick={() => setShowPostOutfitModal(true)}
 						className="mx-2"
 					>
 						Post an Outfit
-					</button>
+					</button> */}
 				</div>
 				<div className="float-right">
 					{username ? (
@@ -80,12 +80,12 @@ export function Navbar(props: {cookie: string}) {
 			{showCreateAccountModal && (
 				<CreateAccount handleClose={() => setShowCreateAccountModal(false)} />
 			)}
-			{showPostOutfitModal && (
+			{/* {showPostOutfitModal && (
 				<PostOutfit
 					cookie={props.cookie}
 					handleClose={() => setShowPostOutfitModal(false)}
 				/>
-			)}
+			)} */}
 		</>
 	);
 }

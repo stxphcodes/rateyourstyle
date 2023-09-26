@@ -2,11 +2,13 @@ import type {NextPage} from "next";
 import {GetServerSideProps} from 'next';
 import {useState} from 'react';
 
+import {Campaign, GetCampaigns} from '../apis/get_campaigns';
 import {GetOutfits, Outfit} from '../apis/get_outfits';
+import {GetUsername} from '../apis/get_user';
+import {Footer} from '../components/footer';
 import {Navbar} from '../components/navarbar';
 import {OutfitCard} from '../components/outfitcard';
 import Searchbar from '../components/searchbar';
-import { Campaign, GetCampaigns } from "../apis/get_campaigns";
 
 type DiscoverItem = {
     tag: string;
@@ -19,6 +21,7 @@ type DiscoverItem = {
 type Props = {
     data: Campaign[] | null;
     cookie: string;
+    username: string;
     error: string | null;
     outfits: Outfit[] | null;
 };
@@ -27,6 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
         data: null,
         cookie: "",
+        username: "",
         error: null,
         outfits: null,
     };
@@ -50,28 +54,41 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     props.outfits = resp;
 
+    if (cookie) {
+        const usernameResp = await GetUsername(cookie);
+        if (!(usernameResp instanceof Error)) {
+            props.username = usernameResp;
+        }
+    }
+
     return {props};
 };
 
-function Home({data, cookie, outfits, error}: Props) {
-    console.log("this is outfits")
-    console.log(outfits)
+function Home({data, cookie, username, outfits, error}: Props) {
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
     const [searchInput, setSearchInput] = useState<string>("");
+    const [readMore, setReadMore] = useState(() => {
+        let intialState =
+            data &&
+            data.map((item) => ({
+                tag: item.tag,
+                readMore: false,
+            }));
+
+        return intialState;
+    });
 
     function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
         setSearchInput(event.target.value);
     }
 
     if (error) {
-        return (
-            <div>error {error} </div>
-        )
+        return <div>error {error} </div>;
     }
 
     return (
         <>
-            <Navbar cookie={cookie} />
+            <Navbar cookie={cookie} username={username} />
 
             <main className="mt-6 p-8">
                 <section className="my-4">
@@ -99,16 +116,40 @@ function Home({data, cookie, outfits, error}: Props) {
                     <div className="grid grid-cols-4 gap-4 mt-4">
                         {data?.map((item) => (
                             <div
-                                className={`w-full h-40 text-white p-4 rounded-lg overflow-y-scroll`}
+                                className={`w-full  text-white p-4 rounded-lg h-fit`}
                                 style={{backgroundColor: `${item.background_img}`}}
                                 key={item.tag}
-                                onClick={() => {
-                                    setSearchTerms([...searchTerms, item.tag]);
-                                }}
                             >
-                                <h2>{item.tag}</h2>
-                                <p>Ends: {item.date_ending}</p>
-                                <p>{item.description}</p>
+                                <h2
+                                    className="hover:cursor-pointer"
+                                    onClick={() => {
+                                        setSearchTerms([...searchTerms, item.tag]);
+                                    }}
+                                >
+                                    {item.tag}
+                                </h2>
+                                <p className="mb-2">Ends: {item.date_ending}</p>
+                                {readMore?.filter((i) => i.tag == item.tag)[0].readMore && (
+                                    <p className="mb-4">{item.description}</p>
+                                )}
+                                <a
+                                    className="hover:cursor-pointer"
+                                    onClick={() => {
+                                        readMore?.forEach((i, index) => {
+                                            if (i.tag == item.tag) {
+                                                let copy = [...readMore];
+                                                copy[index].readMore = !copy[index].readMore;
+                                                setReadMore(copy);
+                                                return;
+                                            }
+                                        });
+                                    }}
+                                >
+                                    Read{" "}
+                                    {readMore?.filter((i) => i.tag == item.tag)[0].readMore
+                                        ? "less"
+                                        : "more"}
+                                </a>
                             </div>
                         ))}
                     </div>
@@ -142,6 +183,7 @@ function Home({data, cookie, outfits, error}: Props) {
                         outfits.map((item) => <OutfitCard data={item} key={item.id} />)}
                 </section>
             </main>
+            <Footer />
         </>
     );
 }
