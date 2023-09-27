@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 
@@ -33,8 +32,9 @@ type Outfit struct {
 }
 
 type OutfitIndices struct {
-	Outfits    map[string]struct{}
-	UserOutfit map[string][]string
+	Outfits       map[string]struct{}
+	UserOutfit    map[string][]string
+	PublicOutfits map[string]struct{}
 }
 
 func listAllOutfits(ctx context.Context, bucket *gcs.BucketHandle) ([]string, error) {
@@ -51,6 +51,7 @@ func listAllOutfits(ctx context.Context, bucket *gcs.BucketHandle) ([]string, er
 			break
 		}
 
+		// skip directory
 		if attrs.Name == "data/outfits/" {
 			continue
 		}
@@ -95,13 +96,12 @@ func createOutfitIndices(ctx context.Context, client *gcs.Client, bucket *gcs.Bu
 	}
 
 	indices := &OutfitIndices{
-		Outfits:    make(map[string]struct{}),
-		UserOutfit: make(map[string][]string),
+		Outfits:       make(map[string]struct{}),
+		PublicOutfits: make(map[string]struct{}),
+		UserOutfit:    make(map[string][]string),
 	}
 
 	for _, outfit := range outfits {
-		fmt.Println("reading this otfit")
-		fmt.Println(outfit)
 		obj := bucket.Object(outfit)
 		reader, err := obj.NewReader(ctx)
 
@@ -121,6 +121,10 @@ func createOutfitIndices(ctx context.Context, client *gcs.Client, bucket *gcs.Bu
 		}
 
 		indices.Outfits[outfit] = struct{}{}
+		if !o.Private {
+			indices.PublicOutfits[outfit] = struct{}{}
+		}
+
 		_, ok := indices.UserOutfit[o.UserId]
 		if ok {
 			indices.UserOutfit[o.UserId] = append(indices.UserOutfit[o.UserId], outfit)

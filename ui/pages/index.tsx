@@ -2,6 +2,7 @@ import type {NextPage} from "next";
 import {GetServerSideProps} from 'next';
 import {useState} from 'react';
 
+import {GetReviews, Review} from '../apis/get_reviews';
 import {Campaign, GetCampaigns} from '../apis/get_campaigns';
 import {GetOutfits, Outfit} from '../apis/get_outfits';
 import {GetUsername} from '../apis/get_user';
@@ -10,13 +11,6 @@ import {Navbar} from '../components/navarbar';
 import {OutfitCard} from '../components/outfitcard';
 import Searchbar from '../components/searchbar';
 
-type DiscoverItem = {
-    tag: string;
-    description: string;
-    background_img: any;
-    outfit_ids: string[];
-    cookie: string | null;
-};
 
 type Props = {
     data: Campaign[] | null;
@@ -24,6 +18,7 @@ type Props = {
     username: string;
     error: string | null;
     outfits: Outfit[] | null;
+    reviews: Review[] | null;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -31,6 +26,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         data: null,
         cookie: "",
         username: "",
+        reviews: null,
         error: null,
         outfits: null,
     };
@@ -61,10 +57,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
 
+    const reviewResp = await GetReviews()
+    if (reviewResp instanceof Error) {
+        props.error = reviewResp.message;
+        return {
+            props 
+        }
+    }
+
+    props.reviews = reviewResp
+
     return {props};
 };
 
-function Home({data, cookie, username, outfits, error}: Props) {
+function Home({data, cookie, username, outfits, reviews, error}: Props) {
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
     const [searchInput, setSearchInput] = useState<string>("");
     const [readMore, setReadMore] = useState(() => {
@@ -180,7 +186,7 @@ function Home({data, cookie, username, outfits, error}: Props) {
 
                 <section >
                     {outfits &&
-                        outfits.map((item) => <OutfitCard data={item} key={item.id} />)}
+                        outfits.map((item) => <OutfitCard data={item} key={item.id} reviews={reviews}/>)}
                 </section>
             </main>
             <Footer />

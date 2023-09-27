@@ -1,27 +1,41 @@
-import {useState} from 'react';
+import { useState } from 'react';
 
-import {Outfit} from '../apis/get_outfits';
-import {Modal} from './modals';
+import { Outfit } from '../apis/get_outfits';
+import { Modal } from './modals';
+import { Review } from '../apis/get_reviews';
 
-export function OutfitCard(props: {data: Outfit}) {
+
+function average(arr: number[]) {
+    let sum = 0
+    arr.forEach(item => sum += item)
+
+    return sum / arr.length
+}
+
+export function OutfitCard(props: { data: Outfit, reviews: Review[] | null, username?: string }) {
     const [expandImage, setExpandImage] = useState<boolean>(false);
     const [submitRating, setSubmitRating] = useState<boolean>(false);
 
     const [userItemRating, setUserItemRating] = useState<number>(2.5);
+
+    let relevantReviews = props.reviews ? props.reviews.filter((item) => item.OutfitId == props.data.id) : []
+
+    let ratings = relevantReviews.map(item => Number(item.Rating))
+    let avg = average(ratings)
 
     return (
         <>
             <div className="w-fit shadow-md p-4 bg-off-white rounded-md my-4 max-h-card overflow-auto border-2 border-off-white">
                 <div className="grid grid-cols-4 gap-4 object-contain">
                     <div className="col-span-1">
-                        <div className="relative">
+                        <div className="">
                             <img className="object-contain" src={props.data.picture_url} />
                             <button
-                                className="absolute top-0 right-0 p-2 bg-pink text-white"
+                                className=""
                                 onClick={() => setExpandImage(true)}
                             >
                                 {" "}
-                                expand
+                                [expand img]
                             </button>
                         </div>
                     </div>
@@ -36,8 +50,8 @@ export function OutfitCard(props: {data: Outfit}) {
                                 </div>
                                 <div className="col-span-2">
                                     <div className="flex items-center">
-                                        <h1 className="text-pink">4.2</h1>
-                                        <div className="mx-2">from 20 ratings</div>
+                                        <h1 className="text-pink">{avg}</h1>
+                                        <div className="mx-2">from {relevantReviews.length} ratings</div>
                                     </div>
 
                                     <div className="flex my-2">

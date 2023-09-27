@@ -39,23 +39,11 @@ export function Navbar(props: {cookie: string, username: string}) {
 					</a>
 					<a href="/campaigns" className="mx-2">Campaigns</a>
 					<a href="/post-outfit" className="">Post an Outfit</a>
-					{/* <button
-						onClick={() => setShowPostOutfitModal(true)}
-						className="mx-2"
-					>
-						Post an Outfit
-					</button> */}
 				</div>
 				<div className="float-right">
 					{props.username ? (
 						<>
-							<button
-								onClick={() => setShowPostOutfitModal(true)}
-								className="mx-2"
-							>
-								Post an Outfit
-							</button>
-							<a href="/">{props.username}</a>
+							<a href={`/user/${props.username}`}>{props.username}</a>
 						</>
 					) : (
 						<>

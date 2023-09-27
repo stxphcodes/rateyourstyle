@@ -97,6 +97,7 @@ func run() error {
 	})
 
 	mux.GET("/outfits", handler.GetOutfits())
+	mux.GET("/user/outfits", handler.GetOutfitsByUser())
 
 	mux.GET("/cookie", handler.GetCookie())
 
@@ -115,6 +116,8 @@ func run() error {
 	})
 
 	mux.GET("/username", handler.GetUsername())
+
+	mux.GET("/ratings", handler.GetRatings())
 
 	mux.POST("/signin", handler.PostSignIn())
 
@@ -150,7 +153,13 @@ func initiateIndices(ctx context.Context, h *Handler) error {
 		return err
 	}
 
+	ratingIndices, err := createRatingIndices(ctx, h.Gcs.Client, h.Gcs.Bucket)
+	if err != nil {
+		return err
+	}
+
 	h.UserIndices = userIndices
 	h.OutfitIndices = outfitIndices
+	h.RatingIndices = ratingIndices
 	return nil
 }
