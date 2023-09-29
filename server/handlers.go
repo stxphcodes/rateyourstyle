@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"log"
-	"math/rand"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -24,6 +23,39 @@ type Handler struct {
 	UserIndices   *UserIndices
 	OutfitIndices *OutfitIndices
 	RatingIndices *RatingIndices
+}
+
+func (h Handler) GetCookie() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		user := User{
+			Id:     uuid(),
+			Cookie: uuid(),
+		}
+
+		// read original file
+		users, err := getAllUsers(ctx.Request().Context(), h.Gcs.Bucket)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		// write new user to original file
+		obj := h.Gcs.Bucket.Object("data/users/users.json")
+		writer := obj.NewWriter(ctx.Request().Context())
+		defer writer.Close()
+
+		users = append(users, user)
+		if err := json.NewEncoder(writer).Encode(users); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		// update indices
+		h.UserIndices.CookieId[user.Cookie] = user.Id
+
+		// return user cookie in response
+		return ctx.String(http.StatusCreated, createCookieStr(user.Cookie))
+	}
 }
 
 // only gets public outfits
@@ -51,12 +83,6 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 	}
 }
 
-func (h Handler) GetRatings() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		return ctx.JSON(http.StatusOK, h.RatingIndices.AllRatings)
-	}
-}
-
 func (h Handler) GetOutfitsByUser() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		cookie, err := getCookie(ctx.Request())
@@ -67,25 +93,22 @@ func (h Handler) GetOutfitsByUser() echo.HandlerFunc {
 
 		userId, ok := h.UserIndices.CookieId[cookie]
 		if !ok {
-			if err != nil {
-				log.Println("user id not found for cookie " + cookie)
-				return ctx.NoContent(http.StatusForbidden)
-			}
+			log.Println("user id not found for cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+
 		}
 
 		outfitIds, ok := h.OutfitIndices.UserOutfit[userId]
 		if !ok {
-			if err != nil {
-				log.Println("outfitids not found for user id " + userId)
-				return ctx.NoContent(http.StatusForbidden)
-			}
+			log.Println("outfitids not found for user id " + userId)
+			return ctx.NoContent(http.StatusForbidden)
 		}
 
 		var outfits []*Outfit
 		for _, outfit := range outfitIds {
 			o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, outfit)
 			if err != nil {
-				log.Println("error " + err.Error())
+				log.Println(err.Error())
 				return ctx.NoContent(http.StatusInternalServerError)
 			}
 
@@ -96,40 +119,25 @@ func (h Handler) GetOutfitsByUser() echo.HandlerFunc {
 	}
 }
 
+func (h Handler) GetRatings() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		return ctx.JSON(http.StatusOK, h.RatingIndices.AllRatings)
+	}
+}
+
 func (h *Handler) GetUsername() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		cookie, err := getCookie(ctx.Request())
 		if err != nil {
-			return ctx.String(500, "")
+			return ctx.NoContent(http.StatusBadRequest)
 		}
 
 		username, ok := h.UserIndices.CookieUsername[cookie]
 		if !ok {
-			return ctx.String(500, "")
+			return ctx.NoContent(http.StatusNotFound)
 		}
 
-		return ctx.String(200, username)
-	}
-}
-
-func (h Handler) GetCookie() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		expiry := time.Now().Add(time.Minute * 525600) // 1 year
-
-		b := make([]byte, 16)
-		for i := range b {
-			b[i] = letters[rand.Intn(len(letters))]
-		}
-
-		ctx.SetCookie(&http.Cookie{
-			Name:     "rys-login",
-			Value:    string(b),
-			Expires:  expiry,
-			HttpOnly: false,
-			Secure:   false,
-		})
-
-		return ctx.NoContent(http.StatusOK)
+		return ctx.String(http.StatusOK, username)
 	}
 }
 
@@ -182,6 +190,11 @@ func (h Handler) PostImage() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
+		ext := strings.ToLower(filepath.Ext(file.Filename))
+		if ext != ".jpeg" && ext != ".jpg" && ext != ".png" {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
 		src, err := file.Open()
 		if err != nil {
 			log.Println(err.Error())
@@ -189,7 +202,6 @@ func (h Handler) PostImage() echo.HandlerFunc {
 		}
 		defer src.Close()
 
-		ext := filepath.Ext(file.Filename)
 		filename := filepath.Join("imgs", "outfits", userId, uuid()+ext)
 
 		obj := h.Gcs.Bucket.Object(filename)
@@ -236,8 +248,8 @@ func (h Handler) PostOutfit() echo.HandlerFunc {
 
 		data.UserId = userId
 		data.Date = time.Now().Format("2006-01-02")
-
-		obj := h.Gcs.Bucket.Object(filepath.Join("data", "outfits", data.Id+".json"))
+		path := filepath.Join("data", "outfits", data.Id+".json")
+		obj := h.Gcs.Bucket.Object(path)
 
 		writer := obj.NewWriter(ctx.Request().Context())
 		defer writer.Close()
@@ -252,6 +264,9 @@ func (h Handler) PostOutfit() echo.HandlerFunc {
 		// update indices
 		h.OutfitIndices.Outfits[data.Id] = struct{}{}
 		h.OutfitIndices.UserOutfit[userId] = append(h.OutfitIndices.UserOutfit[userId], data.Id)
+		if !data.Private {
+			h.OutfitIndices.PublicOutfits[data.Id] = struct{}{}
+		}
 
 		return ctx.NoContent(http.StatusCreated)
 	}
@@ -261,8 +276,8 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var data User
 		if err := ctx.Bind(&data); err != nil {
-			log.Println("error retrieving cookie")
-			return ctx.NoContent(http.StatusForbidden)
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusBadRequest)
 		}
 
 		// uniqueness checks
@@ -276,9 +291,6 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 			return ctx.String(http.StatusBadRequest, "username taken")
 		}
 
-		data.Id = uuid()
-		data.Cookie = uuid()
-
 		// read original file
 		users, err := getAllUsers(ctx.Request().Context(), h.Gcs.Bucket)
 		if err != nil {
@@ -286,12 +298,26 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		// write new user to original file
+		// update user in  original file
 		obj := h.Gcs.Bucket.Object("data/users/users.json")
 		writer := obj.NewWriter(ctx.Request().Context())
 		defer writer.Close()
 
-		users = append(users, data)
+		found := false
+		for i, u := range users {
+			if u.Cookie == data.Cookie {
+				users[i].Email = data.Email
+				users[i].Password = data.Password
+				users[i].Username = data.Username
+				found = true
+			}
+		}
+
+		if !found {
+			data.Id = uuid()
+			users = append(users, data)
+		}
+
 		if err := json.NewEncoder(writer).Encode(users); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
@@ -301,10 +327,11 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 		h.UserIndices.Emails[data.Email] = struct{}{}
 		h.UserIndices.Usernames[data.Username] = struct{}{}
 		h.UserIndices.CookieUsername[data.Cookie] = data.Username
+		h.UserIndices.CookieId[data.Cookie] = data.Id
+		h.UserIndices.IdUsername[data.Id] = data.Username
 
 		// return user cookie in response
 		return ctx.String(http.StatusCreated, createCookieStr(data.Cookie))
-
 	}
 }
 
@@ -350,7 +377,6 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 		}
 
 		obj := h.Gcs.Bucket.Object(filepath.Join("data", "ratings", data.OutfitId+".json"))
-
 		writer := obj.NewWriter(ctx.Request().Context())
 		defer writer.Close()
 
@@ -362,8 +388,7 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 		writer.Close()
 
 		// update indices
-		h.OutfitIndices.Outfits[data.Id] = struct{}{}
-		h.OutfitIndices.UserOutfit[userId] = append(h.OutfitIndices.UserOutfit[userId], data.Id)
-
+		h.RatingIndices.AllRatings = append(h.RatingIndices.AllRatings, &data)
+		return ctx.NoContent(http.StatusCreated)
 	}
 }

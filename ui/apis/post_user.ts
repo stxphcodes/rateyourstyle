@@ -1,40 +1,39 @@
 export async function PostUser(
-    username: string,
-    email: string,
-    password: string
+  cookie: string,
+  username: string,
+  email: string,
+  password: string
 ): Promise<string | Error> {
-    let error: Error | null = null
-    let cookie: string = ""
+  let error: Error | null = null;
 
-    try {
-        const resp = await fetch("http://localhost:8000/user", {
-            method: "POST",
-            body: JSON.stringify({
-                username: username,
-                email: email,
-                password: password
-            }),
-            headers: { "content-type": "application/json" },
-        })
+  try {
+    const resp = await fetch("http://localhost:8000/user", {
+      method: "POST",
+      body: JSON.stringify({
+        username: username,
+        email: email,
+        password: password,
+        cookie: cookie,
+      }),
+      headers: {"content-type": "application/json"},
+    });
 
-        const data = await resp.text()
+    const data = await resp.text();
 
-        if (resp.ok) {
-            cookie = data
-        } else {
-            throw new Error(data)
-        }
-
-    } catch (e) {
-        if (e instanceof Error) {
-            error = e
-        }
+    if (resp.ok) {
+      cookie = data;
+    } else {
+      throw new Error(data);
     }
-
-    if (error) {
-        return error
+  } catch (e) {
+    if (e instanceof Error) {
+      error = e;
     }
+  }
 
-    return cookie
+  if (error) {
+    return error;
+  }
 
+  return cookie;
 }

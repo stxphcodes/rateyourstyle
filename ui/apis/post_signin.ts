@@ -5,7 +5,7 @@ export async function PostSignIn(
   let error: Error | null = null;
   let cookie: string = "";
 
-  await fetch("http://localhost:8000/user", {
+  await fetch("http://localhost:8000/signin", {
     method: "POST",
     body: JSON.stringify({
       username: username,

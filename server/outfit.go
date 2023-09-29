@@ -38,7 +38,6 @@ type OutfitIndices struct {
 }
 
 func listAllOutfits(ctx context.Context, bucket *gcs.BucketHandle) ([]string, error) {
-
 	outfits := []string{}
 	objIter := bucket.Objects(ctx, &gcs.Query{
 		Versions: false,
@@ -67,7 +66,8 @@ func listAllOutfits(ctx context.Context, bucket *gcs.BucketHandle) ([]string, er
 	return outfits, nil
 }
 
-func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, path string) (*Outfit, error) {
+func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, id string) (*Outfit, error) {
+	path := "data/outfits/" + id + ".json"
 	obj := bucket.Object(path)
 	reader, err := obj.NewReader(ctx)
 
@@ -120,16 +120,16 @@ func createOutfitIndices(ctx context.Context, client *gcs.Client, bucket *gcs.Bu
 			return nil, err
 		}
 
-		indices.Outfits[outfit] = struct{}{}
+		indices.Outfits[o.Id] = struct{}{}
 		if !o.Private {
-			indices.PublicOutfits[outfit] = struct{}{}
+			indices.PublicOutfits[o.Id] = struct{}{}
 		}
 
 		_, ok := indices.UserOutfit[o.UserId]
 		if ok {
-			indices.UserOutfit[o.UserId] = append(indices.UserOutfit[o.UserId], outfit)
+			indices.UserOutfit[o.UserId] = append(indices.UserOutfit[o.UserId], o.Id)
 		} else {
-			indices.UserOutfit[o.UserId] = []string{outfit}
+			indices.UserOutfit[o.UserId] = []string{o.Id}
 		}
 	}
 

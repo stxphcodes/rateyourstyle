@@ -1,34 +1,47 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 
-import {GetUsername} from '../apis/get_user';
-import {CreateAccount} from './modals/createaccount';
-import {SignIn} from './modals/signin';
+import { GetCookie } from '../apis/get_cookie';
+import { GetUsername } from '../apis/get_user';
+import { CreateAccount } from './modals/createaccount';
+import { SignIn } from './modals/signin';
 
-export function Navbar(props: {cookie: string, username: string}) {
+export function Navbar(props: {cookie: string; user?: string}) {
 	const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
 	const [showCreateAccountModal, setShowCreateAccountModal] =
 		useState<boolean>(false);
 	const [showPostOutfitModal, setShowPostOutfitModal] =
 		useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
+	const [username, setUsername] = useState<string>(
+		props.user ? props.user : ""
+	);
 
-	// useEffect(() => {
-	// 	if (!props.cookie || props.username) {
-	// 		return;
-	// 	}
+	useEffect(() => {
+		async function getcookie() {
+			const resp = await GetCookie();
+			if (resp instanceof Error) {
+				setError(resp.message);
+				return;
+			}
 
-	// 	async function fetchData() {
-	// 		const resp = await GetUsername(props.cookie);
-	// 		if (resp instanceof Error) {
-	// 			setError(resp.message);
-	// 			return;
-	// 		}
+			// set cookie in browser
+			document.cookie = resp;
+		}
 
-	// 		setUsername(resp);
-	// 	}
+		async function getusername() {
+			const resp = await GetUsername(props.cookie);
+			if (!(resp instanceof Error)) {
+				setUsername(resp);
+				return;
+			}
+		}
 
-	// 	fetchData();
-	// }, []);
+		if (!props.cookie) {
+			getcookie();
+		} else {
+			!username && getusername();
+		}
+	}, []);
 
 	return (
 		<>
@@ -37,13 +50,17 @@ export function Navbar(props: {cookie: string, username: string}) {
 					<a href="/" className="mx-2">
 						Home
 					</a>
-					<a href="/campaigns" className="mx-2">Campaigns</a>
-					<a href="/post-outfit" className="">Post an Outfit</a>
+					<a href="/campaigns" className="mx-2">
+						Campaigns
+					</a>
+					<a href="/post-outfit" className="">
+						Post an Outfit
+					</a>
 				</div>
 				<div className="float-right">
-					{props.username ? (
+					{username ? (
 						<>
-							<a href={`/user/${props.username}`}>{props.username}</a>
+							<a href={`/user/${username}`}>{username}</a>
 						</>
 					) : (
 						<>
@@ -65,7 +82,10 @@ export function Navbar(props: {cookie: string, username: string}) {
 				<SignIn handleClose={() => setShowSignInModal(false)} />
 			)}
 			{showCreateAccountModal && (
-				<CreateAccount handleClose={() => setShowCreateAccountModal(false)} />
+				<CreateAccount
+					cookie={props.cookie}
+					handleClose={() => setShowCreateAccountModal(false)}
+				/>
 			)}
 			{/* {showPostOutfitModal && (
 				<PostOutfit

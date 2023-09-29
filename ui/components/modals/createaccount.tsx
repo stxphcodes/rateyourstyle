@@ -1,9 +1,9 @@
-import {useState} from 'react';
+import { useState } from 'react';
 
-import {PostUser} from '../../apis/post_user';
-import {Modal} from './';
+import { PostUser } from '../../apis/post_user';
+import { Modal } from './';
 
-export function CreateAccount(props: {handleClose: any}) {
+export function CreateAccount(props: {cookie: string, handleClose: any}) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
@@ -26,7 +26,7 @@ export function CreateAccount(props: {handleClose: any}) {
     async function handleSubmit(event: React.FormEvent<HTMLButtonElement>) {
         event.preventDefault();
 
-        const resp = await PostUser(username, email, password);
+        const resp = await PostUser(props.cookie, username, email, password);
         if (resp instanceof Error) {
             setError(resp.message);
             return;

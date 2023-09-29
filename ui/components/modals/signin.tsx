@@ -1,7 +1,7 @@
-import {useState} from 'react';
+import { useState } from 'react';
 
-import {PostSignIn} from '../../apis/post_signin';
-import {Modal} from './';
+import { PostSignIn } from '../../apis/post_signin';
+import { Modal } from './';
 
 export function SignIn(props: {handleClose: any}) {
     const [username, setUsername] = useState("");
@@ -32,19 +32,15 @@ export function SignIn(props: {handleClose: any}) {
         return;
     }
 
-    if (error) {
-        return (
-            <div>
-                <h1>Error</h1>
-                <p>{error}</p>
-            </div>
-        );
-    }
-
     return (
         <Modal handleClose={props.handleClose}>
             <>
                 <h2 className="mb-4">Sign In</h2>
+                {error && (
+                    <div className="p-2 my-2 bg-red-500 text-white">
+                        Incorrect username or password.
+                    </div>
+                )}
                 <form className="">
                     <div className="mb-4">
                         <label className="" htmlFor="username">
@@ -74,6 +70,7 @@ export function SignIn(props: {handleClose: any}) {
                         <button
                             className="bg-pink hover:bg-black text-white font-bold py-2 px-4 rounded"
                             type="button"
+                            onClick={handleSubmit}
                         >
                             Submit
                         </button>
@@ -81,7 +78,5 @@ export function SignIn(props: {handleClose: any}) {
                 </form>
             </>
         </Modal>
-
-
     );
 }

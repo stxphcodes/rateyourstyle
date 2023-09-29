@@ -10,16 +10,6 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-// type ReviewItem struct {
-// 	UserId string      `json:"user_id"`
-// 	Rating interface{} `json:"rating"`
-// 	Review string      `json:"review"`
-// }
-// type Review struct {
-// 	OutfitId string       `json:"outfit_id"`
-// 	Reviews  []ReviewItem `json:"reviews"`
-// }
-
 type RatingIndices struct {
 	AllRatings []*Rating
 }

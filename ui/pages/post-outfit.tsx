@@ -2,57 +2,53 @@ import { GetServerSideProps } from 'next';
 import { useEffect, useState } from 'react';
 
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
-import { OutfitItem, Outfit } from '../apis/get_outfits';
+import { Outfit, OutfitItem } from '../apis/get_outfits';
 import { GetUsername } from '../apis/get_user';
 import { PostImage } from '../apis/post_image';
+import { PostOutfit } from '../apis/post_outfit';
 import { Footer } from '../components/footer';
 import { Modal, XButton } from '../components/modals';
 import { Navbar } from '../components/navarbar';
-import { PostOutfit } from '../apis/post_outfit';
 
 type Props = {
 	campaigns: Campaign[] | null;
 	cookie: string;
-	username: string;
 	error: string | null;
+	username: string;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	let props: Props = {
 		campaigns: null,
 		cookie: "",
-		username: "",
 		error: null,
+		username: ""
 	};
 
 	let cookie = context.req.cookies["rys-login"];
 	props.cookie = cookie ? cookie : "";
 
-	const resp = await GetCampaigns();
-	if (resp instanceof Error) {
-		props.error = resp.message;
-		return { props };
-	}
-
-	props.campaigns = resp;
-
-	if (cookie) {
-		const usernameResp = await GetUsername(cookie);
+	if (props.cookie) {
+		const usernameResp = await GetUsername(props.cookie)
 		if (!(usernameResp instanceof Error)) {
 			props.username = usernameResp
 		}
 	}
 
+	const resp = await GetCampaigns();
+	if (resp instanceof Error) {
+		props.error = resp.message;
+		return {props};
+	}
+	props.campaigns = resp;
 
-
-	return { props };
+	return {props};
 };
 
 function validateForm(imageURL: string | null, caption: string, tags: string, outfitItems: OutfitItem[]) {
 	if (!imageURL || !caption || outfitItems.length == 0 || !tags) {
 		return false;
 	}
-
 
 	let itemMissingField = false;
 	outfitItems.forEach((item) => {
@@ -69,9 +65,9 @@ function validateForm(imageURL: string | null, caption: string, tags: string, ou
 	}
 }
 
-function PostOutfitPage({ campaigns, cookie, username, error }: Props) {
+function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 	const [file, setFile] = useState<File | null>(null);
-	const [imageURL, setImageURL] = useState<string | null>("");
+	const [imageURL, setImageURL] = useState<string | null>("someurl");
 	const [fileError, setFileError] = useState<string | null>(null);
 	const [outfitCaption, setOutfitCaption] = useState<string>("");
 	const [privateMode, setPrivateMode] = useState<boolean>(false);
@@ -119,6 +115,7 @@ function PostOutfitPage({ campaigns, cookie, username, error }: Props) {
 			item.rating = Number(e.target.value);
 		}
 
+
 		if (e.target.id == "review") {
 			item.review = e.target.value;
 		}
@@ -147,7 +144,7 @@ function PostOutfitPage({ campaigns, cookie, username, error }: Props) {
 		]);
 	};
 
-	const handleAddItem = (e) => {
+	const handleAddItem = (e: any) => {
 		e.preventDefault();
 		setOutfitItems([
 			...outfitItems,
@@ -230,9 +227,9 @@ function PostOutfitPage({ campaigns, cookie, username, error }: Props) {
 
 	return (
 		<>
-			<Navbar cookie={cookie} username={username} />
+			<Navbar cookie={cookie} user={username} />
 
-			<main className="mt-6 p-8 w-3/4">
+			<main className="mt-6 p-4 md:p-8 w-full md:w-3/4">
 				<section className="mb-8">
 					<h1>Outfit Post</h1>
 					{!username &&
@@ -243,17 +240,16 @@ function PostOutfitPage({ campaigns, cookie, username, error }: Props) {
 				{
 					formSubmissionStatus == "success" &&
 					<div className="h-screen">
-						<h2>Lookin' chic✨ </h2>
 						<p>
-							Check out your post on the <a className="text-pink underline" href="/">homepage</a> and rate outfits you like!
+							Your outfit was successfully submitted
 						</p>
 					</div>
 				}
 				{formSubmissionStatus !== "success" &&
 					<form className=" shadow px-4 py-8 border-off-white border-2">
 						{imageURL ? (
-							<>
-								<img src={imageURL} className="" />
+							<div className="flex flex-wrap gap-4">
+								<img src={imageURL} className="max-h-80" />
 
 								<button
 									onClick={(e) => {
@@ -261,17 +257,19 @@ function PostOutfitPage({ campaigns, cookie, username, error }: Props) {
 										setFile(null);
 										setImageURL("");
 									}}
+									className="h-fit my-auto bg-black p-1 text-white rounded text-sm hover:bg-pink"
 								>
 									{" "}
 									remove
 								</button>
-							</>
+							</div>
 						) : (
 							<>
 								<label htmlFor="file" className="">
 									Choose an image
 								</label>
 								<input
+									className="w-full"
 									id="file"
 									type="file"
 									accept="image/*"
@@ -323,7 +321,7 @@ function PostOutfitPage({ campaigns, cookie, username, error }: Props) {
 								onChange={handleFormInput}
 							></input>
 							<label className="text-pink italic font-normal">Required</label>
-							<div className="flex gap-2 mt-2">
+							<div className="flex gap-2 mt-2 flex-wrap">
 								{campaigns &&
 									campaigns.map((item) => (
 										<button
@@ -337,7 +335,6 @@ function PostOutfitPage({ campaigns, cookie, username, error }: Props) {
 												if (!styleTags.includes(item.tag)) {
 													setStyleTags(styleTags.concat(item.tag + " "));
 												} else {
-													let index = styleTags.indexOf(item.tag);
 													setStyleTags(styleTags.replace(item.tag, ""));
 												}
 											}}
@@ -360,7 +357,7 @@ function PostOutfitPage({ campaigns, cookie, username, error }: Props) {
 								{outfitItems.map((item, index) => {
 									let displayCount = index + 1;
 									return (
-										<li className="shadow border-2 border-off-white my-2 rounded-lg p-4" key={item.description}>
+										<li className="shadow border-2 border-off-white my-2 rounded-lg p-4" key={displayCount}>
 											<div className="flex items-start justify-between">
 												<h6 className="mx-2">Item #{displayCount}.</h6>
 												<XButton
@@ -405,9 +402,20 @@ function PostOutfitPage({ campaigns, cookie, username, error }: Props) {
 					<Modal handleClose={() => setFormSubmissionStatus("")}>
 						<div>
 							<h3>Uh oh 😕 Our servers might be down. </h3> Please try submitting the form again when you are able.<br />If the error persists, please email us at sitesbystephanie@gmail.com .
-							</div>
+						</div>
 					</Modal>
 				)
+			}
+			{
+				formSubmissionStatus == "success" &&
+				<Modal handleClose={() => location.assign("/")}>
+					<div>
+						<h2>Lookin' chic✨ </h2>
+						<p>
+							Check out your post on the <a className="text-pink underline" href="/">homepage</a> and rate outfits you like!
+						</p>
+					</div>
+				</Modal>
 			}
 			<Footer />
 		</>
@@ -420,20 +428,22 @@ function OutfitItemForm(props: {
 	handleItemChange: any;
 }) {
 	return (
-		<div className="grid grid-cols-2 gap-4">
+		<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 			<div className="col-span-1">
+
 				<label>Please describe the item in a few words.</label>
 				<input
 					className="w-full"
 					id="description"
 					type="text"
 					placeholder="Description"
-					onChange={(e) => props.handleItemChange(e, props.index)}
 					value={props.item.description}
+					onChange={(e) => props.handleItemChange(e, props.index)}
 				></input>
-				<label htmlFor="Email" className="text-pink italic font-normal">
+				<label htmlFor="" className="text-pink italic font-normal">
 					Required
 				</label>
+
 
 				<label className="mt-2">
 					What brand is the item or where is it from?
@@ -446,9 +456,11 @@ function OutfitItemForm(props: {
 					value={props.item.brand}
 					onChange={(e) => props.handleItemChange(e, props.index)}
 				></input>
-				<label htmlFor="Email" className="text-pink italic font-normal">
+				<label htmlFor="" className="text-pink italic font-normal">
 					Required
 				</label>
+
+
 
 				<label className="mt-2">Link to the item</label>
 				<input

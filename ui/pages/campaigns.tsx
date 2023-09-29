@@ -1,14 +1,12 @@
-import {GetServerSideProps} from 'next';
+import { GetServerSideProps } from 'next';
 
-import {Campaign, GetCampaigns} from '../apis/get_campaigns';
-import {Footer} from '../components/footer';
-import {Navbar} from '../components/navarbar';
-import { GetUsername } from '../apis/get_user';
+import { Campaign, GetCampaigns } from '../apis/get_campaigns';
+import { Footer } from '../components/footer';
+import { Navbar } from '../components/navarbar';
 
 type Props = {
     campaigns: Campaign[] | null;
     cookie: string;
-    username: string;
     error: string | null;
 };
 
@@ -16,7 +14,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
         campaigns: null,
         cookie: "",
-        username: "",
         error: null,
     };
 
@@ -28,23 +25,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         props.error = resp.message;
         return {props};
     }
-
     props.campaigns = resp;
-
-    if (cookie) {
-        const usernameResp = await GetUsername(cookie);
-        if (!(usernameResp instanceof Error)) {
-            props.username = usernameResp;
-        }
-    }
 
     return {props};
 };
 
-function Campaigns({campaigns, cookie, username, error}: Props) {
+function Campaigns({campaigns, cookie, error}: Props) {
     return (
         <>
-            <Navbar cookie={cookie} username={username}/>
+            <Navbar cookie={cookie} />
 
             <main className="mt-6 p-8">
                 <section className="my-4">
@@ -81,16 +70,16 @@ function Campaigns({campaigns, cookie, username, error}: Props) {
                         ))} */}
 
                     {campaigns?.map((item) => (
-                            <div
-                                className={`w-3/4 h-40 text-white p-4 rounded-lg h-fit my-2`}
-                                style={{backgroundColor: `${item.background_img}`}}
-                                key={item.tag}
-                            >
-                                <h2>{item.tag}</h2>
-                                <p>Ends on: {item.date_ending}</p>
-                                <p className="mt-4">{item.description}</p>
-                            </div>
-                        ))}
+                        <div
+                            className={`w-3/4 h-40 text-white p-4 rounded-lg h-fit my-2`}
+                            style={{backgroundColor: `${item.background_img}`}}
+                            key={item.tag}
+                        >
+                            <h2>{item.tag}</h2>
+                            <p>Ends on: {item.date_ending}</p>
+                            <p className="mt-4">{item.description}</p>
+                        </div>
+                    ))}
 
                     {/* <div className="grid grid-cols-2 gap-4 mt-4">
                         {campaigns?.map((item) => (

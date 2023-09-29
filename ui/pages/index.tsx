@@ -1,82 +1,66 @@
 import type {NextPage} from "next";
-import {GetServerSideProps} from 'next';
-import {useState} from 'react';
+import { GetServerSideProps } from 'next';
+import { useState } from 'react';
 
-import {GetReviews, Review} from '../apis/get_reviews';
-import {Campaign, GetCampaigns} from '../apis/get_campaigns';
-import {GetOutfits, Outfit} from '../apis/get_outfits';
-import {GetUsername} from '../apis/get_user';
-import {Footer} from '../components/footer';
-import {Navbar} from '../components/navarbar';
-import {OutfitCard} from '../components/outfitcard';
-import Searchbar from '../components/searchbar';
-
+import { Campaign, GetCampaigns } from '../apis/get_campaigns';
+import { GetOutfits, Outfit } from '../apis/get_outfits';
+import { GetRatings, Rating } from '../apis/get_ratings';
+import { Footer } from '../components/footer';
+import { Navbar } from '../components/navarbar';
+import { OutfitCard } from '../components/outfitcard';
 
 type Props = {
-    data: Campaign[] | null;
+    campaigns: Campaign[] | null;
     cookie: string;
-    username: string;
     error: string | null;
     outfits: Outfit[] | null;
-    reviews: Review[] | null;
+    ratings: Rating[] | null;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
-        data: null,
+        campaigns: null,
         cookie: "",
-        username: "",
-        reviews: null,
+        ratings: null,
         error: null,
         outfits: null,
     };
 
-    let cookie = context.req.cookies["rys-login"];
-    props.cookie = cookie ? cookie : "";
+    if (context.req.cookies["rys-login"]) {
+        props.cookie = context.req.cookies["rys-login"];
+    }
 
     const campaignResp = await GetCampaigns();
     if (campaignResp instanceof Error) {
         props.error = campaignResp.message;
         return {props};
     }
+    props.campaigns = campaignResp;
 
-    props.data = campaignResp;
-
-    const resp = await GetOutfits();
-    if (resp instanceof Error) {
-        props.error = resp.message;
+    const outfitResp = await GetOutfits();
+    if (outfitResp instanceof Error) {
+        props.error = outfitResp.message;
         return {props};
     }
+    props.outfits = outfitResp;
 
-    props.outfits = resp;
-
-    if (cookie) {
-        const usernameResp = await GetUsername(cookie);
-        if (!(usernameResp instanceof Error)) {
-            props.username = usernameResp;
-        }
+    const ratingResp = await GetRatings();
+    if (ratingResp instanceof Error) {
+        props.error = ratingResp.message;
+        return {props};
     }
-
-    const reviewResp = await GetReviews()
-    if (reviewResp instanceof Error) {
-        props.error = reviewResp.message;
-        return {
-            props 
-        }
-    }
-
-    props.reviews = reviewResp
+    props.ratings = ratingResp;
 
     return {props};
 };
 
-function Home({data, cookie, username, outfits, reviews, error}: Props) {
+function Home({campaigns, cookie, outfits, ratings, error}: Props) {
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
     const [searchInput, setSearchInput] = useState<string>("");
     const [readMore, setReadMore] = useState(() => {
         let intialState =
-            data &&
-            data.map((item) => ({
+            campaigns &&
+            campaigns.map((item) => ({
                 tag: item.tag,
                 readMore: false,
             }));
@@ -94,7 +78,7 @@ function Home({data, cookie, username, outfits, reviews, error}: Props) {
 
     return (
         <>
-            <Navbar cookie={cookie} username={username} />
+            <Navbar cookie={cookie} />
 
             <main className="mt-6 p-8">
                 <section className="my-4">
@@ -113,14 +97,9 @@ function Home({data, cookie, username, outfits, reviews, error}: Props) {
                         Click on a card below or enter something in the searchbar to see
                         matching outfits.
                     </div>
-                    <Searchbar
-                        inputValue={searchInput}
-                        handleInputChange={handleInputChange}
-                        handleSubmit={() => { }}
-                    />
 
                     <div className="grid grid-cols-4 gap-4 mt-4">
-                        {data?.map((item) => (
+                        {campaigns?.map((item) => (
                             <div
                                 className={`w-full  text-white p-4 rounded-lg h-fit`}
                                 style={{backgroundColor: `${item.background_img}`}}
@@ -184,13 +163,21 @@ function Home({data, cookie, username, outfits, reviews, error}: Props) {
                     )}
                 </section>
 
-                <section >
+                <section>
                     {outfits &&
-                        outfits.map((item) => <OutfitCard data={item} key={item.id} reviews={reviews}/>)}
+                        outfits.map((item) => (
+                            <OutfitCard
+                                data={item}
+                                key={item.id}
+                                ratings={
+                                    ratings ? ratings.filter((r) => r.outfit_id == item.id) : null
+                                }
+                            />
+                        ))}
                 </section>
             </main>
             <Footer />
-            </>
+        </>
     );
 }
 

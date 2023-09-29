@@ -60,11 +60,14 @@ func createUserIndices(ctx context.Context, client *gcs.Client, bucket *gcs.Buck
 	}
 
 	for _, user := range users {
-		indices.Emails[user.Email] = struct{}{}
-		indices.Usernames[user.Username] = struct{}{}
-		indices.CookieUsername[user.Cookie] = user.Username
+		if user.Email != "" && user.Username != "" && user.Password != "" {
+			indices.IdUsername[user.Id] = user.Username
+			indices.CookieUsername[user.Cookie] = user.Username
+			indices.Usernames[user.Username] = struct{}{}
+			indices.Emails[user.Email] = struct{}{}
+		}
+
 		indices.CookieId[user.Cookie] = user.Id
-		indices.IdUsername[user.Id] = user.Username
 	}
 
 	return indices, nil

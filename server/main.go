@@ -143,23 +143,30 @@ func validateConfig(cfg *Config) error {
 }
 
 func initiateIndices(ctx context.Context, h *Handler) error {
+	fmt.Println("initiaitng indicies")
 	userIndices, err := createUserIndices(ctx, h.Gcs.Client, h.Gcs.Bucket)
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("created user indices")
 
 	outfitIndices, err := createOutfitIndices(ctx, h.Gcs.Client, h.Gcs.Bucket)
 	if err != nil {
 		return err
 	}
 
+	fmt.Println("created outfit indices")
+
 	ratingIndices, err := createRatingIndices(ctx, h.Gcs.Client, h.Gcs.Bucket)
 	if err != nil {
 		return err
 	}
+	fmt.Println("created rating indices")
 
 	h.UserIndices = userIndices
 	h.OutfitIndices = outfitIndices
 	h.RatingIndices = ratingIndices
+
 	return nil
 }
