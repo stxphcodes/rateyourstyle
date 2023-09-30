@@ -36,6 +36,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     if (context.query["user_id"] !== props.username) {
         props.error = "forbidden";
+        return {props};
     }
 
     const resp = await GetOutfitsByUser(props.cookie);
@@ -103,6 +104,11 @@ export default function Index({cookie, username, outfits, ratings, error}: Props
         <>
             <Navbar cookie={cookie} user={username} />
             <main className="mt-6 p-8">
+                <section>
+                    <h3>Your Profile</h3>
+                    <div>Username: {username}</div>
+                    <div>Email: szh2425@gmail.com</div>
+                </section>
                 {outfits &&
                     outfits.map((item) => (
                         <OutfitCardUser
@@ -113,7 +119,9 @@ export default function Index({cookie, username, outfits, ratings, error}: Props
                             }
                         />
                     ))}
-            </main>
+            </main >
         </>
     );
 }
+
+

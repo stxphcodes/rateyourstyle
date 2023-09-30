@@ -101,7 +101,7 @@ func (h Handler) GetOutfitsByUser() echo.HandlerFunc {
 		outfitIds, ok := h.OutfitIndices.UserOutfit[userId]
 		if !ok {
 			log.Println("outfitids not found for user id " + userId)
-			return ctx.NoContent(http.StatusForbidden)
+			return ctx.NoContent(http.StatusNotFound)
 		}
 
 		var outfits []*Outfit
@@ -306,14 +306,22 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 		found := false
 		for i, u := range users {
 			if u.Cookie == data.Cookie {
+				// update fields for user
 				users[i].Email = data.Email
 				users[i].Password = data.Password
 				users[i].Username = data.Username
+
+				// get user id from files
+				data.Id = u.Id
 				found = true
 			}
 		}
 
 		if !found {
+			// cookie wasn't found in users file for some reason.
+			// create a new id to associate with the cookie.
+			// this scenario shouldn't be the case.
+			log.Println("in post user, cookie not found in users file")
 			data.Id = uuid()
 			users = append(users, data)
 		}
@@ -323,12 +331,12 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		// update indices
+		// update indices that need updating
 		h.UserIndices.Emails[data.Email] = struct{}{}
 		h.UserIndices.Usernames[data.Username] = struct{}{}
 		h.UserIndices.CookieUsername[data.Cookie] = data.Username
-		h.UserIndices.CookieId[data.Cookie] = data.Id
 		h.UserIndices.IdUsername[data.Id] = data.Username
+		h.UserIndices.CookieId[data.Cookie] = data.Id
 
 		// return user cookie in response
 		return ctx.String(http.StatusCreated, createCookieStr(data.Cookie))

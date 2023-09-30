@@ -22,16 +22,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		campaigns: null,
 		cookie: "",
 		error: null,
-		username: ""
+		username: "",
 	};
 
 	let cookie = context.req.cookies["rys-login"];
 	props.cookie = cookie ? cookie : "";
 
 	if (props.cookie) {
-		const usernameResp = await GetUsername(props.cookie)
+		const usernameResp = await GetUsername(props.cookie);
 		if (!(usernameResp instanceof Error)) {
-			props.username = usernameResp
+			props.username = usernameResp;
 		}
 	}
 
@@ -45,7 +45,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	return {props};
 };
 
-function validateForm(imageURL: string | null, caption: string, tags: string, outfitItems: OutfitItem[]) {
+function validateForm(
+	imageURL: string | null,
+	caption: string,
+	tags: string,
+	outfitItems: OutfitItem[]
+) {
 	if (!imageURL || !caption || outfitItems.length == 0 || !tags) {
 		return false;
 	}
@@ -67,12 +72,12 @@ function validateForm(imageURL: string | null, caption: string, tags: string, ou
 
 function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 	const [file, setFile] = useState<File | null>(null);
-	const [imageURL, setImageURL] = useState<string | null>("someurl");
-	const [fileError, setFileError] = useState<string | null>(null);
+	const [imageURL, setImageURL] = useState<string | null>("");
+	const [fileError, setFileError] = useState<string | null>("");
 	const [outfitCaption, setOutfitCaption] = useState<string>("");
 	const [privateMode, setPrivateMode] = useState<boolean>(false);
 	const [styleTags, setStyleTags] = useState<string>("");
-	const [formSubmissionStatus, setFormSubmissionStatus] = useState("")
+	const [formSubmissionStatus, setFormSubmissionStatus] = useState("");
 	const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([
 		{
 			brand: "",
@@ -115,7 +120,6 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 			item.rating = Number(e.target.value);
 		}
 
-
 		if (e.target.id == "review") {
 			item.review = e.target.value;
 		}
@@ -135,7 +139,6 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 		if (e.target.id == "brand") {
 			item.brand = e.target.value;
 		}
-
 
 		setOutfitItems([
 			...outfitItems.slice(0, index),
@@ -171,13 +174,19 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 	const handleSubmit = async (e: any) => {
 		e.preventDefault();
 
-		if (imageURL && validateForm(imageURL, outfitCaption, styleTags, outfitItems)) {
+		if (
+			imageURL &&
+			validateForm(imageURL, outfitCaption, styleTags, outfitItems)
+		) {
 			setFormSubmissionStatus("");
 
-			let tags = styleTags.split(" ")
-			let outfitId = imageURL?.replace("https://storage.googleapis.com/rateyourstyle/imgs/outfits/", "")
-			outfitId = outfitId.split("/")[1]
-			outfitId = outfitId.split(".")[0]
+			let tags = styleTags.split(" ");
+			let outfitId = imageURL?.replace(
+				"https://storage.googleapis.com/rateyourstyle/imgs/outfits/",
+				""
+			);
+			outfitId = outfitId.split("/")[1];
+			outfitId = outfitId.split(".")[0];
 
 			let outfit: Outfit = {
 				id: outfitId,
@@ -189,13 +198,13 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 				date: "",
 				user_id: "",
 				description: "",
-			}
+			};
 
-			const resp = await PostOutfit(cookie, outfit)
+			const resp = await PostOutfit(cookie, outfit);
 			if (resp instanceof Error) {
-				setFormSubmissionStatus("errorOnSubmission")
+				setFormSubmissionStatus("errorOnSubmission");
 			} else {
-				setFormSubmissionStatus("success")
+				setFormSubmissionStatus("success");
 			}
 		} else {
 			setFormSubmissionStatus("missingFields");
@@ -221,10 +230,6 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 		}
 	}, [file]);
 
-	if (fileError) {
-		return <h1>File Error {fileError}</h1>;
-	}
-
 	return (
 		<>
 			<Navbar cookie={cookie} user={username} />
@@ -232,20 +237,21 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 			<main className="mt-6 p-4 md:p-8 w-full md:w-3/4">
 				<section className="mb-8">
 					<h1>Outfit Post</h1>
-					{!username &&
+					{!username && (
 						<div className="bg-red-700 p-2 rounded text-white">
-							You are not currently signed into an account. You can still create a post but it will be difficult to edit it later on. To make it easier to track your posts, please sign in or create an account if you don't have one!</div>
-					}
+							You are not currently signed into an account. You can still create
+							a post but it will be difficult to edit it later on. To make it
+							easier to track your posts, please sign in or create an account if
+							you don't have one!
+						</div>
+					)}
 				</section>
-				{
-					formSubmissionStatus == "success" &&
+				{formSubmissionStatus == "success" && (
 					<div className="h-screen">
-						<p>
-							Your outfit was successfully submitted
-						</p>
+						<p>Your outfit was successfully submitted</p>
 					</div>
-				}
-				{formSubmissionStatus !== "success" &&
+				)}
+				{formSubmissionStatus !== "success" && (
 					<form className=" shadow px-4 py-8 border-off-white border-2">
 						{imageURL ? (
 							<div className="flex flex-wrap gap-4">
@@ -265,6 +271,23 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 							</div>
 						) : (
 							<>
+								{fileError && (
+									<>
+										<div className="p-2 my-2 bg-red-500 text-white">
+											Encountered error uploading image. Please {' '}
+											<button
+												onClick={(e) => {
+													location.reload()
+												}}
+												className="h-fit my-auto bg-black p-1 text-white rounded text-sm hover:bg-pink"
+											>
+												{" "}
+												refresh
+											</button>{' '} the page and try again.
+										</div>
+
+									</>
+								)}
 								<label htmlFor="file" className="">
 									Choose an image
 								</label>
@@ -284,12 +307,25 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 							</label>
 
 							<label className="relative inline-flex items-center cursor-pointer">
-								<input type="checkbox" checked={privateMode} className="sr-only peer" value={privateMode.toString()} onChange={() => setPrivateMode(!privateMode)} />
-								<div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:pink
-							 rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink"></div>
-								<span className="ml-3 text-sm font-medium text-gray-900">Private</span>
+								<input
+									type="checkbox"
+									checked={privateMode}
+									className="sr-only peer"
+									value={privateMode.toString()}
+									onChange={() => setPrivateMode(!privateMode)}
+								/>
+								<div
+									className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:pink
+							 rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink"
+								></div>
+								<span className="ml-3 text-sm font-medium text-gray-900">
+									Private
+								</span>
 							</label>
-							<label className="italic font-normal">Private posts are only viewable by you and the sponsor of the campaign if you use a campaign tag.</label>
+							<label className="italic font-normal">
+								Private posts are only viewable by you and the sponsor of the
+								campaign if you use a campaign tag.
+							</label>
 						</div>
 
 						<div className="my-4">
@@ -309,8 +345,8 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 
 						<div className="my-4">
 							<label>
-								Select a tag from the options below or enter your own. Start tags
-								with '#'
+								Select a tag from the options below or enter your own. Start
+								tags with '#'
 							</label>
 							<input
 								className="w-full"
@@ -357,7 +393,10 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 								{outfitItems.map((item, index) => {
 									let displayCount = index + 1;
 									return (
-										<li className="shadow border-2 border-off-white my-2 rounded-lg p-4" key={displayCount}>
+										<li
+											className="shadow border-2 border-off-white my-2 rounded-lg p-4"
+											key={displayCount}
+										>
 											<div className="flex items-start justify-between">
 												<h6 className="mx-2">Item #{displayCount}.</h6>
 												<XButton
@@ -389,34 +428,38 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 							Submit
 						</button>
 					</form>
-				}
-			</main >
+				)}
+			</main>
 			{formSubmissionStatus == "missingFields" && (
 				<Modal handleClose={() => setFormSubmissionStatus("")}>
 					<div>Form is missing required fields.</div>
 				</Modal>
-			)
-			}
-			{
-				formSubmissionStatus == "errorOnSubmission" && (
-					<Modal handleClose={() => setFormSubmissionStatus("")}>
-						<div>
-							<h3>Uh oh 😕 Our servers might be down. </h3> Please try submitting the form again when you are able.<br />If the error persists, please email us at sitesbystephanie@gmail.com .
-						</div>
-					</Modal>
-				)
-			}
-			{
-				formSubmissionStatus == "success" &&
+			)}
+			{formSubmissionStatus == "errorOnSubmission" && (
+				<Modal handleClose={() => setFormSubmissionStatus("")}>
+					<div>
+						<h3>Uh oh 😕 Our servers might be down. </h3> Please try submitting
+						the form again when you are able.
+						<br />
+						If the error persists, please email us at sitesbystephanie@gmail.com
+						.
+					</div>
+				</Modal>
+			)}
+			{formSubmissionStatus == "success" && (
 				<Modal handleClose={() => location.assign("/")}>
 					<div>
 						<h2>Lookin' chic✨ </h2>
 						<p>
-							Check out your post on the <a className="text-pink underline" href="/">homepage</a> and rate outfits you like!
+							Check out your post on the{" "}
+							<a className="text-pink underline" href="/">
+								homepage
+							</a>{" "}
+							and rate outfits you like!
 						</p>
 					</div>
 				</Modal>
-			}
+			)}
 			<Footer />
 		</>
 	);
@@ -430,7 +473,6 @@ function OutfitItemForm(props: {
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 			<div className="col-span-1">
-
 				<label>Please describe the item in a few words.</label>
 				<input
 					className="w-full"
@@ -443,7 +485,6 @@ function OutfitItemForm(props: {
 				<label htmlFor="" className="text-pink italic font-normal">
 					Required
 				</label>
-
 
 				<label className="mt-2">
 					What brand is the item or where is it from?
@@ -459,8 +500,6 @@ function OutfitItemForm(props: {
 				<label htmlFor="" className="text-pink italic font-normal">
 					Required
 				</label>
-
-
 
 				<label className="mt-2">Link to the item</label>
 				<input
@@ -529,10 +568,15 @@ function OutfitItemForm(props: {
 				</div>
 
 				<label className="mt-2">Your Review</label>
-				<textarea rows={4} className="w-full" id="review" placeholder="Review" onChange={(e) => props.handleItemChange(e, props.index)} value={props.item.review}></textarea>
-				<label className="text-pink italic font-normal">
-					Required
-				</label>
+				<textarea
+					rows={4}
+					className="w-full"
+					id="review"
+					placeholder="Review"
+					onChange={(e) => props.handleItemChange(e, props.index)}
+					value={props.item.review}
+				></textarea>
+				<label className="text-pink italic font-normal">Required</label>
 			</div>
 		</div>
 	);

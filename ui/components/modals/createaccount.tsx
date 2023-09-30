@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { PostUser } from '../../apis/post_user';
 import { Modal } from './';
 
-export function CreateAccount(props: {cookie: string, handleClose: any}) {
+export function CreateAccount(props: {cookie: string; handleClose: any}) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
@@ -37,19 +37,27 @@ export function CreateAccount(props: {cookie: string, handleClose: any}) {
         return;
     }
 
-    if (error) {
+    if (error && !error.includes("taken")) {
         return (
-            <div>
-                <h1>Error</h1>
-                <p>{error}</p>
-            </div>
+            <Modal handleClose={props.handleClose}>
+                <div>
+                    <h3>Uh oh. Looks like we encountered a server issue on our end.</h3>
+                    If the issue persists, pleae email sitesbystephanie @gmail.com
+                </div>
+            </Modal>
         );
     }
 
     return (
         <Modal handleClose={props.handleClose}>
             <>
+
                 <h2 className="mb-8">Create an Account</h2>
+                {error && error.includes("taken") && (
+                    <div className="p-2 my-2 bg-red-500 text-white">
+                        {error}. please choose another.
+                    </div>
+                )}
                 <form className="">
                     <div className="mb-4">
                         <label htmlFor="Email">Email</label>
