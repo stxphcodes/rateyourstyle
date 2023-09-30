@@ -1,4 +1,4 @@
-import type {NextPage} from "next";
+import type { NextPage } from "next";
 import { GetServerSideProps } from 'next';
 
 import { GetOutfitsByUser, Outfit } from '../../apis/get_outfits';
@@ -6,6 +6,7 @@ import { GetRatings, Rating } from '../../apis/get_ratings';
 import { GetUsername } from '../../apis/get_user';
 import { Navbar } from '../../components/navarbar';
 import { OutfitCardUser } from '../../components/outfitcard-user';
+import { GetServerURL } from "../../apis/get_server";
 
 type Props = {
     cookie: string;
@@ -16,6 +17,8 @@ type Props = {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+    const server = GetServerURL();
+
     let props: Props = {
         cookie: "",
         username: "",
@@ -28,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props.cookie = cookie ? cookie : "";
 
     if (cookie) {
-        const usernameResp = await GetUsername(cookie);
+        const usernameResp = await GetUsername(server, cookie);
         if (!(usernameResp instanceof Error)) {
             props.username = usernameResp;
         }
@@ -36,27 +39,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     if (context.query["user_id"] !== props.username) {
         props.error = "forbidden";
-        return {props};
+        return { props };
     }
 
-    const resp = await GetOutfitsByUser(props.cookie);
+    const resp = await GetOutfitsByUser(server, props.cookie);
     if (resp instanceof Error) {
         props.error = resp.message;
-        return {props};
+        return { props };
     }
     props.outfits = resp;
 
-    const ratingResp = await GetRatings();
+    const ratingResp = await GetRatings(server);
     if (ratingResp instanceof Error) {
         props.error = ratingResp.message;
-        return {props};
+        return { props };
     }
     props.ratings = ratingResp;
 
-    return {props};
+    return { props };
 };
 
-export default function Index({cookie, username, outfits, ratings, error}: Props) {
+export default function Index({ cookie, username, outfits, ratings, error }: Props) {
     if (error) {
         if (error == "forbidden") {
             return (

@@ -1,11 +1,12 @@
 import { OutfitItem, Outfit } from "./get_outfits";
 export async function PostOutfit(
+    server: string,
     cookie: string,
     outfit: Outfit,
 ): Promise<Error | null> {
     let error: Error | null = null
 
-    await fetch("http://localhost:8000/outfit", {
+    await fetch(`${server}/outfit`, {
         method: "POST",
         body: JSON.stringify(outfit),
         headers: {

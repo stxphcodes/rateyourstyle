@@ -9,16 +9,21 @@ import { PostOutfit } from '../apis/post_outfit';
 import { Footer } from '../components/footer';
 import { Modal, XButton } from '../components/modals';
 import { Navbar } from '../components/navarbar';
+import { GetServerURL } from '../apis/get_server';
 
 type Props = {
 	campaigns: Campaign[] | null;
 	cookie: string;
 	error: string | null;
 	username: string;
+	server: string;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+	const server = GetServerURL()
+
 	let props: Props = {
+		server: server,
 		campaigns: null,
 		cookie: "",
 		error: null,
@@ -29,13 +34,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	props.cookie = cookie ? cookie : "";
 
 	if (props.cookie) {
-		const usernameResp = await GetUsername(props.cookie);
+		const usernameResp = await GetUsername(server, props.cookie);
 		if (!(usernameResp instanceof Error)) {
 			props.username = usernameResp;
 		}
 	}
 
-	const resp = await GetCampaigns();
+	const resp = await GetCampaigns(server);
 	if (resp instanceof Error) {
 		props.error = resp.message;
 		return {props};
@@ -70,7 +75,7 @@ function validateForm(
 	}
 }
 
-function PostOutfitPage({campaigns, cookie, username, error}: Props) {
+function PostOutfitPage({campaigns, cookie, username, server, error}: Props) {
 	const [file, setFile] = useState<File | null>(null);
 	const [imageURL, setImageURL] = useState<string | null>("");
 	const [fileError, setFileError] = useState<string | null>("");
@@ -200,7 +205,7 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 				description: "",
 			};
 
-			const resp = await PostOutfit(cookie, outfit);
+			const resp = await PostOutfit(server, cookie, outfit);
 			if (resp instanceof Error) {
 				setFormSubmissionStatus("errorOnSubmission");
 			} else {
@@ -213,7 +218,7 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 
 	useEffect(() => {
 		async function upload(formData: any) {
-			const resp = await PostImage(formData, cookie);
+			const resp = await PostImage(server, formData, cookie);
 			if (resp instanceof Error) {
 				setFileError(resp.message);
 				return;

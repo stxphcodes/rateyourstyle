@@ -1,13 +1,13 @@
 export async function PostRating(
+    server: string,
     cookie: string,
     outfitId: string,
     rating: number,
-   
 ): Promise<string | Error> {
     let error: Error | null = null
 
     try {
-        const resp = await fetch("http://localhost:8000/rating", {
+        const resp = await fetch(`${server}/rating`, {
             method: "POST",
             body: JSON.stringify({
                 outfit_id: outfitId, 

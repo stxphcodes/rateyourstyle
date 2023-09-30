@@ -1,8 +1,8 @@
-export async function GetUsername(cookie: string): Promise<string | Error> { 
+export async function GetUsername(server: string, cookie: string): Promise<string | Error> { 
     let error: Error | null = null 
     let username: string = ""
 
-    await fetch("http://localhost:8000/username", {
+    await fetch(`${server}/username`, {
         method: "GET",
         headers: {
             'content-type': "text/plain",

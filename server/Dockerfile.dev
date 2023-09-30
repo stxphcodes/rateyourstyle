@@ -1,0 +1,8 @@
+FROM debian:bookworm-slim
+
+COPY . .
+
+WORKDIR /
+
+RUN apt-get -y -qq update && \
+    apt-get -y -qq --no-install-recommends install ca-certificates

@@ -4,6 +4,7 @@ import { GetCookie } from '../apis/get_cookie';
 import { GetUsername } from '../apis/get_user';
 import { CreateAccount } from './modals/createaccount';
 import { SignIn } from './modals/signin';
+import { GetServerURL } from '../apis/get_server';
 
 export function Navbar(props: {cookie: string; user?: string}) {
 	const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
@@ -16,9 +17,11 @@ export function Navbar(props: {cookie: string; user?: string}) {
 		props.user ? props.user : ""
 	);
 
+	const server = GetServerURL(true);
+
 	useEffect(() => {
 		async function getcookie() {
-			const resp = await GetCookie();
+			const resp = await GetCookie(server);
 			if (resp instanceof Error) {
 				setError(resp.message);
 				return;
@@ -29,7 +32,7 @@ export function Navbar(props: {cookie: string; user?: string}) {
 		}
 
 		async function getusername() {
-			const resp = await GetUsername(props.cookie);
+			const resp = await GetUsername(server, props.cookie);
 			if (!(resp instanceof Error)) {
 				setUsername(resp);
 				return;

@@ -8,11 +8,11 @@ export type Campaign= {
   };
 
   
-  export async function GetCampaigns(): Promise<Campaign[] | Error> {
+  export async function GetCampaigns(server:string): Promise<Campaign[] | Error> {
     let error: Error | null = null;
     let campaigns: Campaign[] = [];
   
-    await fetch("http://localhost:8000/campaigns")
+    await fetch(`${server}/campaigns`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("response not ok");

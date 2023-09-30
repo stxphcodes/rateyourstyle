@@ -8,6 +8,7 @@ import { GetRatings, Rating } from '../apis/get_ratings';
 import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
 import { OutfitCard } from '../components/outfitcard';
+import { GetServerURL } from "../apis/get_server";
 
 type Props = {
     campaigns: Campaign[] | null;
@@ -26,25 +27,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         outfits: null,
     };
 
+    let server = GetServerURL()
+
     if (context.req.cookies["rys-login"]) {
         props.cookie = context.req.cookies["rys-login"];
     }
 
-    const campaignResp = await GetCampaigns();
+    const campaignResp = await GetCampaigns(server);
     if (campaignResp instanceof Error) {
         props.error = campaignResp.message;
         return {props};
     }
     props.campaigns = campaignResp;
 
-    const outfitResp = await GetOutfits();
+    const outfitResp = await GetOutfits(server);
     if (outfitResp instanceof Error) {
         props.error = outfitResp.message;
         return {props};
     }
     props.outfits = outfitResp;
 
-    const ratingResp = await GetRatings();
+    const ratingResp = await GetRatings(server);
     if (ratingResp instanceof Error) {
         props.error = ratingResp.message;
         return {props};

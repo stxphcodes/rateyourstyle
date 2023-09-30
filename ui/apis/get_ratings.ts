@@ -4,11 +4,11 @@ export type Rating = {
   rating: any;
 };
 
-export async function GetRatings(): Promise<Rating[] | Error> {
+export async function GetRatings(server: string): Promise<Rating[] | Error> {
   let error: Error | null = null;
   let ratings: Rating[] = [];
 
-  await fetch("http://localhost:8000/ratings", {
+  await fetch(`${server}/ratings`, {
     method: "GET",
     headers: {
       "content-type": "application/json",

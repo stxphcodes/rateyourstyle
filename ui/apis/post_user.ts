@@ -1,4 +1,5 @@
 export async function PostUser(
+  server: string,
   cookie: string,
   username: string,
   email: string,
@@ -7,7 +8,7 @@ export async function PostUser(
   let error: Error | null = null;
 
   try {
-    const resp = await fetch("http://localhost:8000/user", {
+    const resp = await fetch(`${server}/user`, {
       method: "POST",
       body: JSON.stringify({
         username: username,

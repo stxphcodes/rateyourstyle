@@ -3,6 +3,7 @@ import { GetServerSideProps } from 'next';
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
 import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
+import { GetServerURL } from '../apis/get_server';
 
 type Props = {
     campaigns: Campaign[] | null;
@@ -17,10 +18,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         error: null,
     };
 
+    const server = GetServerURL()
+
     let cookie = context.req.cookies["rys-login"];
     props.cookie = cookie ? cookie : "";
 
-    const resp = await GetCampaigns();
+    const resp = await GetCampaigns(server);
     if (resp instanceof Error) {
         props.error = resp.message;
         return {props};

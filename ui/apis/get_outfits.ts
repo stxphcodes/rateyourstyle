@@ -20,11 +20,11 @@ export type Outfit = {
   private: boolean;
 };
 
-export async function GetOutfits(): Promise<Outfit[] | Error> {
+export async function GetOutfits(server: string): Promise<Outfit[] | Error> {
   let error: Error | null = null;
   let outfits: Outfit[] = [];
 
-  await fetch("http://localhost:8000/outfits")
+  await fetch(`${server}/outfits`)
     .then((response) => {
       if (!response.ok) {
         throw new Error("response not ok");
@@ -46,11 +46,11 @@ export async function GetOutfits(): Promise<Outfit[] | Error> {
   return outfits;
 }
 
-export async function GetOutfitsByUser(cookie: string): Promise<Outfit[] | Error> {
+export async function GetOutfitsByUser(server: string, cookie: string): Promise<Outfit[] | Error> {
     let error: Error | null = null;
     let outfits: Outfit[] = [];
   
-    await fetch("http://localhost:8000/user/outfits", {
+    await fetch(`${server}/user/outfits`, {
         method: "GET",
         headers: {
             'content-type': "application/json",

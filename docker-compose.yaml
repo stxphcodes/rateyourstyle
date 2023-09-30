@@ -6,9 +6,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    volumes:
+      - ./secrets/:/secrets
 
     command:
       - "/app"
+      - "--gcs.creds=/secrets/localdev_sa.json"
   ui:
     build:
       context: ./ui
@@ -20,11 +23,12 @@ services:
     environment:
       # comment NODE_ENV to test prod build.
       NODE_ENV: development
+      NEXT_PUBLIC_SERVER_URL: http://host.docker.internal:8000
       SERVER_URL: http://host.docker.internal:8000
 
     # comment from here
     volumes:
-      - ./:/opt/app
+      - ./ui:/opt/app
       - /opt/app/node_modules
       - /opt/app/.next
     command: "npm run dev"

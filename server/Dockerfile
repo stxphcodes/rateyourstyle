@@ -1,4 +1,4 @@
-FROM golang:1.19-bullseye as build
+FROM golang:1.21.1-bookworm as build
 
 WORKDIR /opt/dist
 
@@ -17,5 +17,8 @@ WORKDIR /
 
 RUN apt-get -y -qq update && \
     apt-get -y -qq --no-install-recommends install ca-certificates
+
+# TO DO: figure out how to get campaign info
+COPY --from=build /opt/dist/campaigns.json /campaigns.json
 
 COPY --from=build /app /app 

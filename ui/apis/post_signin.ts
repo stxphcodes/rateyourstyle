@@ -1,11 +1,12 @@
 export async function PostSignIn(
+  server: string,
   username: string,
   password: string
 ): Promise<string | Error> {
   let error: Error | null = null;
   let cookie: string = "";
 
-  await fetch("http://localhost:8000/signin", {
+  await fetch(`${server}/signin`, {
     method: "POST",
     body: JSON.stringify({
       username: username,
