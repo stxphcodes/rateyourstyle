@@ -2,8 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "custom-serif";
+  src: url("/fonts/SourceSerif4-Variable.ttf")
+}
+
 label {
-  font-family: 'Arial';
   font-size: 12px;
   font-weight: 600;
   margin-bottom: 4px;
@@ -25,42 +29,36 @@ input:focus, textarea:focus {
 
 
 body {
-  font-family:'Cambria';
+  font-size: 14px;
 }
 
 
 h1 {
   font-size: 40px;
-  font-weight: 600;
-  font-family: 'Arial';
-  text-transform: uppercase;
-
+  font-family: 'custom-serif';
 }
 
 h2 {
   font-size: 30px;
-  font-family: 'Arial';
+  font-family: 'custom-serif';
 }
 
 h3 {
   font-size: 20px;
-  font-weight: 600;
-  font-family: 'Arial';
-  text-transform: uppercase;
+  font-family: 'custom-serif';
 }
 
 h5 {
-  font-family: 'Arial';
-  text-transform: uppercase;
-  font-weight: 600;
+  font-family: 'custom-serif';
+  font-size: 18px;
 }
 
 h6 {
-  font-weight: 600;
-  font-family: 'Arial';
+  font-family: 'custom-serif';
+  font-size: 16px;
 }
 
 p {
-  font-size: 16px;
+  font-size: 14px;
 }
 

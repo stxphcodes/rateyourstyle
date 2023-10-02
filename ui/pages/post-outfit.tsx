@@ -1,5 +1,6 @@
 import { GetServerSideProps } from 'next';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
 import { Outfit, OutfitItem } from '../apis/get_outfits';
@@ -233,7 +234,7 @@ function PostOutfitPage({campaigns, cookie, username, server, error}: Props) {
 
 			upload(formData);
 		}
-	}, [file]);
+	}, [server, cookie, file]);
 
 	return (
 		<>
@@ -247,7 +248,7 @@ function PostOutfitPage({campaigns, cookie, username, server, error}: Props) {
 							You are not currently signed into an account. You can still create
 							a post but it will be difficult to edit it later on. To make it
 							easier to track your posts, please sign in or create an account if
-							you don't have one!
+							you don&apos;t have one!
 						</div>
 					)}
 				</section>
@@ -351,7 +352,7 @@ function PostOutfitPage({campaigns, cookie, username, server, error}: Props) {
 						<div className="my-4">
 							<label>
 								Select a tag from the options below or enter your own. Start
-								tags with '#'
+								tags with &apos;#&apos;
 							</label>
 							<input
 								className="w-full"
@@ -454,12 +455,12 @@ function PostOutfitPage({campaigns, cookie, username, server, error}: Props) {
 			{formSubmissionStatus == "success" && (
 				<Modal handleClose={() => location.assign("/")}>
 					<div>
-						<h2>Lookin' chic✨ </h2>
+						<h2>Lookin&apos; chic✨ </h2>
 						<p>
 							Check out your post on the{" "}
-							<a className="text-pink underline" href="/">
-								homepage
-							</a>{" "}
+							<Link href="/">
+								<a className="text-pink underline">homepage</a>
+							</Link>{" "}
 							and rate outfits you like!
 						</p>
 					</div>

@@ -29,11 +29,11 @@ export function OutfitCard(props: {
 
     return (
         <>
-            <div className="w-full shadow-md p-4 bg-off-white rounded-md my-4 max-h-card overflow-auto border-2 border-off-white break-words">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 object-contain">
+            <div  className="w-full shadow-md p-4 bg-off-white rounded-md my-4 max-h-card overflow-auto border-2 border-off-white break-words">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 object-contain content-start">
                     <div className="col-span-1 mx-auto">
                         <img
-                            className="h-96 md:h-fit md:object-contain"
+                            className="h-96  object-contain"
                             src={props.data.picture_url}
                         />
                         <div className="flex flex-row-reverse">
@@ -47,19 +47,19 @@ export function OutfitCard(props: {
                     <div className="col-span-3 bg-white p-4 rounded-md">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="col-span-1">
-                                <h3>{props.data.title}</h3>
+                                <h3 className="font-semibold">{props.data.title}</h3>
                                 <p>
-                                    <span className="font-bold font-sans">date:</span>{" "}
+                                    <span className="font-bold">date:</span>{" "}
                                     {props.data.date}
                                 </p>
                                 <p>
-                                    <span className="font-bold font-sans">by:</span>{" "}
+                                    <span className="font-bold">by:</span>{" "}
                                     {props.data.user_id}
                                 </p>
-                                <h6>tags:</h6>
+                                <p className="font-bold">tags:</p>
                                 <div className="flex gap-2">
                                     {props.data.style_tags.map((item) => (
-                                        <div className="">{item}</div>
+                                        <div className="" key={item}>{item}</div>
                                     ))}
                                 </div>
                             </div>
@@ -67,12 +67,12 @@ export function OutfitCard(props: {
                                 <div className="flex items-center">
                                     {!avg ? (
                                         <>
-                                            <h1 className="text-pink">?</h1>
+                                            <div  className="text-xl text-white bg-pink px-3 rounded">{"  "}?{"  "}</div>
                                             <div className="mx-2">no ratings submitted yet</div>
                                         </>
                                     ) : (
                                         <>
-                                            <h1 className="text-pink">{avg}</h1>
+                                            <div  className="text-xl text-white bg-pink p-1 rounded">{avg}{avg.toString().length > 1 ? "" : ".0"}</div>
                                             <div className="mx-2">
                                                 from {props.ratings && props.ratings.length} ratings
                                             </div>
@@ -83,7 +83,7 @@ export function OutfitCard(props: {
                                 <div className="flex my-2">
                                     {!submitRating ? (
                                         <div className="flex items-center gap-4">
-                                            <h1 className="text-pink">?</h1>
+                                            <div className="text-xl text-white bg-pink px-3 rounded">?</div>
                                             <div
                                                 className="hover:cursor-pointer underline"
                                                 onClick={() => setSubmitRating(true)}
@@ -94,7 +94,7 @@ export function OutfitCard(props: {
                                     ) : (
                                         <>
                                             <div className="flex gap-4 items-center">
-                                                <h1 className="text-pink">{userItemRating}</h1>
+                                                <div className="text-white text-xl bg-pink p-1 rounded">{userItemRating}</div>
                                                 <div className="w-fit">
                                                     <label>Your rating</label>
                                                     <input
@@ -135,20 +135,20 @@ export function OutfitCard(props: {
                                     )}
                                 </div>
                             </div>
-                            <h5 className="col-span-1 underline">Items</h5>
-                            <h5 className="col-span-2 underline">Review</h5>
+                            <h3 className="col-span-1 underline font-semibold">Items</h3>
+                            <h5 className="col-span-2 underline font-semibold">Review</h5>
+
                             {props.data.items.map((item) => (
                                 <>
                                     <div className="col-span-1" key={`col-1-${item.brand}`}>
-                                        <h6 className="">{item.description}</h6>
-                                        {item.link && (
-                                            <h6 className="text-pink">
+                                        <div className="font-bold text-lg">{item.description} {" "} {item.link && (
+                                            <span className="text-pink font-normal text-xs">
                                                 <a href={item.link} target="_blank">
-                                                    {" "}
-                                                    [ LINK ]
+
+                                                    [LINK]
                                                 </a>
-                                            </h6>
-                                        )}
+                                            </span>
+                                        )}</div>
                                         <p>
                                             <span className="font-bold">from: </span>
                                             {item.brand}
@@ -165,11 +165,13 @@ export function OutfitCard(props: {
 
                                     <div className="col-span-2" key={`col-2-${item.brand}`}>
                                         <div className="flex items-start">
-                                            <h3 className="text-pink ">{item.rating}</h3>
+                                            <div className="text-white bg-pink p-1 rounded">{item.rating}{item.rating.toString().length > 2 ? "" : ".0"}</div>
 
-                                            <div className="mx-2">"{item.review}"</div>
+                                            <div className="mx-2">&quot;{item.review}&quot;</div>
                                         </div>
                                     </div>
+
+                                    <hr className="col-span-3 my-1" />
                                 </>
                             ))}
                         </div>

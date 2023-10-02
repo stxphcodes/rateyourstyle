@@ -52,7 +52,7 @@ export function OutfitCardUser(props: {
 								<h6>tags:</h6>
 								<div className="flex gap-2">
 									{props.data.style_tags.map((item) => (
-										<div className="">{item}</div>
+										<div className="" key={item}>{item}</div>
 									))}
 								</div>
 							</div>

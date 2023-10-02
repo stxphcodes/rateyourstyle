@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Link from 'next/link'
 
 import { GetCookie } from '../apis/get_cookie';
 import { GetUsername } from '../apis/get_user';
@@ -6,7 +7,7 @@ import { CreateAccount } from './modals/createaccount';
 import { SignIn } from './modals/signin';
 import { GetServerURL } from '../apis/get_server';
 
-export function Navbar(props: {cookie: string; user?: string}) {
+export function Navbar(props: { cookie: string; user?: string }) {
 	const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
 	const [showCreateAccountModal, setShowCreateAccountModal] =
 		useState<boolean>(false);
@@ -50,20 +51,20 @@ export function Navbar(props: {cookie: string; user?: string}) {
 		<>
 			<div className="mb-20 shadow-md px-4 py-2  top-0 w-screen bg-white flex flex-wrap items-center justify-between fixed">
 				<div>
-					<a href="/" className="mx-2">
-						Home
-					</a>
-					<a href="/campaigns" className="mx-2">
-						Campaigns
-					</a>
-					<a href="/post-outfit" className="">
+					<Link href="/" >
+						<a className="mx-2">Home</a>
+					</Link>
+					<Link href="/campaigns">
+						<a className="mx-2">Campaigns</a>
+					</Link>
+					<Link href="/post-outfit">
 						Post an Outfit
-					</a>
+					</Link>
 				</div>
 				<div className="float-right">
 					{username ? (
 						<>
-							<a href={`/user/${username}`}>{username}</a>
+							<Link href={`/user/${username}`}>{username}</Link>
 						</>
 					) : (
 						<>
@@ -90,12 +91,6 @@ export function Navbar(props: {cookie: string; user?: string}) {
 					handleClose={() => setShowCreateAccountModal(false)}
 				/>
 			)}
-			{/* {showPostOutfitModal && (
-				<PostOutfit
-					cookie={props.cookie}
-					handleClose={() => setShowPostOutfitModal(false)}
-				/>
-			)} */}
 		</>
 	);
 }

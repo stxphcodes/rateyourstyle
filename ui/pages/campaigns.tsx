@@ -1,4 +1,5 @@
 import { GetServerSideProps } from 'next';
+import Link from 'next/link';
 
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
 import { Footer } from '../components/footer';
@@ -46,9 +47,9 @@ function Campaigns({campaigns, cookie, error}: Props) {
                         showcase your style.
 
                         To apply to an active campaign,{" "}
-                        <a className="text-pink underline" href="/post-outfit">
-                            Post an Outfit
-                        </a>{" "}
+                        <Link  href="/post-outfit">
+                            <a className="text-pink underline">Post an Outfit</a> 
+                        </Link>{" "}
                         according to the requirements listed in the campaign, and tag the
                         outfit with the campaign tag. Please note that both public and
                         private posts are shared with the sponsor of the campaign, however
@@ -100,7 +101,7 @@ function Campaigns({campaigns, cookie, error}: Props) {
                 </section>
                 <section>
                     <h1>Create a Campaign</h1>
-                    <div>Creating a campaigns on RateYourStyle is a direct way for your company to engage with and give back to the loyal consumers of your brand. A campaign is also ideal for market research and as a form of advertisement for your brand. <br />If you're interested in a campaign on RateYourStyle, or if you'd like to learn more, please fill out this form.</div>
+                    <div>Creating a campaigns on RateYourStyle is a direct way for your company to engage with and give back to the loyal consumers of your brand. A campaign is also ideal for market research and as a form of advertisement for your brand. <br />If you&apos;re interested in a campaign on RateYourStyle, or if you&apos;d like to learn more, please fill out this form.</div>
 
                 </section>
             </main>

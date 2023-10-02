@@ -1,5 +1,5 @@
-import type { NextPage } from "next";
 import { GetServerSideProps } from 'next';
+import Link from "next/link";
 
 import { GetOutfitsByUser, Outfit } from '../../apis/get_outfits';
 import { GetRatings, Rating } from '../../apis/get_ratings';
@@ -78,7 +78,7 @@ export default function Index({ cookie, username, outfits, ratings, error }: Pro
                 <Navbar cookie={cookie} user={username} />
                 <main className="mt-6 p-8">
                     <h1>😕 Oh no</h1>
-                    Looks like there's an error on our end. Please refresh the page in a
+                    Looks like there&apos;s an error on our end. Please refresh the page in a
                     few minutes. If the issue persists, please email
                     sitesbystephanie@gmail.com.
                 </main>
@@ -94,9 +94,9 @@ export default function Index({ cookie, username, outfits, ratings, error }: Pro
                     <h1 className="text-gray-200">Your outfits go here.</h1>
                     <p>
                         Click{" "}
-                        <a className="underline text-pink" href="/post-outfit">
-                            here
-                        </a>{" "}
+                        <Link href="/post-outfit">
+                            <a className="underline text-pink" >here</a>
+                        </Link>{" "}
                         to post your first outfit.
                     </p>
                 </main>
