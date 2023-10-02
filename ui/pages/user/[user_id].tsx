@@ -5,7 +5,7 @@ import { GetOutfitsByUser, Outfit } from '../../apis/get_outfits';
 import { GetRatings, Rating } from '../../apis/get_ratings';
 import { GetUsername } from '../../apis/get_user';
 import { Navbar } from '../../components/navarbar';
-import { OutfitCardUser } from '../../components/outfitcard-user';
+import { OutfitCard } from '../../components/outfitcard';
 import { GetServerURL } from "../../apis/get_server";
 
 type Props = {
@@ -114,7 +114,8 @@ export default function Index({ cookie, username, outfits, ratings, error }: Pro
                 </section>
                 {outfits &&
                     outfits.map((item) => (
-                        <OutfitCardUser
+                        <OutfitCard
+                        asUser={true}
                             data={item}
                             key={item.id}
                             ratings={

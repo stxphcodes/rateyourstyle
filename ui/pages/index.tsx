@@ -159,6 +159,7 @@ function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
                     {outfits &&
                         outfits.map((item) => (
                             <OutfitCard
+                                asUser={false}
                                 data={item}
                                 key={item.id}
                                 ratings={
