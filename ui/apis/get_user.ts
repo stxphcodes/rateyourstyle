@@ -2,7 +2,7 @@ export async function GetUsername(server: string, cookie: string): Promise<strin
     let error: Error | null = null 
     let username: string = ""
 
-    await fetch(`${server}/username`, {
+    await fetch(`${server}/api/username`, {
         method: "GET",
         headers: {
             'content-type': "text/plain",

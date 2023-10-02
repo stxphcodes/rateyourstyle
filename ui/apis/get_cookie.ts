@@ -2,7 +2,7 @@ export async function GetCookie(server: string): Promise<string | Error> {
   let error: Error | null = null;
   let cookie: string = "";
 
-  await fetch(`${server}/cookie`)
+  await fetch(`${server}/api/cookie`)
     .then((response) => {
       if (!response.ok) {
         throw new Error("response not ok");

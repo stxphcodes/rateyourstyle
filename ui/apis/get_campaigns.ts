@@ -12,7 +12,7 @@ export type Campaign= {
     let error: Error | null = null;
     let campaigns: Campaign[] = [];
   
-    await fetch(`${server}/campaigns`)
+    await fetch(`${server}/api/campaigns`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("response not ok");

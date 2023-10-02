@@ -6,7 +6,7 @@ export async function PostOutfit(
 ): Promise<Error | null> {
     let error: Error | null = null
 
-    await fetch(`${server}/outfit`, {
+    await fetch(`${server}/api/outfit`, {
         method: "POST",
         body: JSON.stringify(outfit),
         headers: {

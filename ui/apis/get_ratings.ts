@@ -8,7 +8,7 @@ export async function GetRatings(server: string): Promise<Rating[] | Error> {
   let error: Error | null = null;
   let ratings: Rating[] = [];
 
-  await fetch(`${server}/ratings`, {
+  await fetch(`${server}/api/ratings`, {
     method: "GET",
     headers: {
       "content-type": "application/json",

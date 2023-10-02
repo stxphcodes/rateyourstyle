@@ -6,7 +6,7 @@ export async function PostImage(
     let error: Error | null = null
     let imageURL: string = ""
 
-    await fetch(`${server}/image`, {
+    await fetch(`${server}/api/image`, {
         method: "POST",
         body: formData,
         headers: {

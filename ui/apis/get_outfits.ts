@@ -24,7 +24,7 @@ export async function GetOutfits(server: string): Promise<Outfit[] | Error> {
   let error: Error | null = null;
   let outfits: Outfit[] = [];
 
-  await fetch(`${server}/outfits`)
+  await fetch(`${server}/api/outfits`)
     .then((response) => {
       if (!response.ok) {
         throw new Error("response not ok");
@@ -50,7 +50,7 @@ export async function GetOutfitsByUser(server: string, cookie: string): Promise<
     let error: Error | null = null;
     let outfits: Outfit[] = [];
   
-    await fetch(`${server}/user/outfits`, {
+    await fetch(`${server}/api/user/outfits`, {
         method: "GET",
         headers: {
             'content-type': "application/json",

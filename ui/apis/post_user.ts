@@ -8,7 +8,7 @@ export async function PostUser(
   let error: Error | null = null;
 
   try {
-    const resp = await fetch(`${server}/user`, {
+    const resp = await fetch(`${server}/api/user`, {
       method: "POST",
       body: JSON.stringify({
         username: username,

@@ -96,12 +96,12 @@ func run() error {
 		return ctx.JSON(200, nil)
 	})
 
-	mux.GET("/outfits", handler.GetOutfits())
-	mux.GET("/user/outfits", handler.GetOutfitsByUser())
+	mux.GET("/api/outfits", handler.GetOutfits())
+	mux.GET("/api/user/outfits", handler.GetOutfitsByUser())
 
-	mux.GET("/cookie", handler.GetCookie())
+	mux.GET("/api/cookie", handler.GetCookie())
 
-	mux.GET("/campaigns", func(ctx echo.Context) error {
+	mux.GET("/api/campaigns", func(ctx echo.Context) error {
 		bytes, err := os.ReadFile("campaigns.json")
 		if err != nil {
 			return ctx.JSON(500, err.Error())
@@ -115,17 +115,17 @@ func run() error {
 		return ctx.JSON(200, a)
 	})
 
-	mux.GET("/username", handler.GetUsername())
+	mux.GET("/api/username", handler.GetUsername())
 
-	mux.GET("/ratings", handler.GetRatings())
+	mux.GET("/api/ratings", handler.GetRatings())
 
-	mux.POST("/signin", handler.PostSignIn())
+	mux.POST("/api/signin", handler.PostSignIn())
 
-	mux.POST("/user", handler.PostUser())
+	mux.POST("/api/user", handler.PostUser())
 
-	mux.POST("/image", handler.PostImage())
+	mux.POST("/api/image", handler.PostImage())
 
-	mux.POST("/outfit", handler.PostOutfit())
+	mux.POST("/api/outfit", handler.PostOutfit())
 
 	return mux.Start(cfg.HttpAddr)
 }

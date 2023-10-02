@@ -4,7 +4,7 @@ export function GetServerURL(clientSide?: boolean) {
     }
 
     if (process.env.NEXT_PUBLIC_SERVER_URL ) {
-        return process.env.NEXT_PUBLIC_SERVER_URL 
+        return process.env.NEXT_PUBLIC_SERVER_URL
     }
 
     if (process.env.NODE_ENV == "development") {

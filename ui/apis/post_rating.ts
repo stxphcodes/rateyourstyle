@@ -7,7 +7,7 @@ export async function PostRating(
     let error: Error | null = null
 
     try {
-        const resp = await fetch(`${server}/rating`, {
+        const resp = await fetch(`${server}/api/rating`, {
             method: "POST",
             body: JSON.stringify({
                 outfit_id: outfitId, 
