@@ -42,14 +42,15 @@ func main() {
 
 func run() error {
 	var (
-		cfg Config
+		cfg           Config
+		campaignsPath string
 	)
 	flag.StringVar(&cfg.HttpAddr, "http.addr", "0.0.0.0:8000", "HTTP bind address.")
 	flag.StringVar(&cfg.HealthAddr, "health.addr", "0.0.0.0:8001", "HTTP health address.")
 	flag.StringVar(&cfg.CORSOrigins, "cors.origin", "*", "CORS origins, separated by ,")
 	flag.StringVar(&cfg.GCS.CredsPath, "gcs.creds", "", "Path to GCS credentials file")
 	flag.StringVar(&cfg.GCS.BucketName, "gcs.bucket", "rateyourstyle", "Name of GCS bucket")
-
+	flag.StringVar(&campaignsPath, "campaigns.path", "campaigns.json", "Path to campaigns file")
 	flag.Parse()
 
 	if err := validateConfig(&cfg); err != nil {
@@ -97,7 +98,7 @@ func run() error {
 	})
 
 	mux.GET("/api/campaigns", func(ctx echo.Context) error {
-		bytes, err := os.ReadFile("campaigns.json")
+		bytes, err := os.ReadFile(campaignsPath)
 		if err != nil {
 			return ctx.JSON(500, err.Error())
 		}

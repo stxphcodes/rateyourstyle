@@ -3,15 +3,19 @@ services:
   server:
     build:
       context: ./server
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - "8000:8000"
     volumes:
       - ./secrets/:/secrets
+      - ./server/dist/linux-amd64/:/mnt
+      - ./server/campaigns.json/:/mnt/campaigns.json
 
     command:
-      - "/app"
+      # sh -c "tail -f /dev/null"
+      - "./mnt/app"
       - "--gcs.creds=/secrets/localdev_sa.json"
+      - "--campaigns.path=/mnt/campaigns.json"
   ui:
     build:
       context: ./ui
@@ -33,3 +37,5 @@ services:
     command: "npm run dev"
     #to here to test prod build.
     #command: "npm start"
+    depends_on:
+      - server
