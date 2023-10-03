@@ -121,7 +121,23 @@ func (h Handler) GetOutfitsByUser() echo.HandlerFunc {
 
 func (h Handler) GetRatings() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		return ctx.JSON(http.StatusOK, h.RatingIndices.AllRatings)
+		arr := []interface{}{}
+
+		for _, rating := range h.RatingIndices.AllRatings {
+			cookie, ok := h.UserIndices.IdCookie[rating.UserId]
+			if !ok {
+				continue
+			}
+
+			arr = append(arr, map[string]interface{}{
+				"cookie":    cookie,
+				"user_id":   rating.UserId,
+				"rating":    rating.Rating,
+				"outfit_id": rating.OutfitId,
+			},
+			)
+		}
+		return ctx.JSON(http.StatusOK, arr)
 	}
 }
 
@@ -337,6 +353,7 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 		h.UserIndices.CookieUsername[data.Cookie] = data.Username
 		h.UserIndices.IdUsername[data.Id] = data.Username
 		h.UserIndices.CookieId[data.Cookie] = data.Id
+		h.UserIndices.IdCookie[data.Id] = data.Cookie
 
 		// return user cookie in response
 		return ctx.String(http.StatusCreated, createCookieStr(data.Cookie))
@@ -367,8 +384,11 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 		// read original file
 		ratings, err := getRatingsByOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, "data/ratings/"+data.OutfitId+".json")
 		if err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
+			// object doesn't exist
+			if !strings.Contains(err.Error(), "exist") {
+				log.Println(err.Error())
+				return ctx.NoContent(http.StatusInternalServerError)
+			}
 		}
 
 		found := false
@@ -396,7 +416,15 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 		writer.Close()
 
 		// update indices
-		h.RatingIndices.AllRatings = append(h.RatingIndices.AllRatings, &data)
+		if !found {
+			h.RatingIndices.AllRatings = append(h.RatingIndices.AllRatings, &data)
+		} else {
+			for index, r := range h.RatingIndices.AllRatings {
+				if r.OutfitId == data.OutfitId && r.UserId == data.UserId {
+					h.RatingIndices.AllRatings[index].Rating = data.Rating
+				}
+			}
+		}
 		return ctx.NoContent(http.StatusCreated)
 	}
 }

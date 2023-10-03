@@ -9,6 +9,7 @@ import { OutfitCard } from '../../components/outfitcard';
 import { GetServerURL } from "../../apis/get_server";
 
 type Props = {
+    server: string;
     cookie: string;
     username: string;
     error: string | null;
@@ -17,9 +18,8 @@ type Props = {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const server = GetServerURL();
-
     let props: Props = {
+        server:  GetServerURL(),
         cookie: "",
         username: "",
         error: null,
@@ -31,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props.cookie = cookie ? cookie : "";
 
     if (cookie) {
-        const usernameResp = await GetUsername(server, cookie);
+        const usernameResp = await GetUsername(props.server, cookie);
         if (!(usernameResp instanceof Error)) {
             props.username = usernameResp;
         }
@@ -42,14 +42,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         return { props };
     }
 
-    const resp = await GetOutfitsByUser(server, props.cookie);
+    const resp = await GetOutfitsByUser(props.server, props.cookie);
     if (resp instanceof Error) {
         props.error = resp.message;
         return { props };
     }
     props.outfits = resp;
 
-    const ratingResp = await GetRatings(server);
+    const ratingResp = await GetRatings(props.server);
     if (ratingResp instanceof Error) {
         props.error = ratingResp.message;
         return { props };
@@ -59,7 +59,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props };
 };
 
-export default function Index({ cookie, username, outfits, ratings, error }: Props) {
+export default function Index({ server, cookie, username, outfits, ratings, error }: Props) {
     if (error) {
         if (error == "forbidden") {
             return (
@@ -115,6 +115,7 @@ export default function Index({ cookie, username, outfits, ratings, error }: Pro
                 {outfits &&
                     outfits.map((item) => (
                         <OutfitCard
+                        cookie={cookie}
                         asUser={true}
                             data={item}
                             key={item.id}

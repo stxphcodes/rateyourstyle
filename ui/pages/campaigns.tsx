@@ -58,20 +58,8 @@ function Campaigns({campaigns, cookie, error}: Props) {
                     </div>
                 </section>
 
-                <section className="my-8">
+                <section className="my-4">
                     <h1>Active Campaigns</h1>
-
-                    {/* {campaigns?.map((item) => (
-                            <div
-                                className={`w-3/4  shadow rounded-lg h-fit my-2 `}
-                                // style={{color: `${item.background_img}`}}
-                                key={item.tag}
-                            >
-                                <h2 className="p-2 text-white rounded" style={{backgroundColor: `${item.background_img}`}}>{item.tag}</h2>
-                                <p className="p-2"> Ends on: {item.date_ending}</p>
-                                <p className="mt-4 p-2">{item.description}</p>
-                            </div>
-                        ))} */}
 
                     {campaigns?.map((item) => (
                         <div
@@ -84,24 +72,10 @@ function Campaigns({campaigns, cookie, error}: Props) {
                             <p className="mt-4">{item.description}</p>
                         </div>
                     ))}
-
-                    {/* <div className="grid grid-cols-2 gap-4 mt-4">
-                        {campaigns?.map((item) => (
-                            <div
-                                className={`w-full h-40 text-white p-4 rounded-lg h-fit`}
-                                style={{backgroundColor: `${item.background_img}`}}
-                                key={item.tag}
-                            >
-                                <h2>{item.tag}</h2>
-                                <p>Ends on: {item.date_ending}</p>
-                                <p className="mt-4">{item.description}</p>
-                            </div>
-                        ))}
-                    </div> */}
                 </section>
                 <section>
                     <h1>Create a Campaign</h1>
-                    <div>Creating a campaigns on RateYourStyle is a direct way for your company to engage with and give back to the loyal consumers of your brand. A campaign is also ideal for market research and as a form of advertisement for your brand. <br />If you&apos;re interested in a campaign on RateYourStyle, or if you&apos;d like to learn more, please fill out this form.</div>
+                    <div>Creating a campaign on RateYourStyle is a direct way for your company to engage with and give back to the loyal consumers of your brand. A campaign is also a great way to conduct market research and doubles as a form of advertisement. If you&apos;re interested in starting a campaign on RateYourStyle, please contact us at sitesbystephanie@gmail.com.</div>
 
                 </section>
             </main>

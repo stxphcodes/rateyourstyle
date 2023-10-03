@@ -14,6 +14,7 @@ import { GetServerURL } from "../apis/get_server";
 type Props = {
     campaigns: Campaign[] | null;
     cookie: string;
+    server: string;
     error: string | null;
     outfits: Outfit[] | null;
     ratings: Rating[] | null;
@@ -26,29 +27,28 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         ratings: null,
         error: null,
         outfits: null,
+        server: GetServerURL(),
     };
-
-    let server = GetServerURL()
 
     if (context.req.cookies["rys-login"]) {
         props.cookie = context.req.cookies["rys-login"];
     }
 
-    const campaignResp = await GetCampaigns(server);
+    const campaignResp = await GetCampaigns(props.server);
     if (campaignResp instanceof Error) {
         props.error = campaignResp.message;
         return { props };
     }
     props.campaigns = campaignResp;
 
-    const outfitResp = await GetOutfits(server);
+    const outfitResp = await GetOutfits(props.server);
     if (outfitResp instanceof Error) {
         props.error = outfitResp.message;
         return { props };
     }
     props.outfits = outfitResp;
 
-    const ratingResp = await GetRatings(server);
+    const ratingResp = await GetRatings(props.server);
     if (ratingResp instanceof Error) {
         props.error = ratingResp.message;
         return { props };
@@ -58,9 +58,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props };
 };
 
-function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
+function Home({ campaigns, server, cookie, outfits, ratings, error }: Props) {
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
-    const [searchInput, setSearchInput] = useState<string>("");
     const [readMore, setReadMore] = useState(() => {
         let intialState =
             campaigns &&
@@ -85,11 +84,11 @@ function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
                     <h1>Welcome to Rate Your Style</h1>
                     <div className="">
                         Creating a fashion database ranging from casual outfits to chic ensembles worn by the everyday fashion enthusiast. Use the database to find inspo, read
-                        reviews, and upload your own outfit reviews. Check out currently active <Link href="/campaigns"><a className="text-pink underline">campaigns</a></Link> for a chance to win prizes and giveaways.
+                        reviews, rate outfits, and upload your own. Check out currently active <Link href="/campaigns"><a className="text-pink underline">campaigns</a></Link> for a chance to win prizes and giveaways.
                     </div>
                 </section>
 
-                <section className="my-8">
+                <section className="my-4">
                     <h1>Discover</h1>
                     <div className="mb-4">
                         Click on a hashtag to see the outfits that have been uploaded for the current campaigns.
@@ -111,7 +110,7 @@ function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
                                     >
                                         {item.tag}
                                     </h3>
-                                    <input type="checkbox" onClick={() => {
+                                    <input type="checkbox" onChange={() => {
                                         let checked = searchTerms.filter(term => item.tag == term).length > 0
 
                                         setSearchTerms(
@@ -157,16 +156,32 @@ function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
 
                 <section>
                     {outfits &&
-                        outfits.map((item) => (
-                            <OutfitCard
-                                asUser={false}
-                                data={item}
-                                key={item.id}
-                                ratings={
-                                    ratings ? ratings.filter((r) => r.outfit_id == item.id) : null
-                                }
-                            />
-                        ))}
+                        outfits.map((item) => {
+                            let outfitRatings = ratings ?
+                                ratings.filter((r) => r.outfit_id == item.id) :
+                                null
+
+                            let userRatingFiltered = outfitRatings ? outfitRatings.filter(r => r.cookie == cookie) : null
+
+                            let userRating = 0
+                            if (
+                                userRatingFiltered &&
+                                userRatingFiltered.length > 0
+                            ) {
+                                userRating = userRatingFiltered[0].rating
+                            }
+
+                            return (
+                                <OutfitCard
+                                    cookie={cookie}
+                                    asUser={false}
+                                    data={item}
+                                    key={item.id}
+                                    ratings={outfitRatings}
+                                    userRating={userRating}
+                                />
+                            )
+                        })}
                 </section>
             </main>
             <Footer />

@@ -22,6 +22,7 @@ type UserIndices struct {
 	CookieUsername map[string]string // cookie to username
 	CookieId       map[string]string // cookie to user id
 	IdUsername     map[string]string // id to username
+	IdCookie       map[string]string // id to cookie
 }
 
 func getAllUsers(ctx context.Context, bucket *gcs.BucketHandle) ([]User, error) {
@@ -57,6 +58,7 @@ func createUserIndices(ctx context.Context, client *gcs.Client, bucket *gcs.Buck
 		CookieUsername: make(map[string]string),
 		CookieId:       make(map[string]string),
 		IdUsername:     make(map[string]string),
+		IdCookie:       make(map[string]string),
 	}
 
 	for _, user := range users {
@@ -68,6 +70,7 @@ func createUserIndices(ctx context.Context, client *gcs.Client, bucket *gcs.Buck
 		}
 
 		indices.CookieId[user.Cookie] = user.Id
+		indices.IdCookie[user.Id] = user.Cookie
 	}
 
 	return indices, nil

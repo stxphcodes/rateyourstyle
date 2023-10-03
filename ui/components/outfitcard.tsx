@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Outfit } from '../apis/get_outfits';
-import { Rating } from '../apis/get_ratings';
+import { GetRatings, Rating } from '../apis/get_ratings';
 import { Modal } from './modals';
+import { PostRating } from '../apis/post_rating';
+import { GetServerURL } from '../apis/get_server';
 
 function average(arr: number[]) {
 	let sum = 0;
@@ -24,20 +26,47 @@ function PSpan(props: { span: string; p: string }) {
 }
 
 export function OutfitCard(props: {
+	cookie: string;
 	data: Outfit;
 	ratings: Rating[] | null;
+	userRating?: number;
 	username?: string;
 	asUser?: boolean;
 }) {
+	const server = GetServerURL(true)
+
 	const [expandImage, setExpandImage] = useState<boolean>(false);
 	const [submitRating, setSubmitRating] = useState<boolean>(false);
-	const [userItemRating, setUserItemRating] = useState<number>(2.5);
+	const [userItemRating, setUserItemRating] = useState<number>(props.userRating ? props.userRating : 0);
+	const [ratingSubmissionStatus, setRatingSubmissionStatus] = useState("")
+	const [allRatings, setAllRatings] = useState<Rating[] | null>(props.ratings)
+	const [ratingAverage, setRatingAverage] = useState<number | null>(null)
 
-	let avg: number | null = null;
-	if (props.ratings) {
-		let ratingsArr = props.ratings.map((item) => Number(item.rating));
-		avg = average(ratingsArr);
-	}
+	const handleSubmitRating = async (e: any) => {
+		e.preventDefault();
+
+		const resp = await PostRating(server, props.cookie, props.data.id, userItemRating)
+		if (resp instanceof Error) {
+			setRatingSubmissionStatus("errorOnSubmission");
+			return;
+		}
+
+		setRatingSubmissionStatus("success");
+		const ratingResp = await GetRatings(server)
+		if (!(ratingResp instanceof Error)) {
+			setAllRatings(ratingResp.filter(r => r.outfit_id == props.data.id))
+		}
+
+		setSubmitRating(false);
+	};
+
+	useEffect(() => {
+		if (allRatings) {
+			let ratingsArr = allRatings.map((item) => Number(item.rating));
+			setRatingAverage(average(ratingsArr))
+		}
+
+	}, [allRatings])
 
 	return (
 		<>
@@ -67,6 +96,7 @@ export function OutfitCard(props: {
 									)
 								}
 								<PSpan p={props.data.date} span="date" />
+								<PSpan span={"visibility"} p={props.data.private ? "private 🔐" : "public 🌎"} />
 								<p className="font-bold">tags:</p>
 								<div className="flex gap-2">
 									{props.data.style_tags.map((item) => (
@@ -76,16 +106,16 @@ export function OutfitCard(props: {
 							</div>
 							<div className="col-span-2">
 								<div className="flex items-center">
-									{!avg ? (
+									{!ratingAverage ? (
 										<>
 											<Rating x={0} />
 											<div className="mx-2">no ratings submitted yet</div>
 										</>
 									) : (
 										<>
-											<Rating x={avg} />
+											<Rating x={ratingAverage} />
 											<div className="mx-2">
-												from {props.ratings && props.ratings.length} ratings
+												from {allRatings && allRatings.length} ratings
 											</div>
 										</>
 									)}
@@ -93,42 +123,49 @@ export function OutfitCard(props: {
 
 								{!props.asUser && (
 									<div className="flex gap-4 items-center">
-										<Rating x={userItemRating} />
-										<div className="w-fit">
-											<label>Your rating</label>
-											<input
-												id="rating"
-												type="range"
-												min="1"
-												max="5"
-												step="0.5"
-												className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer  p-0 m-0"
-												onChange={(e) =>
-													setUserItemRating(Number(e.target.value))
-												}
-												list="rating"
-												value={userItemRating}
-											/>
-											<datalist
-												className="flex text-pink -mt-2 p-0 justify-between items-start"
-												id="rating"
-											>
-												<option className="text-xs">|</option>
-												<option className="text-xs">|</option>
-												<option className="text-xs">|</option>
-												<option className="text-xs">|</option>
-												<option className="text-xs">|</option>
-											</datalist>
-										</div>
-										<button
-											className="bg-pink text-white p-1 rounded hover:bg-black"
-											onClick={(e) => {
-												e.preventDefault();
-												setSubmitRating(false);
-											}}
-										>
-											submit
-										</button>
+										{!submitRating ? (
+											<>
+												<Rating x={userItemRating} />
+												<div className="underline hover:cursor-pointer" onClick={() => setSubmitRating(true)}>{userItemRating == 0 ? "submit your rating" : "edit your rating"}</div>
+											</>
+										) : (
+											<>
+												<Rating x={userItemRating} />
+												<div className="w-fit">
+													<label>Your rating</label>
+													<input
+														id="rating"
+														type="range"
+														min="1"
+														max="5"
+														step="0.5"
+														className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer  p-0 m-0"
+														onChange={(e) =>
+															setUserItemRating(Number(e.target.value))
+														}
+														list="rating"
+														value={userItemRating}
+													/>
+													<datalist
+														className="flex text-pink -mt-2 p-0 justify-between items-start"
+														id="rating"
+													>
+														<option className="text-xs">|</option>
+														<option className="text-xs">|</option>
+														<option className="text-xs">|</option>
+														<option className="text-xs">|</option>
+														<option className="text-xs">|</option>
+													</datalist>
+												</div>
+												<button
+													className="bg-pink text-white p-1 rounded hover:bg-black"
+													onClick={handleSubmitRating}
+												>
+													submit
+												</button>
+											</>
+										)
+										}
 									</div>
 								)}
 							</div>

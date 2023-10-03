@@ -44,11 +44,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	const resp = await GetCampaigns(server);
 	if (resp instanceof Error) {
 		props.error = resp.message;
-		return {props};
+		return { props };
 	}
 	props.campaigns = resp;
 
-	return {props};
+	return { props };
 };
 
 function validateForm(
@@ -76,7 +76,7 @@ function validateForm(
 	}
 }
 
-function PostOutfitPage({campaigns, cookie, username, server, error}: Props) {
+function PostOutfitPage({ campaigns, cookie, username, server, error }: Props) {
 	const [file, setFile] = useState<File | null>(null);
 	const [imageURL, setImageURL] = useState<string | null>("");
 	const [fileError, setFileError] = useState<string | null>("");
@@ -241,7 +241,7 @@ function PostOutfitPage({campaigns, cookie, username, server, error}: Props) {
 			<Navbar cookie={cookie} user={username} />
 
 			<main className="mt-6 p-4 md:p-8 w-full md:w-3/4">
-				<section className="mb-8">
+				<section className="my-4">
 					<h1>Outfit Post</h1>
 					{!username && (
 						<div className="bg-red-700 p-2 rounded text-white">
@@ -251,6 +251,14 @@ function PostOutfitPage({campaigns, cookie, username, server, error}: Props) {
 							you don&apos;t have one!
 						</div>
 					)}
+					<div className="bg-off-white p-2 rounded">
+						<h3>FAQs</h3>
+						<div className="font-semibold mt-2">Who can see my outfit posts?</div>
+						<p>Each outfit post has its own privacy setting. If you set the post to be private, then your post will <span className="underline">not</span> appear on the homepage and it is not discoverable by the general public. It is only visible to you, the creator of the post, when you log into your account.<br />However, if your post includes a campaign #tag, the sponsor of the campaign is also able view the post, regardless of the privacy setting on the post. </p>
+						<div className="font-semibold mt-2">How will I be notified if I win a campaign?</div>
+						<p>You will be notified via the email associated to your user account the next day after a campaign ends.</p>
+
+					</div>
 				</section>
 				{formSubmissionStatus == "success" && (
 					<div className="h-screen">

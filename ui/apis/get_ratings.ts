@@ -1,4 +1,5 @@
 export type Rating = {
+  cookie: string;
   user_id: string;
   outfit_id: string;
   rating: any;
@@ -23,8 +24,6 @@ export async function GetRatings(server: string): Promise<Rating[] | Error> {
     })
     .then((data: Rating[]) => {
       ratings = data;
-      console.log("in sever");
-      console.log(ratings[0].outfit_id);
     })
     .catch((err: Error) => {
       error = err;
