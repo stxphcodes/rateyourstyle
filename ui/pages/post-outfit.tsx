@@ -254,7 +254,7 @@ function PostOutfitPage({ campaigns, cookie, username, server, error }: Props) {
 					<div className="bg-off-white p-2 rounded">
 						<h3>FAQs</h3>
 						<div className="font-semibold mt-2">Who can see my outfit posts?</div>
-						<p>Each outfit post has its own privacy setting. If you set the post to be private, then your post will <span className="underline">not</span> appear on the homepage and it is not discoverable by the general public. It is only visible to you, the creator of the post, when you log into your account.<br />However, if your post includes a campaign #tag, the sponsor of the campaign is also able view the post, regardless of the privacy setting on the post. </p>
+						<p>Each outfit post has its own privacy setting. Private posts do{" "}<span className="underline">not</span> appear on the homepage and are not discoverable by the general public. The post is only visible to you, the creator of the post, when you log into your account However, if your post includes a campaign #tag, the sponsor of the campaign is also able view the post, regardless of the privacy setting on the post. </p>
 						<div className="font-semibold mt-2">How will I be notified if I win a campaign?</div>
 						<p>You will be notified via the email associated to your user account the next day after a campaign ends.</p>
 
@@ -359,7 +359,7 @@ function PostOutfitPage({ campaigns, cookie, username, server, error }: Props) {
 
 						<div className="my-4">
 							<label>
-								Select a tag from the options below or enter your own. Start
+								Select as many tags from the options below or enter your own. Start
 								tags with &apos;#&apos;
 							</label>
 							<input

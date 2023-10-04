@@ -87,7 +87,7 @@ export function OutfitCard(props: {
 
 					<div className="col-span-3 bg-white p-4 rounded-md">
 						<div className="md:grid md:grid-cols-3 gap-x-4">
-							<div className="my-2 col-span-1">
+							<div className="col-span-1">
 								<h3 className="font-semibold">{props.data.title}</h3>
 								{
 									!props.asUser && (
@@ -105,6 +105,7 @@ export function OutfitCard(props: {
 								</div>
 							</div>
 							<div className="col-span-2">
+								<h4 className="font-semibold">Audience Rating:</h4>
 								<div className="flex items-center">
 									{!ratingAverage ? (
 										<>
@@ -193,7 +194,7 @@ export function OutfitCard(props: {
 											<div className="flex items-start">
 												<Rating x={item.rating} small={true} />
 
-												<div className="mx-2 break-words">{item.review}</div>
+												<div className="mx-2 break-words">&quot;{item.review}&quot;</div>
 											</div>
 										</div>
 										<hr className="col-span-3 my-2" />

@@ -1,6 +1,5 @@
-import type { NextPage } from "next";
 import { GetServerSideProps } from 'next';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from "next/link";
 
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
@@ -58,7 +57,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props };
 };
 
-function Home({ campaigns, server, cookie, outfits, ratings, error }: Props) {
+function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
     const [readMore, setReadMore] = useState(() => {
         let intialState =
@@ -71,6 +70,33 @@ function Home({ campaigns, server, cookie, outfits, ratings, error }: Props) {
         return intialState;
     });
 
+    const [outfitsFiltered, setOutfitsFiltered] = useState<Outfit[] | null>(outfits);
+
+    useEffect(() => {
+        if (searchTerms.length == 0) {
+            setOutfitsFiltered(outfits)
+            return
+        }
+
+        let filtered: Outfit[] = []
+        outfits?.forEach(outfit => {
+            let tagFound = false
+            outfit.style_tags.forEach(tag => {
+                if (searchTerms.includes(tag)) {
+                    tagFound = true
+                    return;
+                }
+            })
+
+            if (tagFound) {
+                filtered.push(outfit)
+            }
+        })
+
+        setOutfitsFiltered(filtered)
+
+    }, [searchTerms])
+
     if (error) {
         return <div>error {error} </div>;
     }
@@ -78,7 +104,6 @@ function Home({ campaigns, server, cookie, outfits, ratings, error }: Props) {
     return (
         <>
             <Navbar cookie={cookie} />
-
             <main className="mt-6 p-8">
                 <section className="my-4">
                     <h1>Welcome to Rate Your Style</h1>
@@ -91,7 +116,7 @@ function Home({ campaigns, server, cookie, outfits, ratings, error }: Props) {
                 <section className="my-4">
                     <h1>Discover</h1>
                     <div className="mb-4">
-                        Click on a hashtag to see the outfits that have been uploaded for the current campaigns.
+                        Click on a campaign hashtag to see the public outfits that have been uploaded for it so far. To rate an outfit, click on &apos;submit your rating&apos; in the outfit card.
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
@@ -155,8 +180,13 @@ function Home({ campaigns, server, cookie, outfits, ratings, error }: Props) {
                 </section>
 
                 <section>
-                    {outfits &&
-                        outfits.map((item) => {
+                    {
+                        (!outfitsFiltered || outfitsFiltered.length == 0) &&
+                        <div className="h-screen">No results at this time </div>
+                    }
+
+                    {outfitsFiltered &&
+                        outfitsFiltered.map((item) => {
                             let outfitRatings = ratings ?
                                 ratings.filter((r) => r.outfit_id == item.id) :
                                 null

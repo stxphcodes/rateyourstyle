@@ -112,6 +112,12 @@ export default function Index({ server, cookie, username, outfits, ratings, erro
                     <div>Username: {username}</div>
                     <div>Email: szh2425@gmail.com</div>
                 </section>
+                <section className="my-4">
+                <div className="bg-red-500 p-2 rounded text-white">
+							RateYourStyle is still being developed and we currently don&apos;t support editing outfit posts. This feature is coming very soon, I promise! If you have an outfit post that you want to edit, pleae email sitesbystephanie@gmail.com. Thank you for your patience and understanding 💛.
+						</div>
+                    
+                </section>
                 {outfits &&
                     outfits.map((item) => (
                         <OutfitCard

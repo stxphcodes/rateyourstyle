@@ -43,10 +43,7 @@ function Campaigns({campaigns, cookie, error}: Props) {
                 <section className="my-4">
                     <h1>Campaigns</h1>
                     <div className="">
-                        RateYourStyle partners with companies to create campaigns that help
-                        showcase your style.
-
-                        To apply to an active campaign,{" "}
+                        RateYourStyle partners with local boutiques and brands to create campaigns that celebrate, reward and showcase our users&apos; style and fashion. To apply to an active campaign,{" "}
                         <Link  href="/post-outfit">
                             <a className="text-pink underline">Post an Outfit</a> 
                         </Link>{" "}
@@ -75,8 +72,7 @@ function Campaigns({campaigns, cookie, error}: Props) {
                 </section>
                 <section>
                     <h1>Create a Campaign</h1>
-                    <div>Creating a campaign on RateYourStyle is a direct way for your company to engage with and give back to the loyal consumers of your brand. A campaign is also a great way to conduct market research and doubles as a form of advertisement. If you&apos;re interested in starting a campaign on RateYourStyle, please contact us at sitesbystephanie@gmail.com.</div>
-
+                    <div>Creating a campaign on RateYourStyle is a direct way for your company to engage with and give back to the loyal consumers of your brand. A campaign is also a great way to conduct market research and doubles as a form of advertisement. If you&apos;re interested in starting a campaign on RateYourStyle, please send us an email: sitesbystephanie@gmail.com.</div>
                 </section>
             </main>
             <Footer />
