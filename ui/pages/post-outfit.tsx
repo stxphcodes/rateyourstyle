@@ -246,8 +246,7 @@ function PostOutfitPage({ campaigns, cookie, username, server, error }: Props) {
 					{!username && (
 						<div className="bg-red-700 p-2 rounded text-white">
 							You are not currently signed into an account. You can still create
-							a post but it will be difficult to edit it later on. To make it
-							easier to track your posts, please sign in or create an account if
+							a post but your post will be inelible for campaign giveaways since we don&apos;t have an email to contact you with if you were to win. If you are applying to a campaign, please sign in or create an account if
 							you don&apos;t have one!
 						</div>
 					)}

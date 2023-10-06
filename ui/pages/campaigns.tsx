@@ -41,9 +41,9 @@ function Campaigns({campaigns, cookie, error}: Props) {
 
             <main className="mt-6 p-8">
                 <section className="my-4">
-                    <h1>Campaigns</h1>
+                    <h1>How It Works</h1>
                     <div className="">
-                        RateYourStyle partners with local boutiques and brands to create campaigns that celebrate, reward and showcase our users&apos; style and fashion. To apply to an active campaign,{" "}
+                        RateYourStyle partners with local boutiques and brands to create campaigns that celebrate, reward and showcase our users&apos; style and fashion. Typically, at the end of the campaign, a few posts tagged with the campaign #tag will be selected to win $100 gift cards. Each campaign has its own requirements and rewards, so be sure to read campaign descriptions carefully. <br /> <br /> To apply to an active campaign,{" "}
                         <Link  href="/post-outfit">
                             <a className="text-pink underline">Post an Outfit</a> 
                         </Link>{" "}

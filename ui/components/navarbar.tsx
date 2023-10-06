@@ -30,6 +30,7 @@ export function Navbar(props: { cookie: string; user?: string }) {
 
 			// set cookie in browser
 			document.cookie = resp;
+			location.reload();
 		}
 
 		async function getusername() {
@@ -55,7 +56,7 @@ export function Navbar(props: { cookie: string; user?: string }) {
 						<a className="mx-2">Home</a>
 					</Link>
 					<Link href="/campaigns">
-						<a className="mx-2">Campaigns</a>
+						<a className="mx-2">Gift Cards</a>
 					</Link>
 					<Link href="/post-outfit">
 						Post an Outfit

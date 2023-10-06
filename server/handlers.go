@@ -52,6 +52,7 @@ func (h Handler) GetCookie() echo.HandlerFunc {
 
 		// update indices
 		h.UserIndices.CookieId[user.Cookie] = user.Id
+		h.UserIndices.IdCookie[user.Id] = user.Cookie
 
 		// return user cookie in response
 		return ctx.String(http.StatusCreated, createCookieStr(user.Cookie))
