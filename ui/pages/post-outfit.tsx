@@ -1,5 +1,6 @@
 import { GetServerSideProps } from 'next';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
 import { Outfit, OutfitItem } from '../apis/get_outfits';
@@ -9,16 +10,21 @@ import { PostOutfit } from '../apis/post_outfit';
 import { Footer } from '../components/footer';
 import { Modal, XButton } from '../components/modals';
 import { Navbar } from '../components/navarbar';
+import { GetServerURL } from '../apis/get_server';
 
 type Props = {
 	campaigns: Campaign[] | null;
 	cookie: string;
 	error: string | null;
 	username: string;
+	server: string;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+	const server = GetServerURL()
+
 	let props: Props = {
+		server: server,
 		campaigns: null,
 		cookie: "",
 		error: null,
@@ -29,20 +35,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	props.cookie = cookie ? cookie : "";
 
 	if (props.cookie) {
-		const usernameResp = await GetUsername(props.cookie);
+		const usernameResp = await GetUsername(server, props.cookie);
 		if (!(usernameResp instanceof Error)) {
 			props.username = usernameResp;
 		}
 	}
 
-	const resp = await GetCampaigns();
+	const resp = await GetCampaigns(server);
 	if (resp instanceof Error) {
 		props.error = resp.message;
-		return {props};
+		return { props };
 	}
 	props.campaigns = resp;
 
-	return {props};
+	return { props };
 };
 
 function validateForm(
@@ -70,7 +76,7 @@ function validateForm(
 	}
 }
 
-function PostOutfitPage({campaigns, cookie, username, error}: Props) {
+function PostOutfitPage({ campaigns, cookie, username, server, error }: Props) {
 	const [file, setFile] = useState<File | null>(null);
 	const [imageURL, setImageURL] = useState<string | null>("");
 	const [fileError, setFileError] = useState<string | null>("");
@@ -200,7 +206,7 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 				description: "",
 			};
 
-			const resp = await PostOutfit(cookie, outfit);
+			const resp = await PostOutfit(server, cookie, outfit);
 			if (resp instanceof Error) {
 				setFormSubmissionStatus("errorOnSubmission");
 			} else {
@@ -213,7 +219,7 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 
 	useEffect(() => {
 		async function upload(formData: any) {
-			const resp = await PostImage(formData, cookie);
+			const resp = await PostImage(server, formData, cookie);
 			if (resp instanceof Error) {
 				setFileError(resp.message);
 				return;
@@ -228,23 +234,30 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 
 			upload(formData);
 		}
-	}, [file]);
+	}, [server, cookie, file]);
 
 	return (
 		<>
 			<Navbar cookie={cookie} user={username} />
 
 			<main className="mt-6 p-4 md:p-8 w-full md:w-3/4">
-				<section className="mb-8">
+				<section className="my-4">
 					<h1>Outfit Post</h1>
 					{!username && (
 						<div className="bg-red-700 p-2 rounded text-white">
 							You are not currently signed into an account. You can still create
-							a post but it will be difficult to edit it later on. To make it
-							easier to track your posts, please sign in or create an account if
-							you don't have one!
+							a post but your post will be inelible for campaign giveaways since we don&apos;t have an email to contact you with if you were to win. If you are applying to a campaign, please sign in or create an account if
+							you don&apos;t have one!
 						</div>
 					)}
+					<div className="bg-off-white p-2 rounded">
+						<h3>FAQs</h3>
+						<div className="font-semibold mt-2">Who can see my outfit posts?</div>
+						<p>Each outfit post has its own privacy setting. Private posts do{" "}<span className="underline">not</span> appear on the homepage and are not discoverable by the general public. The post is only visible to you, the creator of the post, when you log into your account However, if your post includes a campaign #tag, the sponsor of the campaign is also able view the post, regardless of the privacy setting on the post. </p>
+						<div className="font-semibold mt-2">How will I be notified if I win a campaign?</div>
+						<p>You will be notified via the email associated to your user account the next day after a campaign ends.</p>
+
+					</div>
 				</section>
 				{formSubmissionStatus == "success" && (
 					<div className="h-screen">
@@ -345,8 +358,8 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 
 						<div className="my-4">
 							<label>
-								Select a tag from the options below or enter your own. Start
-								tags with '#'
+								Select as many tags from the options below or enter your own. Start
+								tags with &apos;#&apos;
 							</label>
 							<input
 								className="w-full"
@@ -449,12 +462,12 @@ function PostOutfitPage({campaigns, cookie, username, error}: Props) {
 			{formSubmissionStatus == "success" && (
 				<Modal handleClose={() => location.assign("/")}>
 					<div>
-						<h2>Lookin' chic✨ </h2>
+						<h2>Lookin&apos; chic✨ </h2>
 						<p>
 							Check out your post on the{" "}
-							<a className="text-pink underline" href="/">
-								homepage
-							</a>{" "}
+							<Link href="/">
+								<a className="text-pink underline">homepage</a>
+							</Link>{" "}
 							and rate outfits you like!
 						</p>
 					</div>

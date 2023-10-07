@@ -1,35 +1,35 @@
 [
     {
-        "tag": "#nike_dunks",
-        "date_starting": "20231001",
-        "date_ending": "20231031",
+        "tag": "#fall_fits",
+        "date_starting": "2023-10-01",
+        "date_ending": "2023-11-15",
         "ended": false,
-        "description": "The Nike Dunks are one of the most popular pair of 👟👟 this year. To apply to this campaign, post an outfit wearing your Nike Dunks. 3️⃣ outfits with the highest number of reviews will receive $100 Nike gift cards.",
-        "background_img": "#e73e06"
-    },
-    {
-        "tag": "#wedding_guest",
-        "date_starting": "20231001",
-        "date_ending": "20231201",
-        "ended": false,
-        "description": "We love celebrating love, and we also love an opportunity to dress up💃🏽. To apply to this campaign, post the outfit that you wore as a wedding guest! One outfit will be selected at random to win a $100 gift card to one of the brands listed in their Outfit.",
-        "background_img": "#3870b6"
-    },
-    {
-        "tag": "#fall_fit",
-        "date_starting": "20231001",
-        "date_ending": "20231201",
-        "ended": false,
-        "description": "Fall is here which means cozy vibes, PSL's and vibrant autumn leaves 🍂🍁. We'd love to see your favorite fall fit! One outfit will be selected at random to win a $50 gift card to Starbucks, or a cafe of your choice. ☕️🥧",
+        "description": "Pumpkin spice lattes? ✅ Apple picking? ✅  Cozy vibes? ✅ Fall is officially here🍂🍁. We'd love to see your favorite fall fit! 3 outfits will be selected at random to win a $100 gift card to a clothing brand of your choice.",
         "background_img": "#ec994a"
     },
     {
         "tag": "#halloween",
-        "date_starting": "20231001",
-        "date_ending": "20231107",
+        "date_starting": "2023-10-01",
+        "date_ending": "2023-11-07",
         "ended": false,
-        "description": "It's spooky season 👻! Share your costume with us for a chance to win a $50 gift card to a clothing brand of your choice.",
+        "description": "B👀! Spooky season sure creeped up fast this year 👻.The costume with the highest number of ratings will win a $100 gift card to a clothing brand of your choice.",
         "background_img": "#039776"
 
+    },
+    {
+        "tag": "#weddings",
+        "date_starting": "2023-10-01",
+        "date_ending": "2023-12-01",
+        "ended": false,
+        "description": "We love celebrating 💖, and we also love an opportunity to dress up 💃🏽. To apply to this campaign, post an outfit that you wore to a wedding. One outfit will be selected at random to win a $100 gift card to a clothing brand of your choice.",
+        "background_img": "#ba7c97"
+    },
+    {
+        "tag": "#work_fits",
+        "date_starting": "2023-10-01",
+        "date_ending": "2023-12-01",
+        "ended": false,
+        "description": "Whether it's PJ's or business casual, we'd love to see what you're wearing to work. If you have a work fit that you'd like to share, please tag it with #work_fits. One outfit will be selected at random to win a $100 gift card to a clothing brand of your choice.",
+        "background_img": "#3870b6"
     }
 ]

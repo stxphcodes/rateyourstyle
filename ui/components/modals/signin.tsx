@@ -2,11 +2,13 @@ import { useState } from 'react';
 
 import { PostSignIn } from '../../apis/post_signin';
 import { Modal } from './';
+import { GetServerURL } from '../../apis/get_server';
 
 export function SignIn(props: {handleClose: any}) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
+    const server = GetServerURL();
 
     function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
         if (event.target.id == "username") {
@@ -21,7 +23,7 @@ export function SignIn(props: {handleClose: any}) {
     async function handleSubmit(event: React.FormEvent<HTMLButtonElement>) {
         event.preventDefault();
 
-        const resp = await PostSignIn(username, password);
+        const resp = await PostSignIn(server, username, password);
         if (resp instanceof Error) {
             setError(resp.message);
             return;

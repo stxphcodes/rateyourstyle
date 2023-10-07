@@ -1,0 +1,41 @@
+version: "3"
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./secrets/:/secrets
+      - ./server/dist/linux-amd64/:/mnt
+      - ./server/campaigns.json/:/mnt/campaigns.json
+
+    command:
+      # sh -c "tail -f /dev/null"
+      - "./mnt/app"
+      - "--gcs.creds=/secrets/localdev_sa.json"
+      - "--campaigns.path=/mnt/campaigns.json"
+  ui:
+    build:
+      context: ./ui
+      # change to Dockerfile for prod build.
+      dockerfile: Dockerfile.dev
+      #dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      # comment out NODE_ENV to test prod build.
+      NODE_ENV: development
+      NEXT_PUBLIC_SERVER_URL: http://host.docker.internal:8000
+
+    # comment from here
+    volumes:
+      - ./ui:/opt/app
+      - /opt/app/node_modules
+      - /opt/app/.next
+    command: "npm run dev"
+    #to here to test prod build.
+    #command: "npm start"
+    depends_on:
+      - server

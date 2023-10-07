@@ -2,12 +2,15 @@ import { useState } from 'react';
 
 import { PostUser } from '../../apis/post_user';
 import { Modal } from './';
+import { GetServerURL } from '../../apis/get_server';
 
 export function CreateAccount(props: {cookie: string; handleClose: any}) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
     const [error, setError] = useState<string | null>(null);
+
+    const server = GetServerURL();
 
     function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
         if (event.target.id == "username") {
@@ -26,7 +29,7 @@ export function CreateAccount(props: {cookie: string; handleClose: any}) {
     async function handleSubmit(event: React.FormEvent<HTMLButtonElement>) {
         event.preventDefault();
 
-        const resp = await PostUser(props.cookie, username, email, password);
+        const resp = await PostUser(server, props.cookie, username, email, password);
         if (resp instanceof Error) {
             setError(resp.message);
             return;

@@ -1,0 +1,90 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: server
+  namespace: '590493578686'
+  selfLink: /apis/serving.knative.dev/v1/namespaces/590493578686/services/server
+  uid: f3492bb6-23ff-4d62-b78e-eb01a55158ea
+  resourceVersion: AAYGvU3VN5o
+  generation: 3
+  creationTimestamp: '2023-10-02T15:15:20.960741Z'
+  labels:
+    cloud.googleapis.com/location: us-central1
+  annotations:
+    run.googleapis.com/client-name: cloud-console
+    runapps.googleapis.com/integrations.router.custom-domains: '2023-10-02T08:18:14.78982Z'
+    serving.knative.dev/creator: sitesbystephanie@gmail.com
+    serving.knative.dev/lastModifier: 590493578686-compute@developer.gserviceaccount.com
+    runapps.googleapis.com/integrations: router/custom-domains
+    run.googleapis.com/operation-id: 7f16b982-78e4-4d51-be6b-2344428c0825
+    run.googleapis.com/ingress: all
+    run.googleapis.com/ingress-status: all
+spec:
+  template:
+    metadata:
+      labels:
+        client.knative.dev/nonce: 7ad21b9f-6f33-4b80-9549-69be885cd8e6
+        run.googleapis.com/startupProbeType: Default
+      annotations:
+        run.googleapis.com/client-name: cloud-console
+        autoscaling.knative.dev/minScale: '1'
+        autoscaling.knative.dev/maxScale: '5'
+        run.googleapis.com/startup-cpu-boost: 'true'
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      serviceAccountName: 590493578686-compute@developer.gserviceaccount.com
+      containers:
+      - image: us-east4-docker.pkg.dev/rateyourstyle/server/server@sha256:f7cd10183ad3421e524b319c271e2d6c1b1c21def83d03a4df14f64aa8f6cde0
+        command:
+        - sh
+        args:
+        - -c
+        - /app --gcs.creds=/secret/rys-gcs-sa.json
+        ports:
+        - name: http1
+          containerPort: 8000
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+        volumeMounts:
+        - name: secret-c0cf8b92-e9e9-47ff-84b4-da69f2f4b904
+          mountPath: /secret
+        startupProbe:
+          timeoutSeconds: 240
+          periodSeconds: 240
+          failureThreshold: 1
+          tcpSocket:
+            port: 8000
+      volumes:
+      - name: secret-c0cf8b92-e9e9-47ff-84b4-da69f2f4b904
+        secret:
+          secretName: rys-gcs-sa
+          items:
+          - key: latest
+            path: rys-gcs-sa.json
+  traffic:
+  - percent: 100
+    latestRevision: true
+status:
+  observedGeneration: 3
+  conditions:
+  - type: Ready
+    status: 'True'
+    lastTransitionTime: '2023-10-02T15:19:44.571049Z'
+  - type: ConfigurationsReady
+    status: 'True'
+    lastTransitionTime: '2023-10-02T15:19:03.293620Z'
+  - type: RoutesReady
+    status: 'True'
+    lastTransitionTime: '2023-10-02T15:19:44.668570Z'
+  latestReadyRevisionName: server-00003-7vq
+  latestCreatedRevisionName: server-00003-7vq
+  traffic:
+  - revisionName: server-00003-7vq
+    percent: 100
+    latestRevision: true
+  url: https://server-l6ndjwq4aa-uc.a.run.app
+  address:
+    url: https://server-l6ndjwq4aa-uc.a.run.app

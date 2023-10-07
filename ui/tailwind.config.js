@@ -21,7 +21,7 @@ module.exports = {
     },
     extend: {
       colors: {
-        "off-white": "#efeae8",
+        "off-white": "#f6f9fc",
         "pink": "#f0789e",
       },
       maxHeight: {

@@ -38,3 +38,5 @@ yarn-error.log*
 *.tsbuildinfo
 
 secrets/*
+**/secrets/*
+!secrets/README.md

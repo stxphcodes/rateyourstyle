@@ -1,13 +1,15 @@
-import type {NextPage} from "next";
 import { GetServerSideProps } from 'next';
+import Link from "next/link";
 
 import { GetOutfitsByUser, Outfit } from '../../apis/get_outfits';
 import { GetRatings, Rating } from '../../apis/get_ratings';
 import { GetUsername } from '../../apis/get_user';
 import { Navbar } from '../../components/navarbar';
-import { OutfitCardUser } from '../../components/outfitcard-user';
+import { OutfitCard } from '../../components/outfitcard';
+import { GetServerURL } from "../../apis/get_server";
 
 type Props = {
+    server: string;
     cookie: string;
     username: string;
     error: string | null;
@@ -17,6 +19,7 @@ type Props = {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
+        server:  GetServerURL(),
         cookie: "",
         username: "",
         error: null,
@@ -28,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props.cookie = cookie ? cookie : "";
 
     if (cookie) {
-        const usernameResp = await GetUsername(cookie);
+        const usernameResp = await GetUsername(props.server, cookie);
         if (!(usernameResp instanceof Error)) {
             props.username = usernameResp;
         }
@@ -36,27 +39,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     if (context.query["user_id"] !== props.username) {
         props.error = "forbidden";
-        return {props};
+        return { props };
     }
 
-    const resp = await GetOutfitsByUser(props.cookie);
+    const resp = await GetOutfitsByUser(props.server, props.cookie);
     if (resp instanceof Error) {
         props.error = resp.message;
-        return {props};
+        return { props };
     }
     props.outfits = resp;
 
-    const ratingResp = await GetRatings();
+    const ratingResp = await GetRatings(props.server);
     if (ratingResp instanceof Error) {
         props.error = ratingResp.message;
-        return {props};
+        return { props };
     }
     props.ratings = ratingResp;
 
-    return {props};
+    return { props };
 };
 
-export default function Index({cookie, username, outfits, ratings, error}: Props) {
+export default function Index({ server, cookie, username, outfits, ratings, error }: Props) {
     if (error) {
         if (error == "forbidden") {
             return (
@@ -75,7 +78,7 @@ export default function Index({cookie, username, outfits, ratings, error}: Props
                 <Navbar cookie={cookie} user={username} />
                 <main className="mt-6 p-8">
                     <h1>😕 Oh no</h1>
-                    Looks like there's an error on our end. Please refresh the page in a
+                    Looks like there&apos;s an error on our end. Please refresh the page in a
                     few minutes. If the issue persists, please email
                     sitesbystephanie@gmail.com.
                 </main>
@@ -91,9 +94,9 @@ export default function Index({cookie, username, outfits, ratings, error}: Props
                     <h1 className="text-gray-200">Your outfits go here.</h1>
                     <p>
                         Click{" "}
-                        <a className="underline text-pink" href="/post-outfit">
-                            here
-                        </a>{" "}
+                        <Link href="/post-outfit">
+                            <a className="underline text-pink" >here</a>
+                        </Link>{" "}
                         to post your first outfit.
                     </p>
                 </main>
@@ -109,9 +112,17 @@ export default function Index({cookie, username, outfits, ratings, error}: Props
                     <div>Username: {username}</div>
                     <div>Email: szh2425@gmail.com</div>
                 </section>
+                <section className="my-4">
+                <div className="bg-red-500 p-2 rounded text-white">
+							RateYourStyle is still being developed and we currently don&apos;t support editing outfit posts. This feature is coming very soon, I promise! If you have an outfit post that you want to edit, pleae email sitesbystephanie@gmail.com. Thank you for your patience and understanding 💛.
+						</div>
+                    
+                </section>
                 {outfits &&
                     outfits.map((item) => (
-                        <OutfitCardUser
+                        <OutfitCard
+                        cookie={cookie}
+                        asUser={true}
                             data={item}
                             key={item.id}
                             ratings={

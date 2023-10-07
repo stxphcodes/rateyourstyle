@@ -42,14 +42,15 @@ func main() {
 
 func run() error {
 	var (
-		cfg Config
+		cfg           Config
+		campaignsPath string
 	)
 	flag.StringVar(&cfg.HttpAddr, "http.addr", "0.0.0.0:8000", "HTTP bind address.")
 	flag.StringVar(&cfg.HealthAddr, "health.addr", "0.0.0.0:8001", "HTTP health address.")
 	flag.StringVar(&cfg.CORSOrigins, "cors.origin", "*", "CORS origins, separated by ,")
 	flag.StringVar(&cfg.GCS.CredsPath, "gcs.creds", "", "Path to GCS credentials file")
 	flag.StringVar(&cfg.GCS.BucketName, "gcs.bucket", "rateyourstyle", "Name of GCS bucket")
-
+	flag.StringVar(&campaignsPath, "campaigns.path", "campaigns.json", "Path to campaigns file")
 	flag.Parse()
 
 	if err := validateConfig(&cfg); err != nil {
@@ -96,13 +97,8 @@ func run() error {
 		return ctx.JSON(200, nil)
 	})
 
-	mux.GET("/outfits", handler.GetOutfits())
-	mux.GET("/user/outfits", handler.GetOutfitsByUser())
-
-	mux.GET("/cookie", handler.GetCookie())
-
-	mux.GET("/campaigns", func(ctx echo.Context) error {
-		bytes, err := os.ReadFile("data/campaigns.json")
+	mux.GET("/api/campaigns", func(ctx echo.Context) error {
+		bytes, err := os.ReadFile(campaignsPath)
 		if err != nil {
 			return ctx.JSON(500, err.Error())
 		}
@@ -115,17 +111,25 @@ func run() error {
 		return ctx.JSON(200, a)
 	})
 
-	mux.GET("/username", handler.GetUsername())
+	mux.GET("/api/cookie", handler.GetCookie())
 
-	mux.GET("/ratings", handler.GetRatings())
+	mux.GET("/api/outfits", handler.GetOutfits())
 
-	mux.POST("/signin", handler.PostSignIn())
+	mux.GET("/api/ratings", handler.GetRatings())
 
-	mux.POST("/user", handler.PostUser())
+	mux.GET("/api/user/outfits", handler.GetOutfitsByUser())
 
-	mux.POST("/image", handler.PostImage())
+	mux.GET("/api/username", handler.GetUsername())
 
-	mux.POST("/outfit", handler.PostOutfit())
+	mux.POST("/api/image", handler.PostImage())
+
+	mux.POST("/api/outfit", handler.PostOutfit())
+
+	mux.POST("/api/rating", handler.PostRating())
+
+	mux.POST("/api/signin", handler.PostSignIn())
+
+	mux.POST("/api/user", handler.PostUser())
 
 	return mux.Start(cfg.HttpAddr)
 }
