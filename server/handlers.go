@@ -238,7 +238,13 @@ func (h Handler) PostImage() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		path := "https://storage.googleapis.com/rateyourstyle/" + filename
+		attr, err := h.Gcs.Bucket.Attrs(ctx.Request().Context())
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		path := "https://storage.googleapis.com/" + attr.Name + "/" + filename
 		return ctx.String(http.StatusCreated, path)
 	}
 }
