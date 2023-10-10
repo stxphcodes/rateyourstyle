@@ -13,14 +13,14 @@ export async function PostImage(
             "rys-login": cookie,
         },
     }).then((response) => {
-            if (!response.ok) {
-                throw new Error("response not ok");
-            }
+        if (!response.ok) {
+            throw new Error("response not ok");
+        }
 
-            return response.text()
-        }).then(data => {
-            imageURL = data
-        })
+        return response.text()
+    }).then(data => {
+        imageURL = data
+    })
         .catch((err: Error) => {
             error = err
         });

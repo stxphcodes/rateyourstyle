@@ -127,7 +127,7 @@ export function OutfitCard(props: {
 										{!submitRating ? (
 											<>
 												<Rating x={userItemRating} />
-												<div className="underline hover:cursor-pointer" onClick={() => setSubmitRating(true)}>{userItemRating == 0 ? "submit your rating" : "edit your rating"}</div>
+												<a className="underline hover:cursor-pointer" onClick={() => setSubmitRating(true)}>{userItemRating == 0 ? "submit your rating" : "edit your rating"}</a>
 											</>
 										) : (
 											<>
@@ -177,13 +177,18 @@ export function OutfitCard(props: {
 									<>
 										<div className="col-span-1" key={`col-1-${item.brand}`}>
 											<h4>
-												{count}.{" "} <span className="underline">{item.description}</span>{item.link &&
+												{count}.{" "}
+												{item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="hover:cursor-not-allowed text-pink">{item.description}</span>}
+												
+												
+												
+												 {/* <span className="text-pink underline">{item.description}</span>{item.link &&
 													<span className="text-pink text-sm font-normal">
 														<a href={item.link} target="_blank">
 															{" "}
 															[ LINK ]
 														</a>
-													</span>}
+													</span>} */}
 											</h4>
 											<PSpan p={item.brand} span="from" />
 											<PSpan p={item.size ? item.size : "n/a"} span="size" />

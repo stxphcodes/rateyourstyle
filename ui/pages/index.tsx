@@ -155,8 +155,8 @@ function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
                                 {readMore?.filter((i) => i.tag == item.tag)[0].readMore && (
                                     <p className="mb-4">{item.description}</p>
                                 )}
-                                <a
-                                    className="hover:cursor-pointer underline"
+                                <button
+                                    className="p-1 bg-white opacity-40 rounded text-pink hover:cursor-pointer"
                                     onClick={() => {
                                         readMore?.forEach((i, index) => {
                                             if (i.tag == item.tag) {
@@ -168,11 +168,13 @@ function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
                                         });
                                     }}
                                 >
-                                    Read{" "}
+                                   Read{" "}
                                     {readMore?.filter((i) => i.tag == item.tag)[0].readMore
                                         ? "less"
                                         : "more"}
-                                </a>
+                                      
+                                       
+                                </button>
                             </div>
                         ))}
                     </div>

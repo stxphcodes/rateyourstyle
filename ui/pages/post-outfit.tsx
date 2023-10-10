@@ -76,7 +76,8 @@ function validateForm(
 	}
 }
 
-function PostOutfitPage({ campaigns, cookie, username, server, error }: Props) {
+function PostOutfitPage({ campaigns, cookie, username, error }: Props) {
+	const server = GetServerURL(true);
 	const [file, setFile] = useState<File | null>(null);
 	const [imageURL, setImageURL] = useState<string | null>("");
 	const [fileError, setFileError] = useState<string | null>("");
@@ -187,7 +188,11 @@ function PostOutfitPage({ campaigns, cookie, username, server, error }: Props) {
 			setFormSubmissionStatus("");
 
 			let tags = styleTags.split(" ");
-			let outfitId = imageURL?.replace(
+			let outfitId = process.env.NODE_ENV == "development" ? 
+			imageURL?.replace(
+				"https://storage.googleapis.com/rateyourstyle-dev/imgs/outfits/",
+				""
+			) : imageURL?.replace(
 				"https://storage.googleapis.com/rateyourstyle/imgs/outfits/",
 				""
 			);

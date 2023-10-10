@@ -10,7 +10,7 @@ export function CreateAccount(props: {cookie: string; handleClose: any}) {
     const [email, setEmail] = useState("");
     const [error, setError] = useState<string | null>(null);
 
-    const server = GetServerURL();
+    const server = GetServerURL(true);
 
     function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
         if (event.target.id == "username") {

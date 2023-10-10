@@ -8,7 +8,7 @@ export function SignIn(props: {handleClose: any}) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
-    const server = GetServerURL();
+    const server = GetServerURL(true);
 
     function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
         if (event.target.id == "username") {

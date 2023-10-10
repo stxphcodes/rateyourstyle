@@ -7,11 +7,22 @@ import { CreateAccount } from './modals/createaccount';
 import { SignIn } from './modals/signin';
 import { GetServerURL } from '../apis/get_server';
 
+// check if browser allows cookies to be set
+function cookieEnabled() {
+	var inOneMinute = new Date(new Date().getTime() + 60 * 1000);
+	document.cookie =
+		"rys-test=testcookie; expires=" + inOneMinute.toISOString() + ";";
+	var enabled = document.cookie.indexOf("rys-test") != -1;
+
+	// delete test cookie
+	document.cookie = "rys-test=; expires=Thu, 01 Jan 1970 00:00:01 GMT;"
+
+	return enabled
+}
+
 export function Navbar(props: { cookie: string; user?: string }) {
 	const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
 	const [showCreateAccountModal, setShowCreateAccountModal] =
-		useState<boolean>(false);
-	const [showPostOutfitModal, setShowPostOutfitModal] =
 		useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 	const [username, setUsername] = useState<string>(
@@ -19,6 +30,8 @@ export function Navbar(props: { cookie: string; user?: string }) {
 	);
 
 	const server = GetServerURL(true);
+
+
 
 	useEffect(() => {
 		async function getcookie() {
@@ -42,7 +55,9 @@ export function Navbar(props: { cookie: string; user?: string }) {
 		}
 
 		if (!props.cookie) {
-			getcookie();
+			if (cookieEnabled()) {
+				getcookie();
+			}
 		} else {
 			!username && getusername();
 		}
@@ -65,12 +80,12 @@ export function Navbar(props: { cookie: string; user?: string }) {
 				<div className="float-right">
 					{username ? (
 						<>
-							<Link href={`/user/${username}`}>{username}</Link>
+							<Link href={`/user/${username}`}><a>{username}</a></Link>
 						</>
 					) : (
 						<>
 							<button className="mx-2" onClick={() => setShowSignInModal(true)}>
-								Sign in
+								<a>Sign in</a>
 							</button>
 
 							<button
