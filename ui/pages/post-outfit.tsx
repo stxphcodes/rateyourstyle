@@ -17,14 +17,12 @@ type Props = {
 	cookie: string;
 	error: string | null;
 	username: string;
-	server: string;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const server = GetServerURL()
 
 	let props: Props = {
-		server: server,
 		campaigns: null,
 		cookie: "",
 		error: null,
