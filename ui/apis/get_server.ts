@@ -1,4 +1,8 @@
-export function GetServerURL(clientSide?: boolean) {
+export function GetServerURL(clientSide?: boolean): (string | Error) {
+    if (!process.env.NEXT_PUBLIC_SERVER_URL) {
+        return new Error("NEXT_PUBLIC_SERVER_URL env not set")
+    }
+
     if (process.env.NODE_ENV == "production") {
         return process.env.NEXT_PUBLIC_SERVER_URL
     }
@@ -15,5 +19,5 @@ export function GetServerURL(clientSide?: boolean) {
         return window.location.hostname
     }
 
-   return process.env.NEXT_PUBLIC_SERVER_URL
+    return process.env.NEXT_PUBLIC_SERVER_URL
 }

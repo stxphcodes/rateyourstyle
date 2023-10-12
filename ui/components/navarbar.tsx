@@ -20,7 +20,7 @@ function cookieEnabled() {
 	return enabled
 }
 
-export function Navbar(props: { cookie: string; user?: string }) {
+export function Navbar(props: { clientServer: string; cookie: string; user?: string }) {
 	const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
 	const [showCreateAccountModal, setShowCreateAccountModal] =
 		useState<boolean>(false);
@@ -29,13 +29,9 @@ export function Navbar(props: { cookie: string; user?: string }) {
 		props.user ? props.user : ""
 	);
 
-	const server = GetServerURL(true);
-
-
-
 	useEffect(() => {
 		async function getcookie() {
-			const resp = await GetCookie(server);
+			const resp = await GetCookie(props.clientServer);
 			if (resp instanceof Error) {
 				setError(resp.message);
 				return;
@@ -47,7 +43,7 @@ export function Navbar(props: { cookie: string; user?: string }) {
 		}
 
 		async function getusername() {
-			const resp = await GetUsername(server, props.cookie);
+			const resp = await GetUsername(props.clientServer, props.cookie);
 			if (!(resp instanceof Error)) {
 				setUsername(resp);
 				return;
@@ -99,10 +95,13 @@ export function Navbar(props: { cookie: string; user?: string }) {
 				</div>
 			</div>
 			{showSignInModal && (
-				<SignIn handleClose={() => setShowSignInModal(false)} />
+				<SignIn
+					handleClose={() => setShowSignInModal(false)} clientServer={props.clientServer}
+				/>
 			)}
 			{showCreateAccountModal && (
 				<CreateAccount
+					clientServer={props.clientServer}
 					cookie={props.cookie}
 					handleClose={() => setShowCreateAccountModal(false)}
 				/>

@@ -10,6 +10,7 @@ type Props = {
     campaigns: Campaign[] | null;
     cookie: string;
     error: string | null;
+    clientServer: string;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -17,9 +18,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         campaigns: null,
         cookie: "",
         error: null,
+        clientServer: "",
     };
 
     const server = GetServerURL()
+    if (server instanceof Error) {
+        props.error = server.message;
+        return { props };
+    }
 
     let cookie = context.req.cookies["rys-login"];
     props.cookie = cookie ? cookie : "";
@@ -27,25 +33,32 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const resp = await GetCampaigns(server);
     if (resp instanceof Error) {
         props.error = resp.message;
-        return {props};
+        return { props };
     }
     props.campaigns = resp;
 
-    return {props};
+    const clientServer = GetServerURL(true);
+    if (clientServer instanceof Error) {
+        props.error = clientServer.message;
+        return { props };
+    }
+    props.clientServer = clientServer;
+
+    return { props };
 };
 
-function Campaigns({campaigns, cookie, error}: Props) {
+function Campaigns({ campaigns, cookie, clientServer, error }: Props) {
     return (
         <>
-            <Navbar cookie={cookie} />
+            <Navbar cookie={cookie} clientServer={clientServer} />
 
             <main className="mt-6 p-8">
                 <section className="my-4">
                     <h1>How It Works</h1>
                     <div className="">
                         RateYourStyle partners with local boutiques and brands to create campaigns that celebrate, reward and showcase our users&apos; style and fashion. Typically, at the end of the campaign, a few posts tagged with the campaign #tag will be selected to win $100 gift cards. Each campaign has its own requirements and rewards, so be sure to read campaign descriptions carefully. <br /> <br /> To apply to an active campaign,{" "}
-                        <Link  href="/post-outfit">
-                            <a className="text-pink underline">Post an Outfit</a> 
+                        <Link href="/post-outfit">
+                            <a className="text-pink underline">Post an Outfit</a>
                         </Link>{" "}
                         according to the requirements listed in the campaign, and tag the
                         outfit with the campaign tag. Please note that both public and
@@ -61,7 +74,7 @@ function Campaigns({campaigns, cookie, error}: Props) {
                     {campaigns?.map((item) => (
                         <div
                             className={`w-3/4 h-40 text-white p-4 rounded-lg h-fit my-2`}
-                            style={{backgroundColor: `${item.background_img}`}}
+                            style={{ backgroundColor: `${item.background_img}` }}
                             key={item.tag}
                         >
                             <h2>{item.tag}</h2>

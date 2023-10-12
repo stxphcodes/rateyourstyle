@@ -13,7 +13,7 @@ import { GetServerURL } from "../apis/get_server";
 type Props = {
     campaigns: Campaign[] | null;
     cookie: string;
-    server: string;
+    clientServer: string;
     error: string | null;
     outfits: Outfit[] | null;
     ratings: Rating[] | null;
@@ -26,38 +26,51 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         ratings: null,
         error: null,
         outfits: null,
-        server: GetServerURL(),
+        clientServer:"",
     };
+
+    let server = GetServerURL()
+    if (server instanceof Error) {
+        props.error = server.message; 
+        return {props};
+    }
 
     if (context.req.cookies["rys-login"]) {
         props.cookie = context.req.cookies["rys-login"];
     }
 
-    const campaignResp = await GetCampaigns(props.server);
+    const campaignResp = await GetCampaigns(server);
     if (campaignResp instanceof Error) {
         props.error = campaignResp.message;
         return { props };
     }
     props.campaigns = campaignResp;
 
-    const outfitResp = await GetOutfits(props.server);
+    const outfitResp = await GetOutfits(server);
     if (outfitResp instanceof Error) {
         props.error = outfitResp.message;
         return { props };
     }
     props.outfits = outfitResp;
 
-    const ratingResp = await GetRatings(props.server);
+    const ratingResp = await GetRatings(server);
     if (ratingResp instanceof Error) {
         props.error = ratingResp.message;
         return { props };
     }
     props.ratings = ratingResp;
 
+    const clientServer = GetServerURL(true);
+    if (clientServer instanceof Error ) {
+        props.error = clientServer.message;
+        return { props };
+    }
+    props.clientServer = clientServer;
+
     return { props };
 };
 
-function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
+function Home({ campaigns, cookie, outfits, ratings, clientServer, error }: Props) {
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
     const [readMore, setReadMore] = useState(() => {
         let intialState =
@@ -103,7 +116,7 @@ function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
 
     return (
         <>
-            <Navbar cookie={cookie} />
+            <Navbar clientServer={clientServer} cookie={cookie} />
             <main className="mt-6 p-8">
                 <section className="my-4">
                     <h1>Welcome to Rate Your Style</h1>
@@ -210,6 +223,7 @@ function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
                                     key={item.id}
                                     ratings={outfitRatings}
                                     userRating={userRating}
+                                    clientServer={clientServer}
                                 />
                             )
                         })}

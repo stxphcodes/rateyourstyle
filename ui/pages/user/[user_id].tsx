@@ -9,17 +9,17 @@ import { OutfitCard } from '../../components/outfitcard';
 import { GetServerURL } from "../../apis/get_server";
 
 type Props = {
-    server: string;
     cookie: string;
     username: string;
     error: string | null;
     outfits: Outfit[] | null;
     ratings: Rating[] | null;
+    clientServer: string;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
-        server:  GetServerURL(),
+        clientServer: "",
         cookie: "",
         username: "",
         error: null,
@@ -27,11 +27,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         ratings: null,
     };
 
+    let server = GetServerURL()
+    if (server instanceof Error) {
+        props.error = server.message ;
+        return {props};
+    }
+
     let cookie = context.req.cookies["rys-login"];
     props.cookie = cookie ? cookie : "";
 
     if (cookie) {
-        const usernameResp = await GetUsername(props.server, cookie);
+        const usernameResp = await GetUsername(server, cookie);
         if (!(usernameResp instanceof Error)) {
             props.username = usernameResp;
         }
@@ -42,29 +48,36 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         return { props };
     }
 
-    const resp = await GetOutfitsByUser(props.server, props.cookie);
+    const resp = await GetOutfitsByUser(server, props.cookie);
     if (resp instanceof Error) {
         props.error = resp.message;
         return { props };
     }
     props.outfits = resp;
 
-    const ratingResp = await GetRatings(props.server);
+    const ratingResp = await GetRatings(server);
     if (ratingResp instanceof Error) {
         props.error = ratingResp.message;
         return { props };
     }
     props.ratings = ratingResp;
 
+    const clientServer = GetServerURL(true);
+    if (clientServer instanceof Error ) {
+        props.error = clientServer.message;
+        return { props };
+    }
+    props.clientServer = clientServer;
+
     return { props };
 };
 
-export default function Index({ server, cookie, username, outfits, ratings, error }: Props) {
+export default function Index({  clientServer, cookie, username, outfits, ratings, error }: Props) {
     if (error) {
         if (error == "forbidden") {
             return (
                 <>
-                    <Navbar cookie={cookie} user={username} />
+                    <Navbar clientServer={clientServer} cookie={cookie} user={username} />
                     <main className="mt-6 p-8">
                         <h1>✋ Forbidden </h1>
                         Please sign in as the user to view their posts.
@@ -75,7 +88,7 @@ export default function Index({ server, cookie, username, outfits, ratings, erro
 
         return (
             <>
-                <Navbar cookie={cookie} user={username} />
+                <Navbar clientServer={clientServer} cookie={cookie} user={username} />
                 <main className="mt-6 p-8">
                     <h1>😕 Oh no</h1>
                     Looks like there&apos;s an error on our end. Please refresh the page in a
@@ -89,7 +102,7 @@ export default function Index({ server, cookie, username, outfits, ratings, erro
     if (!outfits || outfits.length == 0) {
         return (
             <>
-                <Navbar cookie={cookie} user={username} />
+                <Navbar clientServer={clientServer}  cookie={cookie} user={username} />
                 <main className="mt-6 p-8">
                     <h1 className="text-gray-200">Your outfits go here.</h1>
                     <p>
@@ -105,7 +118,7 @@ export default function Index({ server, cookie, username, outfits, ratings, erro
     }
     return (
         <>
-            <Navbar cookie={cookie} user={username} />
+            <Navbar clientServer={clientServer}  cookie={cookie} user={username} />
             <main className="mt-6 p-8">
                 <section>
                     <h3>Your Profile</h3>
@@ -121,6 +134,7 @@ export default function Index({ server, cookie, username, outfits, ratings, erro
                 {outfits &&
                     outfits.map((item) => (
                         <OutfitCard
+                        clientServer={clientServer}
                         cookie={cookie}
                         asUser={true}
                             data={item}
