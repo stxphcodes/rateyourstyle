@@ -1,4 +1,4 @@
-import { OutfitItem, Outfit } from "./get_outfits";
+import { Outfit } from "./get_outfits";
 export async function PostOutfit(
     server: string,
     cookie: string,

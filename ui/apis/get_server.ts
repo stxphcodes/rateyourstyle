@@ -11,5 +11,9 @@ export function GetServerURL(clientSide?: boolean) {
         return process.env.NEXT_PUBLIC_SERVER_URL
     }
 
+    if (clientSide) {
+        return window.location.hostname
+    }
+
    return process.env.NEXT_PUBLIC_SERVER_URL
 }
