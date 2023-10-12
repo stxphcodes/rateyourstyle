@@ -4,7 +4,6 @@ import { Outfit } from '../apis/get_outfits';
 import { GetRatings, Rating } from '../apis/get_ratings';
 import { Modal } from './modals';
 import { PostRating } from '../apis/post_rating';
-import { GetServerURL } from '../apis/get_server';
 
 function average(arr: number[]) {
 	let sum = 0;
@@ -32,9 +31,8 @@ export function OutfitCard(props: {
 	userRating?: number;
 	username?: string;
 	asUser?: boolean;
+	clientServer: string;
 }) {
-	const server = GetServerURL(true)
-
 	const [expandImage, setExpandImage] = useState<boolean>(false);
 	const [submitRating, setSubmitRating] = useState<boolean>(false);
 	const [userItemRating, setUserItemRating] = useState<number>(props.userRating ? props.userRating : 0);
@@ -45,14 +43,14 @@ export function OutfitCard(props: {
 	const handleSubmitRating = async (e: any) => {
 		e.preventDefault();
 
-		const resp = await PostRating(server, props.cookie, props.data.id, userItemRating)
+		const resp = await PostRating(props.clientServer, props.cookie, props.data.id, userItemRating)
 		if (resp instanceof Error) {
 			setRatingSubmissionStatus("errorOnSubmission");
 			return;
 		}
 
 		setRatingSubmissionStatus("success");
-		const ratingResp = await GetRatings(server)
+		const ratingResp = await GetRatings(props.clientServer)
 		if (!(ratingResp instanceof Error)) {
 			setAllRatings(ratingResp.filter(r => r.outfit_id == props.data.id))
 		}
