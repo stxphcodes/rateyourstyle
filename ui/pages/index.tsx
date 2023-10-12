@@ -121,7 +121,7 @@ function Home({ campaigns, cookie, outfits, ratings, clientServer, error }: Prop
                 <section className="my-4">
                     <h1>Welcome to Rate Your Style</h1>
                     <div className="">
-                        Creating a fashion database for the everyday fashion enthusiast. Use the database to find style inspo, get  links to clothing items and read their reviews, rate outfits, and upload your own. Check out currently active <Link href="/campaigns"><a className="text-pink underline">campaigns</a></Link> and win up to $500 in gift cards to fashion brands of your choice by <Link href="/post-outfit"><a className="underline text-pink">Posting an Outfit</a></Link>.
+                        A fashion site for style inspo, clothing links and outfit reviews. Check out currently active <Link href="/campaigns"><a className="text-pink underline">campaigns</a></Link> and win up to $500 in gift cards to fashion brands of your choice by <Link href="/post-outfit"><a className="underline text-pink">Posting an Outfit</a></Link>. 
                     </div>
                 </section>
 
