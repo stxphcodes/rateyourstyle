@@ -57,12 +57,6 @@ func run() error {
 		return err
 	}
 
-	// open sqlite
-	// db, err := sql.Open("sqlite3", "rateyourstyle.db")
-	// if err != nil {
-	// 	return err
-	// }
-
 	// authenticate to gcs
 	ctx := context.Background()
 	gcsClient, err := gcs.NewClient(ctx, option.WithCredentialsFile(cfg.GCS.CredsPath))
