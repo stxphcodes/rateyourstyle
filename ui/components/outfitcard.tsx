@@ -177,16 +177,6 @@ export function OutfitCard(props: {
 											<h4>
 												{count}.{" "}
 												{item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="hover:cursor-not-allowed text-pink">{item.description}</span>}
-												
-												
-												
-												 {/* <span className="text-pink underline">{item.description}</span>{item.link &&
-													<span className="text-pink text-sm font-normal">
-														<a href={item.link} target="_blank">
-															{" "}
-															[ LINK ]
-														</a>
-													</span>} */}
 											</h4>
 											<PSpan p={item.brand} span="from" />
 											<PSpan p={item.size ? item.size : "n/a"} span="size" />
@@ -204,7 +194,6 @@ export function OutfitCard(props: {
 									</>
 								)
 							}
-
 							)}
 						</div>
 					</div>
