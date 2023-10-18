@@ -3,14 +3,14 @@ import Link from "next/link";
 
 import { GetOutfitsByUser, Outfit } from '../../apis/get_outfits';
 import { GetRatings, Rating } from '../../apis/get_ratings';
-import { GetUsername } from '../../apis/get_user';
+import { GetUser, User } from '../../apis/get_user';
 import { Navbar } from '../../components/navarbar';
 import { OutfitCard } from '../../components/outfitcard';
 import { GetServerURL } from "../../apis/get_server";
 
 type Props = {
     cookie: string;
-    username: string;
+    user: User;
     error: string | null;
     outfits: Outfit[] | null;
     ratings: Rating[] | null;
@@ -21,7 +21,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
         clientServer: "",
         cookie: "",
-        username: "",
+        user: { username: "", email: "" },
         error: null,
         outfits: null,
         ratings: null,
@@ -29,21 +29,24 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     let server = GetServerURL()
     if (server instanceof Error) {
-        props.error = server.message ;
-        return {props};
+        props.error = server.message;
+        return { props };
     }
 
     let cookie = context.req.cookies["rys-login"];
     props.cookie = cookie ? cookie : "";
 
     if (cookie) {
-        const usernameResp = await GetUsername(server, cookie);
-        if (!(usernameResp instanceof Error)) {
-            props.username = usernameResp;
+        const userResp = await GetUser(server, cookie);
+        if (userResp instanceof Error) {
+            props.error = userResp.message;
+            return { props };
         }
+
+        props.user = userResp;
     }
 
-    if (context.query["user_id"] !== props.username) {
+    if (context.query["user_id"] !== props.user.username) {
         props.error = "forbidden";
         return { props };
     }
@@ -63,7 +66,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props.ratings = ratingResp;
 
     const clientServer = GetServerURL(true);
-    if (clientServer instanceof Error ) {
+    if (clientServer instanceof Error) {
         props.error = clientServer.message;
         return { props };
     }
@@ -72,12 +75,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props };
 };
 
-export default function Index({  clientServer, cookie, username, outfits, ratings, error }: Props) {
+export default function Index({ clientServer, cookie, user, outfits, ratings, error }: Props) {
     if (error) {
         if (error == "forbidden") {
             return (
                 <>
-                    <Navbar clientServer={clientServer} cookie={cookie} user={username} />
+                    <Navbar clientServer={clientServer} cookie={cookie} user={user.username} />
                     <main className="mt-6 p-8">
                         <h1>✋ Forbidden </h1>
                         Please sign in as the user to view their posts.
@@ -88,7 +91,7 @@ export default function Index({  clientServer, cookie, username, outfits, rating
 
         return (
             <>
-                <Navbar clientServer={clientServer} cookie={cookie} user={username} />
+                <Navbar clientServer={clientServer} cookie={cookie} user={user.username} />
                 <main className="mt-6 p-8">
                     <h1>😕 Oh no</h1>
                     Looks like there&apos;s an error on our end. Please refresh the page in a
@@ -102,7 +105,7 @@ export default function Index({  clientServer, cookie, username, outfits, rating
     if (!outfits || outfits.length == 0) {
         return (
             <>
-                <Navbar clientServer={clientServer}  cookie={cookie} user={username} />
+                <Navbar clientServer={clientServer} cookie={cookie} user={user.username} />
                 <main className="mt-6 p-8">
                     <h1 className="text-gray-200">Your outfits go here.</h1>
                     <p>
@@ -118,25 +121,25 @@ export default function Index({  clientServer, cookie, username, outfits, rating
     }
     return (
         <>
-            <Navbar clientServer={clientServer}  cookie={cookie} user={username} />
+            <Navbar clientServer={clientServer} cookie={cookie} user={user.username} />
             <main className="mt-6 p-8">
                 <section>
                     <h3>Your Profile</h3>
-                    <div>Username: {username}</div>
-                    <div>Email: szh2425@gmail.com</div>
+                    <div>Username: {user.username}</div>
+                    <div>Email: {user.email}</div>
                 </section>
                 <section className="my-4">
-                <div className="bg-red-500 p-2 rounded text-white">
-							RateYourStyle is still being developed and we currently don&apos;t support editing outfit posts. This feature is coming very soon, I promise! If you have an outfit post that you want to edit, pleae email sitesbystephanie@gmail.com. Thank you for your patience and understanding 💛.
-						</div>
-                    
+                    <div className="bg-red-500 p-2 rounded text-white">
+                        RateYourStyle is still being developed and we currently don&apos;t support editing outfit posts. This feature is coming very soon, I promise! If you have an outfit post that you want to edit, pleae email sitesbystephanie@gmail.com. Thank you for your patience and understanding 💛.
+                    </div>
+
                 </section>
                 {outfits &&
                     outfits.map((item) => (
                         <OutfitCard
-                        clientServer={clientServer}
-                        cookie={cookie}
-                        asUser={true}
+                            clientServer={clientServer}
+                            cookie={cookie}
+                            asUser={true}
                             data={item}
                             key={item.id}
                             ratings={
