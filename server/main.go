@@ -115,6 +115,8 @@ func run() error {
 
 	mux.GET("/api/user/outfits", handler.GetOutfitsByUser())
 
+	mux.GET("/api/user", handler.GetUser())
+
 	mux.GET("/api/username", handler.GetUsername())
 
 	mux.POST("/api/image", handler.PostImage())

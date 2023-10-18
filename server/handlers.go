@@ -158,6 +158,29 @@ func (h *Handler) GetUsername() echo.HandlerFunc {
 	}
 }
 
+func (h *Handler) GetUser() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		users, err := getAllUsers(ctx.Request().Context(), h.Gcs.Bucket)
+		if err != nil {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		for _, user := range users {
+			if user.Cookie == cookie {
+				return ctx.JSON(http.StatusOK, user)
+			}
+		}
+
+		return ctx.String(http.StatusNotFound, "no user found with cookie "+cookie)
+	}
+
+}
+
 func (h Handler) PostSignIn() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var u User
