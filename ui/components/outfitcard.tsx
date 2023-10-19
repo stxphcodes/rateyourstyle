@@ -40,6 +40,8 @@ export function OutfitCard(props: {
 	const [allRatings, setAllRatings] = useState<Rating[] | null>(props.ratings)
 	const [ratingAverage, setRatingAverage] = useState<number | null>(null)
 
+	const [readMore, setReadMore] = useState(false)
+
 	const handleSubmitRating = async (e: any) => {
 		e.preventDefault();
 
@@ -68,7 +70,7 @@ export function OutfitCard(props: {
 
 	return (
 		<>
-			<div className="w-full shadow-md p-4 bg-off-white rounded-md my-4 max-h-card overflow-y-auto border-2 border-off-white break-words">
+			<div className="w-full shadow-md p-4 bg-off-white rounded-md my-4  border-2 border-off-white break-words">
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-4 object-contain">
 					<div className="col-span-1 mx-auto">
 						<img
@@ -76,15 +78,16 @@ export function OutfitCard(props: {
 							src={props.data.picture_url}
 						/>
 						<div className="flex flex-row-reverse">
-							<button onClick={() => setExpandImage(true)}>
+							<a className=""onClick={() => setExpandImage(true)}>
 								{" "}
-								[expand img]
-							</button>
+								expand img
+							</a>
 						</div>
 					</div>
 
-					<div className="col-span-3 bg-white p-4 rounded-md">
-						<div className="md:grid md:grid-cols-3 gap-x-4">
+					<div className="col-span-3 gap-x-4 rounded-md ">
+
+						<div className={`md:grid md:grid-cols-3  p-4  bg-white ${readMore ? "" : "overflow-y-hidden max-h-80"}`}>
 							<div className="col-span-1">
 								<h3 className="font-semibold">{props.data.title}</h3>
 								{
@@ -103,7 +106,9 @@ export function OutfitCard(props: {
 								</div>
 							</div>
 							<div className="col-span-2">
+							
 								<h4 className="font-semibold">Audience Rating:</h4>
+								
 								<div className="flex items-center">
 									{!ratingAverage ? (
 										<>
@@ -196,7 +201,13 @@ export function OutfitCard(props: {
 							}
 							)}
 						</div>
-					</div>
+
+						<button className="bg-white shadow-sm rounded text-pink underline mt-2 px-2 py-1 hover:bg-black" onClick={(e)=> 
+							{e.preventDefault() 
+							setReadMore(!readMore)
+							}}>read {readMore ? "less" : "more"}</button>
+					</div>				
+					
 				</div>
 			</div>
 
