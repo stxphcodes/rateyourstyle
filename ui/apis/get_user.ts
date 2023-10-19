@@ -32,6 +32,10 @@ export async function GetUsername(server: string, cookie: string): Promise<strin
 export type User = {
     username: string;
     email: string;
+    age_range: string;
+    weight_range: string; 
+    height_range: string; 
+    gender: string;
 }
 
 
@@ -39,7 +43,11 @@ export async function GetUser(server: string, cookie: string): Promise<User | Er
     let error: Error | null = null 
     let user: User = {
         username: "",
-        email: ""
+        email: "",
+        weight_range: "",
+        height_range: "",
+        gender: "",
+        age_range: ""
     }
 
     await fetch(`${server}/api/user`, {

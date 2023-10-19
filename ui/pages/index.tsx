@@ -134,7 +134,7 @@ function Home({ campaigns, cookie, outfits, ratings, clientServer, error }: Prop
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                         {campaigns?.map((item) => (
                             <div
-                                className={`w-full  text-white p-4 rounded-lg h-fit `}
+                                className={`w-full  text-white p-2 rounded-lg h-fit `}
                                 style={{ backgroundColor: `${item.background_img}` }}
                                 key={item.tag}
                             >
@@ -169,7 +169,7 @@ function Home({ campaigns, cookie, outfits, ratings, clientServer, error }: Prop
                                     <p className="mb-4">{item.description}</p>
                                 )}
                                 <button
-                                    className="p-1 bg-white opacity-40 rounded text-pink hover:cursor-pointer"
+                                    className="px-1 bg-white opacity-40 rounded text-pink hover:cursor-pointer"
                                     onClick={() => {
                                         readMore?.forEach((i, index) => {
                                             if (i.tag == item.tag) {
