@@ -27,6 +27,11 @@ export async function GetOutfits(server: string): Promise<Outfit[] | Error> {
   await fetch(`${server}/api/outfits`)
     .then((response) => {
       if (!response.ok) {
+        // no outfits for user
+        if (response.status == 404) {
+          return outfits;
+        }
+
         throw new Error("response not ok");
       }
 
