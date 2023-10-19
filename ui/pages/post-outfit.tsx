@@ -17,19 +17,23 @@ type Props = {
 	cookie: string;
 	error: string | null;
 	username: string;
-	server: string;
+	clientServer: string;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-	const server = GetServerURL()
-
 	let props: Props = {
-		server: server,
 		campaigns: null,
 		cookie: "",
 		error: null,
 		username: "",
+		clientServer: "",
 	};
+
+	let server = GetServerURL()
+    if (server instanceof Error) {
+        props.error = server.message; 
+        return {props};
+    }
 
 	let cookie = context.req.cookies["rys-login"];
 	props.cookie = cookie ? cookie : "";
@@ -47,6 +51,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		return { props };
 	}
 	props.campaigns = resp;
+
+	let clientServer = GetServerURL(true)
+	if (clientServer instanceof Error) {
+		props.error = clientServer.message; 
+        return {props};
+	}
+
+	props.clientServer = clientServer
 
 	return { props };
 };
@@ -76,7 +88,7 @@ function validateForm(
 	}
 }
 
-function PostOutfitPage({ campaigns, cookie, username, server, error }: Props) {
+function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Props) {
 	const [file, setFile] = useState<File | null>(null);
 	const [imageURL, setImageURL] = useState<string | null>("");
 	const [fileError, setFileError] = useState<string | null>("");
@@ -95,6 +107,12 @@ function PostOutfitPage({ campaigns, cookie, username, server, error }: Props) {
 			link: "",
 		},
 	]);
+
+	let server = GetServerURL(true)
+	if (server instanceof Error) {
+		server = ""
+	}
+
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		e.preventDefault();
@@ -187,7 +205,11 @@ function PostOutfitPage({ campaigns, cookie, username, server, error }: Props) {
 			setFormSubmissionStatus("");
 
 			let tags = styleTags.split(" ");
-			let outfitId = imageURL?.replace(
+			let outfitId = process.env.NODE_ENV == "development" ? 
+			imageURL?.replace(
+				"https://storage.googleapis.com/rateyourstyle-dev/imgs/outfits/",
+				""
+			) : imageURL?.replace(
 				"https://storage.googleapis.com/rateyourstyle/imgs/outfits/",
 				""
 			);
@@ -206,7 +228,7 @@ function PostOutfitPage({ campaigns, cookie, username, server, error }: Props) {
 				description: "",
 			};
 
-			const resp = await PostOutfit(server, cookie, outfit);
+			const resp = await PostOutfit(clientServer, cookie, outfit);
 			if (resp instanceof Error) {
 				setFormSubmissionStatus("errorOnSubmission");
 			} else {
@@ -219,7 +241,7 @@ function PostOutfitPage({ campaigns, cookie, username, server, error }: Props) {
 
 	useEffect(() => {
 		async function upload(formData: any) {
-			const resp = await PostImage(server, formData, cookie);
+			const resp = await PostImage(clientServer, formData, cookie);
 			if (resp instanceof Error) {
 				setFileError(resp.message);
 				return;
@@ -236,9 +258,13 @@ function PostOutfitPage({ campaigns, cookie, username, server, error }: Props) {
 		}
 	}, [server, cookie, file]);
 
+	if (error) {
+        return <div>error {error} </div>;
+    }
+
 	return (
 		<>
-			<Navbar cookie={cookie} user={username} />
+			<Navbar clientServer={clientServer} cookie={cookie} user={username} />
 
 			<main className="mt-6 p-4 md:p-8 w-full md:w-3/4">
 				<section className="my-4">

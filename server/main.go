@@ -49,19 +49,13 @@ func run() error {
 	flag.StringVar(&cfg.HealthAddr, "health.addr", "0.0.0.0:8001", "HTTP health address.")
 	flag.StringVar(&cfg.CORSOrigins, "cors.origin", "*", "CORS origins, separated by ,")
 	flag.StringVar(&cfg.GCS.CredsPath, "gcs.creds", "", "Path to GCS credentials file")
-	flag.StringVar(&cfg.GCS.BucketName, "gcs.bucket", "rateyourstyle", "Name of GCS bucket")
+	flag.StringVar(&cfg.GCS.BucketName, "gcs.bucket", "rateyourstyle-dev", "Name of GCS bucket")
 	flag.StringVar(&campaignsPath, "campaigns.path", "campaigns.json", "Path to campaigns file")
 	flag.Parse()
 
 	if err := validateConfig(&cfg); err != nil {
 		return err
 	}
-
-	// open sqlite
-	// db, err := sql.Open("sqlite3", "rateyourstyle.db")
-	// if err != nil {
-	// 	return err
-	// }
 
 	// authenticate to gcs
 	ctx := context.Background()
@@ -100,11 +94,13 @@ func run() error {
 	mux.GET("/api/campaigns", func(ctx echo.Context) error {
 		bytes, err := os.ReadFile(campaignsPath)
 		if err != nil {
+			log.Println(err.Error())
 			return ctx.JSON(500, err.Error())
 		}
 
 		var a []interface{}
 		if err := json.Unmarshal(bytes, &a); err != nil {
+			log.Println(err.Error())
 			return ctx.JSON(500, err.Error())
 		}
 
@@ -118,6 +114,8 @@ func run() error {
 	mux.GET("/api/ratings", handler.GetRatings())
 
 	mux.GET("/api/user/outfits", handler.GetOutfitsByUser())
+
+	mux.GET("/api/user", handler.GetUser())
 
 	mux.GET("/api/username", handler.GetUsername())
 

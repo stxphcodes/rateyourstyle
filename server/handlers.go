@@ -158,6 +158,29 @@ func (h *Handler) GetUsername() echo.HandlerFunc {
 	}
 }
 
+func (h *Handler) GetUser() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		users, err := getAllUsers(ctx.Request().Context(), h.Gcs.Bucket)
+		if err != nil {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		for _, user := range users {
+			if user.Cookie == cookie {
+				return ctx.JSON(http.StatusOK, user)
+			}
+		}
+
+		return ctx.String(http.StatusNotFound, "no user found with cookie "+cookie)
+	}
+
+}
+
 func (h Handler) PostSignIn() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var u User
@@ -238,7 +261,13 @@ func (h Handler) PostImage() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		path := "https://storage.googleapis.com/rateyourstyle/" + filename
+		attr, err := h.Gcs.Bucket.Attrs(ctx.Request().Context())
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		path := "https://storage.googleapis.com/" + attr.Name + "/" + filename
 		return ctx.String(http.StatusCreated, path)
 	}
 }

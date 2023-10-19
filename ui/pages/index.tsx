@@ -13,7 +13,7 @@ import { GetServerURL } from "../apis/get_server";
 type Props = {
     campaigns: Campaign[] | null;
     cookie: string;
-    server: string;
+    clientServer: string;
     error: string | null;
     outfits: Outfit[] | null;
     ratings: Rating[] | null;
@@ -26,38 +26,51 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         ratings: null,
         error: null,
         outfits: null,
-        server: GetServerURL(),
+        clientServer:"",
     };
+
+    let server = GetServerURL()
+    if (server instanceof Error) {
+        props.error = server.message; 
+        return {props};
+    }
 
     if (context.req.cookies["rys-login"]) {
         props.cookie = context.req.cookies["rys-login"];
     }
 
-    const campaignResp = await GetCampaigns(props.server);
+    const campaignResp = await GetCampaigns(server);
     if (campaignResp instanceof Error) {
         props.error = campaignResp.message;
         return { props };
     }
     props.campaigns = campaignResp;
 
-    const outfitResp = await GetOutfits(props.server);
+    const outfitResp = await GetOutfits(server);
     if (outfitResp instanceof Error) {
         props.error = outfitResp.message;
         return { props };
     }
     props.outfits = outfitResp;
 
-    const ratingResp = await GetRatings(props.server);
+    const ratingResp = await GetRatings(server);
     if (ratingResp instanceof Error) {
         props.error = ratingResp.message;
         return { props };
     }
     props.ratings = ratingResp;
 
+    const clientServer = GetServerURL(true);
+    if (clientServer instanceof Error ) {
+        props.error = clientServer.message;
+        return { props };
+    }
+    props.clientServer = clientServer;
+
     return { props };
 };
 
-function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
+function Home({ campaigns, cookie, outfits, ratings, clientServer, error }: Props) {
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
     const [readMore, setReadMore] = useState(() => {
         let intialState =
@@ -103,12 +116,12 @@ function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
 
     return (
         <>
-            <Navbar cookie={cookie} />
+            <Navbar clientServer={clientServer} cookie={cookie} />
             <main className="mt-6 p-8">
                 <section className="my-4">
                     <h1>Welcome to Rate Your Style</h1>
                     <div className="">
-                        Creating a fashion database for the everyday fashion enthusiast. Use the database to find style inspo, get  links to clothing items and read their reviews, rate outfits, and upload your own. Check out currently active <Link href="/campaigns"><a className="text-pink underline">campaigns</a></Link> and win up to $500 in gift cards to fashion brands of your choice by <Link href="/post-outfit"><a className="underline text-pink">Posting an Outfit</a></Link>.
+                        A fashion site for style inspo, clothing links and outfit reviews. Check out currently active <Link href="/campaigns"><a className="text-pink underline">campaigns</a></Link> and win up to $500 in gift cards to fashion brands of your choice by <Link href="/post-outfit"><a className="underline text-pink">Posting an Outfit</a></Link>. 
                     </div>
                 </section>
 
@@ -155,8 +168,8 @@ function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
                                 {readMore?.filter((i) => i.tag == item.tag)[0].readMore && (
                                     <p className="mb-4">{item.description}</p>
                                 )}
-                                <a
-                                    className="hover:cursor-pointer underline"
+                                <button
+                                    className="p-1 bg-white opacity-40 rounded text-pink hover:cursor-pointer"
                                     onClick={() => {
                                         readMore?.forEach((i, index) => {
                                             if (i.tag == item.tag) {
@@ -168,11 +181,13 @@ function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
                                         });
                                     }}
                                 >
-                                    Read{" "}
+                                   Read{" "}
                                     {readMore?.filter((i) => i.tag == item.tag)[0].readMore
                                         ? "less"
                                         : "more"}
-                                </a>
+                                      
+                                       
+                                </button>
                             </div>
                         ))}
                     </div>
@@ -208,6 +223,7 @@ function Home({ campaigns, cookie, outfits, ratings, error }: Props) {
                                     key={item.id}
                                     ratings={outfitRatings}
                                     userRating={userRating}
+                                    clientServer={clientServer}
                                 />
                             )
                         })}
