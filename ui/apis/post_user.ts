@@ -1,3 +1,5 @@
+import { UserProfile } from "./get_user";
+
 export async function PostUser(
   server: string,
   cookie: string,
@@ -37,4 +39,30 @@ export async function PostUser(
   }
 
   return cookie;
+}
+
+
+export async function PostUserProfile(
+  server: string,
+  cookie: string,
+  userProfile: UserProfile,
+): Promise<Error | null> {
+  let error: Error | null = null
+
+  await fetch(`${server}/api/user-profile`, {
+      method: "POST",
+      body: JSON.stringify(userProfile),
+      headers: {
+          "content-type": "application/json",
+          "rys-login": cookie
+      },
+  }).then((response) => {
+      if (!response.ok) {
+          throw new Error("response not ok");
+      }
+  }).catch((err: Error) => {
+      error = err
+  });
+
+  return error
 }

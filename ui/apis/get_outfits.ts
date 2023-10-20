@@ -1,3 +1,5 @@
+import { UserProfile } from "./get_user";
+
 export type OutfitItem = {
   brand: string;
   link: string;
@@ -18,6 +20,8 @@ export type Outfit = {
   style_tags: string[];
   items: OutfitItem[];
   private: boolean;
+
+  user_profile?: UserProfile;
 };
 
 export async function GetOutfits(server: string): Promise<Outfit[] | Error> {
