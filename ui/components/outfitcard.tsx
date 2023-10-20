@@ -202,10 +202,10 @@ export function OutfitCard(props: {
 							)}
 						</div>
 
-						<button className="bg-white shadow-sm rounded text-pink underline mt-2 px-2 py-1 hover:bg-black" onClick={(e)=> 
+						<a className="mt-2 mx-1" onClick={(e)=> 
 							{e.preventDefault() 
 							setReadMore(!readMore)
-							}}>read {readMore ? "less" : "more"}</button>
+							}}>read {readMore ? "less" : "more"}</a>
 					</div>				
 					
 				</div>
