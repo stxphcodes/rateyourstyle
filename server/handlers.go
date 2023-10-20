@@ -72,6 +72,7 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 				)
 			}
 
+			// get user profile of outfit poster
 			u := &User{Id: o.UserId}
 			upf, err := getUserProfileFile(ctx.Request().Context(), h.Gcs.Bucket, u)
 			if err == nil {
@@ -511,7 +512,7 @@ func (h *Handler) PostUserProfile() echo.HandlerFunc {
 
 		user, err := getUser(ctx.Request().Context(), h.Gcs.Bucket, userId)
 		if err != nil {
-			log.Println("user id not found based on cookie " + cookie)
+			log.Println("user not found based on cookie " + cookie)
 			return ctx.NoContent(http.StatusForbidden)
 		}
 
