@@ -33,6 +33,34 @@ function checkEmptyUserProfile(profile: UserProfile) {
     return false
 }
 
+function findSimilarToMe(outfitUser: UserProfile, user: UserProfile) {
+    if (user.age_range !== "") {
+        if (outfitUser.age_range !== user.age_range) {
+            return false
+        }
+    }
+
+    if (user.department !== "") {
+        if (outfitUser.department !== user.department) {
+            return false
+        }
+    }
+
+    if (user.height_range !== "") {
+        if (outfitUser.height_range !== user.height_range) {
+            return false
+        }
+    }
+
+    if (user.weight_range !== "") {
+        if (outfitUser.weight_range !== user.weight_range) {
+            return false
+        }
+    }
+
+    return true
+}
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
         campaigns: null,
@@ -135,13 +163,11 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
             }
 
             if (similarToMe) {
-                if (
-                    outfit?.user_profile?.age_range == user?.user_profile.age_range && 
-                    outfit?.user_profile?.department == user?.user_profile.department && 
-                    outfit?.user_profile?.height_range == user?.user_profile.height_range && 
-                    outfit?.user_profile?.weight_range == user?.user_profile.weight_range) {
+                if (outfit?.user_profile && user?.user_profile) {
+                    if (findSimilarToMe(outfit.user_profile, user.user_profile)) {
                         filtered.push(outfit);
                     }
+                }
             }
         })
 
