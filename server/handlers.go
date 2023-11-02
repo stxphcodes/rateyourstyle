@@ -92,6 +92,50 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 	}
 }
 
+// get only public outfits from user
+func (h Handler) GetPublicOutfitsByUser() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		username := ctx.QueryParam("username")
+		if username == "" {
+			return ctx.String(http.StatusBadRequest, "missing username query")
+		}
+
+		userId := ""
+		for id, user := range h.UserIndices.IdUsername {
+			if user == username {
+				userId = id
+			}
+		}
+
+		if userId == "" {
+			ctx.String(http.StatusNotFound, username+" has no id")
+		}
+
+		outfitIds, ok := h.OutfitIndices.UserOutfit[userId]
+		if !ok {
+			log.Println("outfitids not found for user id " + userId)
+			return ctx.NoContent(http.StatusNotFound)
+		}
+
+		var outfits []*Outfit
+		for _, outfit := range outfitIds {
+			o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, outfit)
+			if err != nil {
+				log.Println(err.Error())
+				return ctx.NoContent(http.StatusInternalServerError)
+			}
+
+			// return public outfits
+			if !o.Private {
+				outfits = append(outfits, o)
+			}
+		}
+
+		return ctx.JSON(http.StatusOK, outfits)
+	}
+}
+
+// getoutfitsbyuser will get private and public outfits for user
 func (h Handler) GetOutfitsByUser() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		cookie, err := getCookie(ctx.Request())
