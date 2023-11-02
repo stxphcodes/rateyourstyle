@@ -181,7 +181,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
     return (
         <>
             <Navbar clientServer={clientServer} cookie={cookie} user={user?.username} />
-            <main className="mt-6 p-8">
+            <main className="mt-6 p-3 md:p-8">
                 <section className="my-4">
                     <h1>Welcome to Rate Your Style</h1>
                     <div className="">

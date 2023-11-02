@@ -70,11 +70,11 @@ export function OutfitCard(props: {
 
 	return (
 		<>
-			<div className="w-full shadow-md p-4 bg-off-white rounded-md my-4  border-2 border-off-white break-words">
+			<div className="w-full shadow-md p-1 bg-off-white rounded-md my-4 break-words">
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-4 object-contain">
 					<div className="col-span-1 mx-auto">
 						<img
-							className="max-h-96 object-contain"
+							className="max-h-96 object-contain rounded"
 							src={props.data.picture_url}
 						/>
 						<div className="flex flex-row-reverse">
@@ -85,9 +85,9 @@ export function OutfitCard(props: {
 						</div>
 					</div>
 
-					<div className="col-span-3 gap-x-4 rounded-md ">
+					<div className="col-span-3 gap-x-4">
 
-						<div className={`md:grid md:grid-cols-3  p-4  bg-white ${readMore ? "" : "overflow-y-hidden max-h-80"}`}>
+						<div className={`md:grid md:grid-cols-3  p-4 rounded bg-white ${readMore ? "" : "overflow-y-hidden max-h-80"}`}>
 							<div className="col-span-1">
 								<h3 className="font-semibold">{props.data.title}</h3>
 								{

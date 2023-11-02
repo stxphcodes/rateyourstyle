@@ -587,7 +587,7 @@ function OutfitItemForm(props: {
 							min="1"
 							max="5"
 							step="0.5"
-							className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer  p-0 m-0"
+							className="h-1  rounded-lg appearance-none cursor-pointer  p-0 m-0"
 							onChange={(e) => props.handleItemChange(e, props.index)}
 							list="rating"
 							value={props.item.rating}

@@ -86,3 +86,41 @@ export async function GetOutfitsByUser(server: string, cookie: string): Promise<
 
   return outfits;
 }
+
+
+export async function GetPublicOutfitsByUser(server: string, cookie: string, username: string): Promise<Outfit[] | Error> {
+  let error: Error | null = null;
+  let outfits: Outfit[] = [];
+
+  await fetch(`${server}/api/user/public-outfits?username=`+username, {
+    method: "GET",
+    headers: {
+      'content-type': "application/json",
+      'rys-login': cookie,
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        // no outfits for user
+        if (response.status == 404) {
+          return outfits;
+        }
+
+        throw new Error("response not ok");
+      }
+
+      return response.json();
+    })
+    .then((data: Outfit[]) => {
+      outfits = data;
+    })
+    .catch((err: Error) => {
+      error = err;
+    });
+
+  if (error) {
+    return error;
+  }
+
+  return outfits;
+}
