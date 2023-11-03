@@ -24,11 +24,16 @@ export type Outfit = {
   user_profile?: UserProfile;
 };
 
-export async function GetOutfits(server: string): Promise<Outfit[] | Error> {
+export async function GetOutfits(server: string, count?: number): Promise<Outfit[] | Error> {
   let error: Error | null = null;
   let outfits: Outfit[] = [];
 
-  await fetch(`${server}/api/outfits`)
+  let url = `${server}/api/outfits`
+  if (count && count > 0) {
+    url = url + `?count=${count}`
+  }
+
+  await fetch(url)
     .then((response) => {
       if (!response.ok) {
         throw new Error("response not ok");

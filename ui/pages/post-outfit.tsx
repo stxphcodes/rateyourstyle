@@ -312,6 +312,8 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 						<p>Each outfit post has its own privacy setting. Private posts do{" "}<span className="underline">not</span> appear on the homepage and are not discoverable by the general public. The post is only visible to you, the creator of the post, when you log into your account However, if your post includes a campaign #tag, the sponsor of the campaign is also able view the post, regardless of the privacy setting on the post. </p>
 						<div className="font-semibold mt-2">How will I be notified if I win a campaign?</div>
 						<p>You will be notified via the email associated to your user account the next day after a campaign ends.</p>
+						<div className="font-semibold mt-2">What should I include in the item review?</div>
+						<p>You can write about the item's fit, material quality and whether you would recommend the item. The item review and rating system is a great way to decide whether you want to keep something in your closet in the future, so try to be honest about how you feel!</p>
 
 					</div>
 				</section>

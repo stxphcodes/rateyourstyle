@@ -8,6 +8,7 @@ import { OutfitCard } from '../../components/outfitcard';
 import { GetServerURL } from "../../apis/get_server";
 import { ClosetTable } from '../../components/closet-table';
 import { GetUsername } from '../../apis/get_user';
+import { Footer } from '../../components/footer';
 
 type Props = {
     cookie: string;
@@ -194,7 +195,6 @@ export default function UserClosetPage({ clientServer, cookie, outfits, ratings,
                             <OutfitCard
                                 clientServer={clientServer}
                                 cookie={cookie}
-                                asUser={true}
                                 data={item}
                                 key={item.id}
                                 ratings={
@@ -204,6 +204,7 @@ export default function UserClosetPage({ clientServer, cookie, outfits, ratings,
                         ))}
                 </section>
             </main >
+            <Footer />
         </>
     );
 }
