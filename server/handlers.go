@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -59,11 +60,30 @@ func (h Handler) GetCookie() echo.HandlerFunc {
 	}
 }
 
-// only gets public outfits
+// only gets public outfits.
+// if count query param is passed and greater than 0,
+// GetOutfits will return up to that number of outfits.
 func (h Handler) GetOutfits() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var outfits []*Outfit
+
+		countStr := ctx.QueryParam("count")
+		countReq := 0
+		if countStr != "" {
+			countInt, err := strconv.Atoi(countStr)
+			if err != nil {
+				countReq = 0
+			} else {
+				countReq = countInt
+			}
+		}
+
+		count := 0
 		for outfit := range h.OutfitIndices.PublicOutfits {
+			if countReq > 0 && count == countReq {
+				break
+			}
+
 			o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, outfit)
 			if err != nil {
 				log.Println("error: " + err.Error())
@@ -89,6 +109,8 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 			}
 
 			outfits = append(outfits, o)
+			count++
+
 		}
 
 		return ctx.JSON(http.StatusOK, outfits)
