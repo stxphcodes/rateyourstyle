@@ -61,10 +61,10 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 
 	return (
 		<>
-			<div className="mb-20 shadow-md px-3 py-2  top-0 w-screen bg-white flex flex-wrap items-center justify-between fixed">
+			<div className="mb-20 shadow-sm px-3 py-2 md:py-4  top-0 w-screen bg-white flex flex-wrap items-center justify-between fixed">
 				<div>
 					<Link href="/" >
-						<a className="mr-2">Home</a>
+						<a className="mr-2 md:ml-4">Home</a>
 					</Link>
 					<Link href="/campaigns">
 						<a className="mx-2">Gift Cards</a>
