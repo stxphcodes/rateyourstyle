@@ -2,14 +2,15 @@ import { GetServerSideProps } from 'next';
 import Link from "next/link";
 import { useState, useEffect } from 'react';
 
-import { GetOutfitsByUser, Outfit, OutfitItem } from '../../apis/get_outfits';
-import { GetRatings, Rating } from '../../apis/get_ratings';
-import { GetUserProfile, User, UserProfile } from '../../apis/get_user';
-import { Navbar } from '../../components/navarbar';
-import { OutfitCard } from '../../components/outfitcard';
-import { GetServerURL } from "../../apis/get_server";
-import { PostUserProfile } from '../../apis/post_user';
-import { SortingArrowsIcon } from '../../components/icons/sorting-arrows';
+import { GetOutfitsByUser, Outfit, OutfitItem } from '../../../apis/get_outfits';
+import { GetRatings, Rating } from '../../../apis/get_ratings';
+import { GetUserProfile, User, UserProfile } from '../../../apis/get_user';
+import { Navbar } from '../../../components/navarbar';
+import { OutfitCard } from '../../../components/outfitcard';
+import { GetServerURL } from "../../../apis/get_server";
+import { PostUserProfile } from '../../../apis/post_user';
+import { SortingArrowsIcon } from '../../../components/icons/sorting-arrows';
+import { ClosetTable } from '../../../components/closet-table';
 
 type Props = {
     cookie: string;
@@ -18,9 +19,6 @@ type Props = {
     outfits: Outfit[] | null;
     ratings: Rating[] | null;
     clientServer: string;
-
-    // outfitItems: OutfitItem[] | null;
-    // outfitItemToIds: Map<string, string[]>;
 };
 
 
@@ -91,11 +89,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props };
 };
 
-function PSpan(props: { span: string; p: string }) {
-    return (
-        <p><span className="font-bold">{props.span}:{" "}</span>{props.p}</p>
-    )
-}
 
 function Rating(props: { x: number, small?: boolean }) {
     return (
@@ -171,10 +164,29 @@ export default function Index({ clientServer, cookie, user, outfits, ratings, er
         })
     })
 
-
-
     const [itemsSelected, setItemsSelected] = useState<string[] | null>(null);
     const [outfitsToDisplay, setOutfitsToDisplay] = useState<Outfit[] | null>(null);
+
+    const handleItemSelection = (itemDescription: string) => {
+        if (!itemsSelected) {
+            setItemsSelected([itemDescription])
+            return
+        }
+
+        let idx = itemsSelected.indexOf(itemDescription)
+
+        if (idx < 0) {
+            setItemsSelected([
+                ...itemsSelected,
+                itemDescription,
+            ])
+        } else {
+            let copy = [...itemsSelected]
+            copy.splice(idx, 1)
+
+            setItemsSelected(copy)
+        }
+    }
 
     useEffect(() => {
         if (!itemsSelected) {
@@ -212,9 +224,18 @@ export default function Index({ clientServer, cookie, user, outfits, ratings, er
                 </section>
 
                 <section className="my-4">
-                    <h2>Your 2023 Closet</h2>
 
-                    <div className="overflow-x-auto shadow-md sm:rounded-lg">
+                    <h2>Your Closet</h2>
+                    <div>
+                        <span className="font-bold">Share your closet: </span> <a target="_blank" href={`/closet/${user.username}`}>https://rateyourstyle.com/closet/{user.username}</a>
+                    </div>
+                    <div className="text-xs mb-2">Only items from public outfits will be shared.</div>
+
+
+                    <ClosetTable outfitItems={outfitItems} handleItemSelection={handleItemSelection} itemsSelected={itemsSelected} />
+
+
+                    {/* <div className="overflow-x-auto shadow-md sm:rounded-lg">
                         <table className="w-full text-sm text-left overflow-x-scroll">
                             <thead className="text-xs uppercase bg-off-white">
                                 <tr>
@@ -311,15 +332,12 @@ export default function Index({ clientServer, cookie, user, outfits, ratings, er
                                                 {item.review}
                                             </div>
                                         </td>
-
                                     </tr>
-
-
                                 ))
                                 }
                             </tbody>
                         </table>
-                    </div>
+                    </div> */}
                 </section>
 
                 <section className="mt-8">

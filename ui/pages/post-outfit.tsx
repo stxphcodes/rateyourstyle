@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
-import { Outfit, OutfitItem } from '../apis/get_outfits';
+import { GetOutfitsByUser, Outfit, OutfitItem } from '../apis/get_outfits';
 import { GetUsername } from '../apis/get_user';
 import { PostImage } from '../apis/post_image';
 import { PostOutfit } from '../apis/post_outfit';
@@ -18,6 +18,7 @@ type Props = {
 	error: string | null;
 	username: string;
 	clientServer: string;
+	previousOutfitItems: OutfitItem[];
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -27,13 +28,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		error: null,
 		username: "",
 		clientServer: "",
+		previousOutfitItems: [],
 	};
 
 	let server = GetServerURL()
-    if (server instanceof Error) {
-        props.error = server.message; 
-        return {props};
-    }
+	if (server instanceof Error) {
+		props.error = server.message;
+		return { props };
+	}
 
 	let cookie = context.req.cookies["rys-login"];
 	props.cookie = cookie ? cookie : "";
@@ -43,6 +45,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		if (!(usernameResp instanceof Error)) {
 			props.username = usernameResp;
 		}
+
+
+		const outfits = await GetOutfitsByUser(server, props.cookie)
+		if (!(outfits instanceof Error)) {
+			outfits.map(outfit => {
+				outfit.items.map(item => {
+					props.previousOutfitItems.push(item)
+				})
+			})
+		}
+
+		// filter item duplicates
+		props.previousOutfitItems = props.previousOutfitItems.filter((value, index, self) =>
+			index === self.findIndex((t) => (
+				t.description == value.description
+			))
+		)
 	}
 
 	const resp = await GetCampaigns(server);
@@ -54,8 +73,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 	let clientServer = GetServerURL(true)
 	if (clientServer instanceof Error) {
-		props.error = clientServer.message; 
-        return {props};
+		props.error = clientServer.message;
+		return { props };
 	}
 
 	props.clientServer = clientServer
@@ -88,7 +107,7 @@ function validateForm(
 	}
 }
 
-function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Props) {
+function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOutfitItems, error }: Props) {
 	const [file, setFile] = useState<File | null>(null);
 	const [imageURL, setImageURL] = useState<string | null>("");
 	const [fileError, setFileError] = useState<string | null>("");
@@ -107,6 +126,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 			link: "",
 		},
 	]);
+	// const [createNewItem, setCreateNewItem] = useState<boolean>(false);
 
 	let server = GetServerURL(true)
 	if (server instanceof Error) {
@@ -171,6 +191,16 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 		]);
 	};
 
+	const handlePreviousItemSelect = (e: any, index: number) => {
+		let item = previousOutfitItems.filter(item => item.description == e.target.value)[0];
+
+		setOutfitItems([
+			...outfitItems.slice(0, index),
+			item,
+			...outfitItems.slice(index + 1),
+		]);
+	}
+
 	const handleAddItem = (e: any) => {
 		e.preventDefault();
 		setOutfitItems([
@@ -205,14 +235,14 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 			setFormSubmissionStatus("");
 
 			let tags = styleTags.split(" ");
-			let outfitId = process.env.NODE_ENV == "development" ? 
-			imageURL?.replace(
-				"https://storage.googleapis.com/rateyourstyle-dev/imgs/outfits/",
-				""
-			) : imageURL?.replace(
-				"https://storage.googleapis.com/rateyourstyle/imgs/outfits/",
-				""
-			);
+			let outfitId = process.env.NODE_ENV == "development" ?
+				imageURL?.replace(
+					"https://storage.googleapis.com/rateyourstyle-dev/imgs/outfits/",
+					""
+				) : imageURL?.replace(
+					"https://storage.googleapis.com/rateyourstyle/imgs/outfits/",
+					""
+				);
 			outfitId = outfitId.split("/")[1];
 			outfitId = outfitId.split(".")[0];
 
@@ -259,8 +289,8 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 	}, [server, cookie, file]);
 
 	if (error) {
-        return <div>error {error} </div>;
-    }
+		return <div>error {error} </div>;
+	}
 
 	return (
 		<>
@@ -442,11 +472,16 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 													onClick={(e: any) => handleRemoveItem(e, index)}
 												/>
 											</div>
+
 											<OutfitItemForm
+												previousOutfitItems={previousOutfitItems}
 												item={item}
 												index={index}
 												handleItemChange={handleItemChange}
+												handlePreviousItemSelect={handlePreviousItemSelect}
 											/>
+
+
 										</li>
 									);
 								})}
@@ -508,7 +543,36 @@ function OutfitItemForm(props: {
 	item: OutfitItem;
 	index: number;
 	handleItemChange: any;
+	previousOutfitItems: OutfitItem[];
+	handlePreviousItemSelect: any;
 }) {
+	const [createNewItem, setCreateNewItem] = useState(false);
+
+	if (props.previousOutfitItems && props.previousOutfitItems.length > 0 && !createNewItem) {
+		return (
+			<div>
+				<div className="flex flex-wrap"><div className="mr-2">Select previous clothing item</div>
+
+					<select
+					onChange={(e)=> props.handlePreviousItemSelect(e, props.index)}
+						className="border-2 overflow-x-scroll max-w-full">
+						{props.previousOutfitItems.map((item) =>
+							<option value={item.description}>{item.description} by {item.brand}</option>
+						)}
+					</select>
+				</div>
+
+				<div>or{" "}
+					<button className="text-pink underline"
+						onClick={(e) => {
+							e.preventDefault();
+							setCreateNewItem(true)
+						}
+						}>create new item</button></div>
+			</div>
+		)
+	}
+
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 			<div className="col-span-1">
@@ -587,7 +651,7 @@ function OutfitItemForm(props: {
 							min="1"
 							max="5"
 							step="0.5"
-							className="h-1  rounded-lg appearance-none cursor-pointer  p-0 m-0"
+							className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer  p-0 m-0"
 							onChange={(e) => props.handleItemChange(e, props.index)}
 							list="rating"
 							value={props.item.rating}

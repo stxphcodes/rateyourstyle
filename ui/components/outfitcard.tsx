@@ -70,7 +70,7 @@ export function OutfitCard(props: {
 
 	return (
 		<>
-			<div className="w-full shadow-md p-1 bg-off-white rounded-md my-4 break-words">
+			<div className="w-full shadow-md p-2 bg-off-white rounded-md my-4 break-words">
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-4 object-contain">
 					<div className="col-span-1 mx-auto">
 						<img
@@ -78,7 +78,7 @@ export function OutfitCard(props: {
 							src={props.data.picture_url}
 						/>
 						<div className="flex flex-row-reverse">
-							<a className=""onClick={() => setExpandImage(true)}>
+							<a className="" onClick={() => setExpandImage(true)}>
 								{" "}
 								expand img
 							</a>
@@ -92,8 +92,11 @@ export function OutfitCard(props: {
 								<h3 className="font-semibold">{props.data.title}</h3>
 								{
 									!props.asUser && (
-										<PSpan p={props.data.user_id} span="by" />
-
+										<p><span className="font-bold">by:{" "}</span>{props.data.user_id ? <a href={`/closet/${props.data.user_id}`}>{props.data.user_id}</a> : "anonymous"}
+										
+										
+										
+										</p>
 									)
 								}
 								<PSpan p={props.data.date} span="date" />
@@ -106,9 +109,9 @@ export function OutfitCard(props: {
 								</div>
 							</div>
 							<div className="col-span-2">
-							
+
 								<h4 className="font-semibold">Audience Rating:</h4>
-								
+
 								<div className="flex items-center">
 									{!ratingAverage ? (
 										<>
@@ -202,12 +205,12 @@ export function OutfitCard(props: {
 							)}
 						</div>
 
-						<a className="mt-2 mx-1" onClick={(e)=> 
-							{e.preventDefault() 
+						<a className="mt-2 mx-1" onClick={(e) => {
+							e.preventDefault()
 							setReadMore(!readMore)
-							}}>read {readMore ? "less" : "more"}</a>
-					</div>				
-					
+						}}>read {readMore ? "less" : "more"}</a>
+					</div>
+
 				</div>
 			</div>
 

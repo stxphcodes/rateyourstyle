@@ -1,15 +1,13 @@
 import { GetServerSideProps } from 'next';
-import Link from "next/link";
 import { useState, useEffect } from 'react';
 
-import { GetOutfitsByUser, GetPublicOutfitsByUser, Outfit, OutfitItem } from '../../apis/get_outfits';
+import { GetPublicOutfitsByUser, Outfit, OutfitItem } from '../../apis/get_outfits';
 import { GetRatings, Rating } from '../../apis/get_ratings';
-import { GetUserProfile, User, UserProfile } from '../../apis/get_user';
 import { Navbar } from '../../components/navarbar';
 import { OutfitCard } from '../../components/outfitcard';
 import { GetServerURL } from "../../apis/get_server";
-import { PostUserProfile } from '../../apis/post_user';
-import { SortingArrowsIcon } from '../../components/icons/sorting-arrows';
+import { ClosetTable } from '../../components/closet-table';
+import { GetUsername } from '../../apis/get_user';
 
 type Props = {
     cookie: string;
@@ -17,16 +15,19 @@ type Props = {
     outfits: Outfit[] | null;
     ratings: Rating[] | null;
     clientServer: string;
+    closetName: string;
+    username: string;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    console.log("I an in line 23")
     let props: Props = {
         clientServer: "",
         cookie: "",
         error: null,
         outfits: null,
         ratings: null,
+        closetName: "",
+        username: "",
     };
 
     let server = GetServerURL()
@@ -38,13 +39,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let cookie = context.req.cookies["rys-login"];
     props.cookie = cookie ? cookie : "";
 
-    let username = context.query["user_id"];
-    if (typeof username !== "string") {
-        props.error = "missing username"
+    if (props.cookie) {
+		const usernameResp = await GetUsername(server, props.cookie);
+		if (!(usernameResp instanceof Error)) {
+			props.username = usernameResp;
+		}
+	}
+
+    let closetName = context.query["user_id"];
+    if (typeof closetName !== "string") {
+        props.error = "missing username for closet"
         return { props };
     }
+    props.closetName = closetName;
 
-    const resp = await GetPublicOutfitsByUser(server, props.cookie, username);
+    const resp = await GetPublicOutfitsByUser(server, props.cookie, closetName);
     if (resp instanceof Error) {
         props.error = resp.message;
         return { props };
@@ -75,13 +84,11 @@ function Rating(props: { x: number, small?: boolean }) {
     )
 }
 
-export default function UserClosePage({ clientServer, cookie, outfits, ratings, error }: Props) {
+export default function UserClosetPage({ clientServer, cookie, outfits, ratings, closetName, username, error }: Props) {
     if (error) {
-
-
         return (
             <>
-                <Navbar clientServer={clientServer} cookie={cookie} />
+                <Navbar clientServer={clientServer} cookie={cookie} user={username}/>
                 <main className="mt-6 p-3 md:p-8">
                     <h1>😕 Oh no</h1>
                     Looks like there&apos;s an error on our end. Please refresh the page in a
@@ -95,14 +102,12 @@ export default function UserClosePage({ clientServer, cookie, outfits, ratings, 
     if (!outfits || outfits.length == 0) {
         return (
             <>
-                <Navbar clientServer={clientServer} cookie={cookie} />
+                <Navbar clientServer={clientServer} cookie={cookie} user={username}/>
                 <main className="mt-6 p-3 md:p-8">
                     <section>
-                        <h2>Your Profile</h2>
-
+                        <h1>😕 Empty</h1>
+                        Looks like the user hasn't posted any public outfits yet.
                     </section>
-
-
                 </main>
             </>
         );
@@ -124,7 +129,6 @@ export default function UserClosePage({ clientServer, cookie, outfits, ratings, 
             }
         })
     })
-
 
 
     const [itemsSelected, setItemsSelected] = useState<string[] | null>(null);
@@ -149,127 +153,39 @@ export default function UserClosePage({ clientServer, cookie, outfits, ratings, 
 
     }, [itemsSelected])
 
+    const handleItemSelection = (itemDescription: string) => {
+        if (!itemsSelected) {
+            setItemsSelected([itemDescription])
+            return
+        }
+
+        let idx = itemsSelected.indexOf(itemDescription)
+
+        if (idx < 0) {
+            setItemsSelected([
+                ...itemsSelected,
+                itemDescription,
+            ])
+        } else {
+            let copy = [...itemsSelected]
+            copy.splice(idx, 1)
+
+            setItemsSelected(copy)
+        }
+    }
+
     return (
         <>
-            <Navbar clientServer={clientServer} cookie={cookie} />
+            <Navbar clientServer={clientServer} cookie={cookie} user={username}/>
             <main className="mt-6 p-3 md:p-8">
-
-
-
                 <section className="my-4">
-                    <h2>So and So 2023 Closet</h2>
-
-                    <div className="overflow-x-auto shadow-md sm:rounded-lg">
-                        <table className="w-full text-sm text-left overflow-x-scroll">
-                            <thead className="text-xs uppercase bg-off-white">
-                                <tr>
-                                    <th scope="col" className="p-4">
-                                        <div className="flex items-center">
-
-                                        </div>
-                                    </th>
-                                    <th scope="col" className="p-4">
-                                        <div className="flex items-center">
-                                            Clothing Item
-                                            <a href="#"><SortingArrowsIcon /></a>
-                                        </div>
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        <div className="flex items-center">
-                                            Brand
-                                            <a href="#"><SortingArrowsIcon /></a>
-                                        </div>
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        <div className="flex items-center">
-                                            Size
-                                            <a href="#"><SortingArrowsIcon /></a>
-                                        </div>
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        <div className="flex items-center">
-                                            Price
-                                            <a href="#"><SortingArrowsIcon /></a>
-                                        </div>
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        <div className="flex items-center">
-                                            Rating
-                                            <a href="#"><SortingArrowsIcon /></a>
-                                        </div>
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        <div className="flex items-center">
-                                            Review
-
-                                        </div>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {outfitItems.map((item) => (
-                                    <tr className="bg-white border-b max-h-8 overflow-hidden">
-                                        <td className="p-4">
-                                            <input type="checkbox"
-                                                onChange={() => {
-                                                    if (!itemsSelected) {
-                                                        setItemsSelected([item.description])
-                                                        return
-                                                    }
-
-                                                    let idx = itemsSelected.indexOf(item.description)
-
-                                                    if (idx < 0) {
-                                                        setItemsSelected([
-                                                            ...itemsSelected,
-                                                            item.description,
-                                                        ])
-                                                    } else {
-                                                        let copy = [...itemsSelected]
-                                                        copy.splice(idx, 1)
-
-                                                        setItemsSelected(copy)
-                                                    }
-
-                                                }}
-                                                checked={itemsSelected ? itemsSelected.includes(item.description) : false}>
-                                            </input>
-                                        </td>
-                                        <td className="p-3 font-medium w-52">
-                                            {item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="hover:cursor-not-allowed text-pink">{item.description}</span>}
-
-                                        </td>
-                                        <td className="p-3">
-                                            {item.brand}
-                                        </td>
-                                        <td className="p-3">
-                                            {item.size}
-                                        </td>
-                                        <td className="p-3">
-                                            {item.price}
-                                        </td>
-                                        <td className="p-3">
-                                            {item.rating}
-                                        </td>
-                                        <td className="p-3">
-                                            <div className="max-h-16 overflow-y-scroll">
-                                                {item.review}
-                                            </div>
-                                        </td>
-
-                                    </tr>
-
-
-                                ))
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                    <h2 className="capitalize">{closetName}&apos;s Closet</h2>
+                    <ClosetTable outfitItems={outfitItems} itemsSelected={itemsSelected} handleItemSelection={handleItemSelection} />
                 </section>
 
                 <section className="mt-8">
-                    <h2>Your Outfits</h2>
-                    <div>Select item(s) from your closet to see all of your outfits that contain the item.</div>
+                    <h2 className="capitalize">{closetName}&apos;s Outfits</h2>
+                    <div>Select item(s) from their closet to see all of the outfits that contain the item.</div>
 
 
                     <div className="mt-4 p-1 bg-pink w-fit rounded text-white">Results: {outfitsToDisplay ? outfitsToDisplay.length : "none"}</div>
