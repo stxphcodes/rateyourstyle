@@ -51,7 +51,7 @@ export function ClosetTable(props: { outfitItems: OutfitItem[], itemsSelected: s
                 </thead>
                 <tbody>
                     {props.outfitItems.map((item) => (
-                        <tr className="bg-white border-b max-h-8 overflow-hidden">
+                        <tr className="bg-white border-b max-h-8 overflow-hidden" key={item.description}>
                             <td className="p-2 md:p-4">
                                 <input type="checkbox"
                                     onChange={() => props.handleItemSelection(item.description)}

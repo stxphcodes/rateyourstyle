@@ -40,11 +40,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props.cookie = cookie ? cookie : "";
 
     if (props.cookie) {
-		const usernameResp = await GetUsername(server, props.cookie);
-		if (!(usernameResp instanceof Error)) {
-			props.username = usernameResp;
-		}
-	}
+        const usernameResp = await GetUsername(server, props.cookie);
+        if (!(usernameResp instanceof Error)) {
+            props.username = usernameResp;
+        }
+    }
 
     let closetName = context.query["user_id"];
     if (typeof closetName !== "string") {
@@ -85,39 +85,10 @@ function Rating(props: { x: number, small?: boolean }) {
 }
 
 export default function UserClosetPage({ clientServer, cookie, outfits, ratings, closetName, username, error }: Props) {
-    if (error) {
-        return (
-            <>
-                <Navbar clientServer={clientServer} cookie={cookie} user={username}/>
-                <main className="mt-6 p-3 md:p-8">
-                    <h1>😕 Oh no</h1>
-                    Looks like there&apos;s an error on our end. Please refresh the page in a
-                    few minutes. If the issue persists, please email
-                    sitesbystephanie@gmail.com.
-                </main>
-            </>
-        );
-    }
-
-    if (!outfits || outfits.length == 0) {
-        return (
-            <>
-                <Navbar clientServer={clientServer} cookie={cookie} user={username}/>
-                <main className="mt-6 p-3 md:p-8">
-                    <section>
-                        <h1>😕 Empty</h1>
-                        Looks like the user hasn't posted any public outfits yet.
-                    </section>
-                </main>
-            </>
-        );
-    }
-
-
     let outfitItemToIds: Map<string, string[]> = new Map<string, string[]>();
     let outfitItems: OutfitItem[] = [];
 
-    outfits.map(outfit => {
+    outfits && outfits.map(outfit => {
         outfit.items.map(item => {
             if (!outfitItemToIds.has(item.description)) {
                 outfitItems.push(item);
@@ -130,12 +101,11 @@ export default function UserClosetPage({ clientServer, cookie, outfits, ratings,
         })
     })
 
-
     const [itemsSelected, setItemsSelected] = useState<string[] | null>(null);
     const [outfitsToDisplay, setOutfitsToDisplay] = useState<Outfit[] | null>(null);
 
     useEffect(() => {
-        if (!itemsSelected) {
+        if (!itemsSelected || !outfits) {
             setOutfitsToDisplay(null);
             return
         }
@@ -151,7 +121,36 @@ export default function UserClosetPage({ clientServer, cookie, outfits, ratings,
         setOutfitsToDisplay(outfits.filter(outfit =>
             newOutfits.includes(outfit.id)));
 
-    }, [itemsSelected])
+    }, [itemsSelected, outfitItemToIds, outfits])
+ 
+
+    if (error) {
+        return (
+            <>
+                <Navbar clientServer={clientServer} cookie={cookie} user={username} />
+                <main className="mt-6 p-3 md:p-8">
+                    <h1>😕 Oh no</h1>
+                    Looks like there&apos;s an error on our end. Please refresh the page in a
+                    few minutes. If the issue persists, please email
+                    sitesbystephanie@gmail.com.
+                </main>
+            </>
+        );
+    }
+
+    if (!outfits || outfits.length == 0) {
+        return (
+            <>
+                <Navbar clientServer={clientServer} cookie={cookie} user={username} />
+                <main className="mt-6 p-3 md:p-8">
+                    <section>
+                        <h1>😕 Empty</h1>
+                        Looks like the user hasn&apos;t posted any public outfits yet.
+                    </section>
+                </main>
+            </>
+        );
+    }
 
     const handleItemSelection = (itemDescription: string) => {
         if (!itemsSelected) {
@@ -176,7 +175,7 @@ export default function UserClosetPage({ clientServer, cookie, outfits, ratings,
 
     return (
         <>
-            <Navbar clientServer={clientServer} cookie={cookie} user={username}/>
+            <Navbar clientServer={clientServer} cookie={cookie} user={username} />
             <main className="mt-6 p-3 md:p-8">
                 <section className="my-4">
                     <h2 className="capitalize">{closetName}&apos;s Closet</h2>
