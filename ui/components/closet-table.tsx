@@ -5,7 +5,7 @@ export function ClosetTable(props: { outfitItems: OutfitItem[], itemsSelected: s
     return (
         <div className="overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-xs md:text-sm text-left overflow-x-scroll">
-                <thead className="text-xs uppercase bg-off-white">
+                <thead className="text-xs uppercase bg-background">
                     <tr>
                         <th scope="col" className="p-2 md:p-4">
                             <div className="flex items-center">
@@ -60,7 +60,7 @@ export function ClosetTable(props: { outfitItems: OutfitItem[], itemsSelected: s
                                 </input>
                             </td>
                             <td className="p-2 md:p-4 font-medium w-52">
-                                {item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="hover:cursor-not-allowed text-pink">{item.description}</span>}
+                                {item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="hover:cursor-not-allowed text-primary">{item.description}</span>}
 
                             </td>
                             <td className="p-2 md:p-4">

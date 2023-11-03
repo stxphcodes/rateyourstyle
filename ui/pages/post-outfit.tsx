@@ -306,7 +306,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 							you don&apos;t have one!
 						</div>
 					)}
-					<div className="bg-off-white p-2 rounded">
+					<div className="bg-background p-2 rounded">
 						<h3>FAQs</h3>
 						<div className="font-semibold mt-2">Who can see my outfit posts?</div>
 						<p>Each outfit post has its own privacy setting. Private posts do{" "}<span className="underline">not</span> appear on the homepage and are not discoverable by the general public. The post is only visible to you, the creator of the post, when you log into your account However, if your post includes a campaign #tag, the sponsor of the campaign is also able view the post, regardless of the privacy setting on the post. </p>
@@ -321,7 +321,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 					</div>
 				)}
 				{formSubmissionStatus !== "success" && (
-					<form className=" shadow px-4 py-8 border-off-white border-2">
+					<form className=" shadow px-4 py-8 border-background border-2">
 						{imageURL ? (
 							<div className="flex flex-wrap gap-4">
 								<img src={imageURL} className="max-h-80" />
@@ -332,7 +332,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 										setFile(null);
 										setImageURL("");
 									}}
-									className="h-fit my-auto bg-black p-1 text-white rounded text-sm hover:bg-pink"
+									className="h-fit my-auto bg-black p-1 text-white rounded text-sm hover:bg-primary"
 								>
 									{" "}
 									remove
@@ -348,7 +348,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 												onClick={(e) => {
 													location.reload()
 												}}
-												className="h-fit my-auto bg-black p-1 text-white rounded text-sm hover:bg-pink"
+												className="h-fit my-auto bg-black p-1 text-white rounded text-sm hover:bg-primary"
 											>
 												{" "}
 												refresh
@@ -367,7 +367,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 									accept="image/*"
 									onChange={handleFileChange}
 								/>
-								<label className="text-pink italic font-normal">Required</label>
+								<label className="text-primary italic font-normal">Required</label>
 							</>
 						)}
 						<div className="my-4">
@@ -384,8 +384,8 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 									onChange={() => setPrivateMode(!privateMode)}
 								/>
 								<div
-									className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:pink
-							 rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink"
+									className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:primary
+							 rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
 								></div>
 								<span className="ml-3 text-sm font-medium text-gray-900">
 									Private
@@ -409,7 +409,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 								value={outfitCaption}
 								onChange={handleFormInput}
 							></input>
-							<label className="text-pink italic font-normal">Required</label>
+							<label className="text-primary italic font-normal">Required</label>
 						</div>
 
 						<div className="my-4">
@@ -425,16 +425,16 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 								value={styleTags}
 								onChange={handleFormInput}
 							></input>
-							<label className="text-pink italic font-normal">Required</label>
+							<label className="text-primary italic font-normal">Required</label>
 							<div className="flex gap-2 mt-2 flex-wrap">
 								{campaigns &&
 									campaigns.map((item) => (
 										<button
 											key={item.tag}
 											className={`${styleTags.includes(item.tag)
-												? "bg-pink text-white"
-												: "bg-white text-pink"
-												} border-2 border-pink p-2 rounded`}
+												? "bg-primary text-white"
+												: "bg-white text-primary"
+												} border-2 border-primary p-2 rounded`}
 											onClick={(e) => {
 												e.preventDefault();
 												if (!styleTags.includes(item.tag)) {
@@ -463,7 +463,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 									let displayCount = index + 1;
 									return (
 										<li
-											className="shadow border-2 border-off-white my-2 rounded-lg p-4"
+											className="shadow border-2 border-background my-2 rounded-lg p-4"
 											key={displayCount}
 										>
 											<div className="flex items-start justify-between">
@@ -488,14 +488,14 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 							</ul>
 							<button
 								onClick={handleAddItem}
-								className="p-2 bg-pink text-white rounded float-right"
+								className="p-2 bg-primary text-white rounded float-right"
 							>
 								add item
 							</button>
 						</div>
 
 						<button
-							className="bg-pink hover:bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mt-8"
+							className="bg-primary hover:bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mt-8"
 							type="button"
 							onClick={handleSubmit}
 						>
@@ -527,7 +527,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 						<p>
 							Check out your post on the{" "}
 							<Link href="/">
-								<a className="text-pink underline">homepage</a>
+								<a className="text-primary underline">homepage</a>
 							</Link>{" "}
 							and rate outfits you like!
 						</p>
@@ -563,7 +563,7 @@ function OutfitItemForm(props: {
 				</div>
 
 				<div>or{" "}
-					<button className="text-pink underline"
+					<button className="text-primary underline"
 						onClick={(e) => {
 							e.preventDefault();
 							setCreateNewItem(true)
@@ -585,7 +585,7 @@ function OutfitItemForm(props: {
 					value={props.item.description}
 					onChange={(e) => props.handleItemChange(e, props.index)}
 				></input>
-				<label htmlFor="" className="text-pink italic font-normal">
+				<label htmlFor="" className="text-primary italic font-normal">
 					Required
 				</label>
 
@@ -600,7 +600,7 @@ function OutfitItemForm(props: {
 					value={props.item.brand}
 					onChange={(e) => props.handleItemChange(e, props.index)}
 				></input>
-				<label htmlFor="" className="text-pink italic font-normal">
+				<label htmlFor="" className="text-primary italic font-normal">
 					Required
 				</label>
 
@@ -657,7 +657,7 @@ function OutfitItemForm(props: {
 							value={props.item.rating}
 						/>
 						<datalist
-							className="flex text-pink -mt-2 p-0 justify-between items-start"
+							className="flex text-primary -mt-2 p-0 justify-between items-start"
 							id="rating"
 						>
 							<option className="text-xs">|</option>
@@ -667,7 +667,7 @@ function OutfitItemForm(props: {
 							<option className="text-xs">|</option>
 						</datalist>
 					</div>
-					<h1 className="text-pink">{props.item.rating}</h1>
+					<h1 className="text-primary">{props.item.rating}</h1>
 				</div>
 
 				<label className="mt-2">Your Review</label>
@@ -679,7 +679,7 @@ function OutfitItemForm(props: {
 					onChange={(e) => props.handleItemChange(e, props.index)}
 					value={props.item.review}
 				></textarea>
-				<label className="text-pink italic font-normal">Required</label>
+				<label className="text-primary italic font-normal">Required</label>
 			</div>
 		</div>
 	);

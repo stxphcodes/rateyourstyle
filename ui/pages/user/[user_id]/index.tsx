@@ -92,7 +92,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 function Rating(props: { x: number, small?: boolean }) {
     return (
-        <div style={{ fontSize: props.small ? "18px" : "30px" }} className="text-pink">{props.x == 0 ? "?" : props.x}</div>
+        <div style={{ fontSize: props.small ? "18px" : "30px" }} className="text-primary">{props.x == 0 ? "?" : props.x}</div>
     )
 }
 
@@ -138,7 +138,7 @@ export default function Index({ clientServer, cookie, user, outfits, ratings, er
                     <p>
                         Click{" "}
                         <Link href="/post-outfit">
-                            <a className="underline text-pink" >here</a>
+                            <a className="underline text-primary" >here</a>
                         </Link>{" "}
                         to post your first outfit.
                     </p>
@@ -230,114 +230,7 @@ export default function Index({ clientServer, cookie, user, outfits, ratings, er
                         <span className="font-bold">Share your closet: </span> <a target="_blank" href={`/closet/${user.username}`}>https://rateyourstyle.com/closet/{user.username}</a>
                     </div>
                     <div className="text-xs mb-2">Only items from public outfits will be shared.</div>
-
-
                     <ClosetTable outfitItems={outfitItems} handleItemSelection={handleItemSelection} itemsSelected={itemsSelected} />
-
-
-                    {/* <div className="overflow-x-auto shadow-md sm:rounded-lg">
-                        <table className="w-full text-sm text-left overflow-x-scroll">
-                            <thead className="text-xs uppercase bg-off-white">
-                                <tr>
-                                    <th scope="col" className="p-4">
-                                        <div className="flex items-center">
-
-                                        </div>
-                                    </th>
-                                    <th scope="col" className="p-4">
-                                        <div className="flex items-center">
-                                            Clothing Item
-                                            <a href="#"><SortingArrowsIcon /></a>
-                                        </div>
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        <div className="flex items-center">
-                                            Brand
-                                            <a href="#"><SortingArrowsIcon /></a>
-                                        </div>
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        <div className="flex items-center">
-                                            Size
-                                            <a href="#"><SortingArrowsIcon /></a>
-                                        </div>
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        <div className="flex items-center">
-                                            Price
-                                            <a href="#"><SortingArrowsIcon /></a>
-                                        </div>
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        <div className="flex items-center">
-                                            Rating
-                                            <a href="#"><SortingArrowsIcon /></a>
-                                        </div>
-                                    </th>
-                                    <th scope="col" className="px-6 py-3">
-                                        <div className="flex items-center">
-                                            Review
-
-                                        </div>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {outfitItems.map((item) => (
-                                    <tr className="bg-white border-b max-h-8 overflow-hidden">
-                                        <td className="p-4">
-                                            <input type="checkbox"
-                                                onChange={() => {
-                                                    if (!itemsSelected) {
-                                                        setItemsSelected([item.description])
-                                                        return
-                                                    }
-
-                                                    let idx = itemsSelected.indexOf(item.description)
-
-                                                    if (idx < 0) {
-                                                        setItemsSelected([
-                                                            ...itemsSelected,
-                                                            item.description,
-                                                        ])
-                                                    } else {
-                                                        let copy = [...itemsSelected]
-                                                        copy.splice(idx, 1)
-
-                                                        setItemsSelected(copy)
-                                                    }
-
-                                                }}
-                                                checked={itemsSelected ? itemsSelected.includes(item.description) : false}>
-                                            </input>
-                                        </td>
-                                        <td className="p-3 font-medium w-52">
-                                            {item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="hover:cursor-not-allowed text-pink">{item.description}</span>}
-
-                                        </td>
-                                        <td className="p-3">
-                                            {item.brand}
-                                        </td>
-                                        <td className="p-3">
-                                            {item.size}
-                                        </td>
-                                        <td className="p-3">
-                                            {item.price}
-                                        </td>
-                                        <td className="p-3">
-                                            {item.rating}
-                                        </td>
-                                        <td className="p-3">
-                                            <div className="max-h-16 overflow-y-scroll">
-                                                {item.review}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                                }
-                            </tbody>
-                        </table>
-                    </div> */}
                 </section>
 
                 <section className="mt-8">
@@ -345,7 +238,7 @@ export default function Index({ clientServer, cookie, user, outfits, ratings, er
                     <div>Select item(s) from your closet to see all of your outfits that contain the item.</div>
 
 
-                    <div className="mt-4 p-1 bg-pink w-fit rounded text-white">Results: {outfitsToDisplay ? outfitsToDisplay.length : "none"}</div>
+                    <div className="mt-4 p-1 bg-primary w-fit rounded text-white">Results: {outfitsToDisplay ? outfitsToDisplay.length : "none"}</div>
 
                     {outfitsToDisplay &&
                         outfitsToDisplay.map((item) => (
@@ -512,7 +405,7 @@ function UserProfileForm(props: { clientServer: string, cookie: string, user: Us
                 {submitError && <div className="bg-red-500 p-1 my-2 text-white rounded">Oh no! We apologize, it looks like we are having server issues. Please refresh the page and try again.</div>}
 
                 {!editUserProfile ? <button
-                    className="px-1 rounded bg-pink text-white"
+                    className="px-1 rounded bg-primary text-white"
                     onClick={(e) => {
                         e.preventDefault()
                         setEditUserProfile(true)
@@ -520,7 +413,7 @@ function UserProfileForm(props: { clientServer: string, cookie: string, user: Us
                     :
                     <>
 
-                        <button className="px-1 mr-2 bg-pink text-white h-fit rounded hover:text-black"
+                        <button className="px-1 mr-2 bg-primary text-white h-fit rounded hover:text-black"
                             onClick={async (e) => {
                                 e.preventDefault()
                                 setEditUserProfile(false)
@@ -547,7 +440,7 @@ function UserProfileForm(props: { clientServer: string, cookie: string, user: Us
 
                             }}>submit</button>
 
-                        <button className="px-1 bg-black text-white h-fit rounded hover:text-pink"
+                        <button className="px-1 bg-black text-white h-fit rounded hover:text-primary"
                             onClick={(e) => {
                                 e.preventDefault()
                                 setDepartment(props.user?.user_profile?.department)

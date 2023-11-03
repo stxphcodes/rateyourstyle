@@ -21,8 +21,8 @@ module.exports = {
     },
     extend: {
       colors: {
-        "off-white": "#ede0d4",
-        "pink": "#aa3c16",
+        "background": "#ede0d4",
+        "primary": "#aa3c16",
       },
       maxHeight: {
         card: "400px",

@@ -85,7 +85,7 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 							</button>
 
 							<button
-								className="p-2 bg-pink text-white rounded-lg"
+								className="p-2 bg-primary text-white rounded-lg"
 								onClick={() => setShowCreateAccountModal(true)}
 							>
 								Create Account

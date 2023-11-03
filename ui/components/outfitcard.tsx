@@ -14,7 +14,7 @@ function average(arr: number[]) {
 
 function Rating(props: { x: number, small?: boolean }) {
 	return (
-		<div style={{ fontSize: props.small ? "18px" : "30px" }} className="text-pink">{props.x == 0 ? "?" : props.x}</div>
+		<div style={{ fontSize: props.small ? "18px" : "30px" }} className="text-primary">{props.x == 0 ? "?" : props.x}</div>
 	)
 }
 
@@ -70,7 +70,7 @@ export function OutfitCard(props: {
 
 	return (
 		<>
-			<div className="w-full shadow-md p-2 bg-off-white rounded-md my-4 break-words">
+			<div className="w-full shadow-md p-2 bg-background rounded-md my-4 break-words">
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-4 object-contain">
 					<div className="col-span-1 mx-auto">
 						<img
@@ -154,7 +154,7 @@ export function OutfitCard(props: {
 														value={userItemRating}
 													/>
 													<datalist
-														className="flex text-pink -mt-2 p-0 justify-between items-start"
+														className="flex text-primary -mt-2 p-0 justify-between items-start"
 														id="rating"
 													>
 														<option className="text-xs">|</option>
@@ -165,7 +165,7 @@ export function OutfitCard(props: {
 													</datalist>
 												</div>
 												<button
-													className="bg-pink text-white p-1 rounded hover:bg-black"
+													className="bg-primary text-white p-1 rounded hover:bg-black"
 													onClick={handleSubmitRating}
 												>
 													submit
@@ -184,7 +184,7 @@ export function OutfitCard(props: {
 										<div className="col-span-1" key={`col-1-${item.brand}`}>
 											<h4>
 												{count}.{" "}
-												{item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="hover:cursor-not-allowed text-pink">{item.description}</span>}
+												{item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="hover:cursor-not-allowed text-primary">{item.description}</span>}
 											</h4>
 											<PSpan p={item.brand} span="from" />
 											<PSpan p={item.size ? item.size : "n/a"} span="size" />

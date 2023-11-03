@@ -58,7 +58,7 @@ function Campaigns({ campaigns, cookie, clientServer, error }: Props) {
                     <div className="">
                         RateYourStyle partners with local boutiques and brands to create campaigns that celebrate, reward and showcase our users&apos; style and fashion. Typically, at the end of the campaign, a few posts tagged with the campaign #tag will be selected to win $100 gift cards. Each campaign has its own requirements and rewards, so be sure to read campaign descriptions carefully. <br /> <br /> To apply to an active campaign,{" "}
                         <Link href="/post-outfit">
-                            <a className="text-pink underline">Post an Outfit</a>
+                            <a className="text-primary underline">Post an Outfit</a>
                         </Link>{" "}
                         according to the requirements listed in the campaign, and tag the
                         outfit with the campaign tag. Please note that both public and

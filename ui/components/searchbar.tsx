@@ -26,7 +26,7 @@ export default function Searchbar({
         </div>
         <button
           type="submit"
-          className="bg-pink font-medium hover:bg-white ml-2 py-2 px-2 md:px-4 text-xs md:text-md rounded-lg text-white hover:text-pink"
+          className="bg-primary font-medium hover:bg-white ml-2 py-2 px-2 md:px-4 text-xs md:text-md rounded-lg text-white hover:text-primary"
           onClick={handleSubmit}
         >
           Search

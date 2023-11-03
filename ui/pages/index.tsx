@@ -185,7 +185,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                 <section className="my-4">
                     <h1>Welcome to Rate Your Style</h1>
                     <div className="">
-                        A fashion site for style inspo, clothing links and outfit reviews. Check out currently active <Link href="/campaigns"><a className="text-pink underline">campaigns</a></Link> and win up to $500 in gift cards to fashion brands of your choice by <Link href="/post-outfit"><a className="underline text-pink">Posting an Outfit</a></Link>.
+                        A fashion site for style inspo, clothing links and outfit reviews. Check out currently active <Link href="/campaigns"><a className="text-primary underline">campaigns</a></Link> and win up to $500 in gift cards to fashion brands of your choice by <Link href="/post-outfit"><a className="underline text-primary">Posting an Outfit</a></Link>.
                     </div>
                 </section>
 
@@ -217,7 +217,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                             <div className="text-xs">Discover outfits from users that are similar in age, height, and weight.
                             </div>
                             {similarToMeError &&
-                                <div className="text-pink">{similarToMeError == "unknownUser" ? "You must be signed into an account to use this filter." : similarToMeError == "missingProfile" && "You must complete your user profile to use this filter."}</div>
+                                <div className="text-primary">{similarToMeError == "unknownUser" ? "You must be signed into an account to use this filter." : similarToMeError == "missingProfile" && "You must complete your user profile to use this filter."}</div>
                             }
                         </div>
 

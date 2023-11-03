@@ -80,7 +80,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 function Rating(props: { x: number, small?: boolean }) {
     return (
-        <div style={{ fontSize: props.small ? "18px" : "30px" }} className="text-pink">{props.x == 0 ? "?" : props.x}</div>
+        <div style={{ fontSize: props.small ? "18px" : "30px" }} className="text-primary">{props.x == 0 ? "?" : props.x}</div>
     )
 }
 
@@ -188,7 +188,7 @@ export default function UserClosetPage({ clientServer, cookie, outfits, ratings,
                     <div>Select item(s) from their closet to see all of the outfits that contain the item.</div>
 
 
-                    <div className="mt-4 p-1 bg-pink w-fit rounded text-white">Results: {outfitsToDisplay ? outfitsToDisplay.length : "none"}</div>
+                    <div className="mt-4 p-1 bg-primary w-fit rounded text-white">Results: {outfitsToDisplay ? outfitsToDisplay.length : "none"}</div>
 
                     {outfitsToDisplay &&
                         outfitsToDisplay.map((item) => (

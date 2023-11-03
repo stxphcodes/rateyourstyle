@@ -70,7 +70,7 @@ export function SignIn(props: {clientServer: string, handleClose: any}) {
                     </div>
                     <div className="flex items-center justify-between">
                         <button
-                            className="bg-pink hover:bg-black text-white font-bold py-2 px-4 rounded"
+                            className="bg-primary hover:bg-black text-white font-bold py-2 px-4 rounded"
                             type="button"
                             onClick={handleSubmit}
                         >
