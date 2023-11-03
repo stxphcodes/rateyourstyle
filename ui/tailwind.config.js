@@ -26,6 +26,7 @@ module.exports = {
       },
       maxHeight: {
         card: "400px",
+        table: "500px"
       },
     },
   },

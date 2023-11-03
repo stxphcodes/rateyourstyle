@@ -3,7 +3,7 @@ import { OutfitItem } from "../apis/get_outfits";
 
 export function ClosetTable(props: { outfitItems: OutfitItem[], itemsSelected: string[] | null, handleItemSelection: any }) {
     return (
-        <div className="overflow-x-auto shadow-md sm:rounded-lg">
+        <div className="overflow-x-auto shadow-md sm:rounded-lg max-h-table">
             <table className="w-full text-xs md:text-sm text-left overflow-x-scroll">
                 <thead className="text-xs uppercase bg-background">
                     <tr>
