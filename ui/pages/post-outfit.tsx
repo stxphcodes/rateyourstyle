@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
-import { Outfit, OutfitItem } from '../apis/get_outfits';
+import { GetOutfitsByUser, Outfit, OutfitItem } from '../apis/get_outfits';
 import { GetUsername } from '../apis/get_user';
 import { PostImage } from '../apis/post_image';
 import { PostOutfit } from '../apis/post_outfit';
@@ -18,6 +18,7 @@ type Props = {
 	error: string | null;
 	username: string;
 	clientServer: string;
+	previousOutfitItems: OutfitItem[];
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -27,13 +28,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		error: null,
 		username: "",
 		clientServer: "",
+		previousOutfitItems: [],
 	};
 
 	let server = GetServerURL()
-    if (server instanceof Error) {
-        props.error = server.message; 
-        return {props};
-    }
+	if (server instanceof Error) {
+		props.error = server.message;
+		return { props };
+	}
 
 	let cookie = context.req.cookies["rys-login"];
 	props.cookie = cookie ? cookie : "";
@@ -43,6 +45,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		if (!(usernameResp instanceof Error)) {
 			props.username = usernameResp;
 		}
+
+
+		const outfits = await GetOutfitsByUser(server, props.cookie)
+		if (!(outfits instanceof Error)) {
+			outfits.map(outfit => {
+				outfit.items.map(item => {
+					props.previousOutfitItems.push(item)
+				})
+			})
+		}
+
+		// filter item duplicates
+		props.previousOutfitItems = props.previousOutfitItems.filter((value, index, self) =>
+			index === self.findIndex((t) => (
+				t.description == value.description
+			))
+		)
 	}
 
 	const resp = await GetCampaigns(server);
@@ -54,8 +73,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 	let clientServer = GetServerURL(true)
 	if (clientServer instanceof Error) {
-		props.error = clientServer.message; 
-        return {props};
+		props.error = clientServer.message;
+		return { props };
 	}
 
 	props.clientServer = clientServer
@@ -88,7 +107,7 @@ function validateForm(
 	}
 }
 
-function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Props) {
+function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOutfitItems, error }: Props) {
 	const [file, setFile] = useState<File | null>(null);
 	const [imageURL, setImageURL] = useState<string | null>("");
 	const [fileError, setFileError] = useState<string | null>("");
@@ -107,6 +126,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 			link: "",
 		},
 	]);
+	// const [createNewItem, setCreateNewItem] = useState<boolean>(false);
 
 	let server = GetServerURL(true)
 	if (server instanceof Error) {
@@ -171,6 +191,16 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 		]);
 	};
 
+	const handlePreviousItemSelect = (e: any, index: number) => {
+		let item = previousOutfitItems.filter(item => item.description == e.target.value)[0];
+
+		setOutfitItems([
+			...outfitItems.slice(0, index),
+			item,
+			...outfitItems.slice(index + 1),
+		]);
+	}
+
 	const handleAddItem = (e: any) => {
 		e.preventDefault();
 		setOutfitItems([
@@ -205,14 +235,14 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 			setFormSubmissionStatus("");
 
 			let tags = styleTags.split(" ");
-			let outfitId = process.env.NODE_ENV == "development" ? 
-			imageURL?.replace(
-				"https://storage.googleapis.com/rateyourstyle-dev/imgs/outfits/",
-				""
-			) : imageURL?.replace(
-				"https://storage.googleapis.com/rateyourstyle/imgs/outfits/",
-				""
-			);
+			let outfitId = process.env.NODE_ENV == "development" ?
+				imageURL?.replace(
+					"https://storage.googleapis.com/rateyourstyle-dev/imgs/outfits/",
+					""
+				) : imageURL?.replace(
+					"https://storage.googleapis.com/rateyourstyle/imgs/outfits/",
+					""
+				);
 			outfitId = outfitId.split("/")[1];
 			outfitId = outfitId.split(".")[0];
 
@@ -259,8 +289,8 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 	}, [server, cookie, file]);
 
 	if (error) {
-        return <div>error {error} </div>;
-    }
+		return <div>error {error} </div>;
+	}
 
 	return (
 		<>
@@ -276,7 +306,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 							you don&apos;t have one!
 						</div>
 					)}
-					<div className="bg-off-white p-2 rounded">
+					<div className="bg-background p-2 rounded">
 						<h3>FAQs</h3>
 						<div className="font-semibold mt-2">Who can see my outfit posts?</div>
 						<p>Each outfit post has its own privacy setting. Private posts do{" "}<span className="underline">not</span> appear on the homepage and are not discoverable by the general public. The post is only visible to you, the creator of the post, when you log into your account However, if your post includes a campaign #tag, the sponsor of the campaign is also able view the post, regardless of the privacy setting on the post. </p>
@@ -291,7 +321,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 					</div>
 				)}
 				{formSubmissionStatus !== "success" && (
-					<form className=" shadow px-4 py-8 border-off-white border-2">
+					<form className=" shadow px-4 py-8 border-background border-2">
 						{imageURL ? (
 							<div className="flex flex-wrap gap-4">
 								<img src={imageURL} className="max-h-80" />
@@ -302,7 +332,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 										setFile(null);
 										setImageURL("");
 									}}
-									className="h-fit my-auto bg-black p-1 text-white rounded text-sm hover:bg-pink"
+									className="h-fit my-auto bg-black p-1 text-white rounded text-sm hover:bg-primary"
 								>
 									{" "}
 									remove
@@ -318,7 +348,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 												onClick={(e) => {
 													location.reload()
 												}}
-												className="h-fit my-auto bg-black p-1 text-white rounded text-sm hover:bg-pink"
+												className="h-fit my-auto bg-black p-1 text-white rounded text-sm hover:bg-primary"
 											>
 												{" "}
 												refresh
@@ -337,7 +367,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 									accept="image/*"
 									onChange={handleFileChange}
 								/>
-								<label className="text-pink italic font-normal">Required</label>
+								<label className="text-primary italic font-normal">Required</label>
 							</>
 						)}
 						<div className="my-4">
@@ -354,8 +384,8 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 									onChange={() => setPrivateMode(!privateMode)}
 								/>
 								<div
-									className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:pink
-							 rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink"
+									className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:primary
+							 rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
 								></div>
 								<span className="ml-3 text-sm font-medium text-gray-900">
 									Private
@@ -379,7 +409,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 								value={outfitCaption}
 								onChange={handleFormInput}
 							></input>
-							<label className="text-pink italic font-normal">Required</label>
+							<label className="text-primary italic font-normal">Required</label>
 						</div>
 
 						<div className="my-4">
@@ -395,16 +425,16 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 								value={styleTags}
 								onChange={handleFormInput}
 							></input>
-							<label className="text-pink italic font-normal">Required</label>
+							<label className="text-primary italic font-normal">Required</label>
 							<div className="flex gap-2 mt-2 flex-wrap">
 								{campaigns &&
 									campaigns.map((item) => (
 										<button
 											key={item.tag}
 											className={`${styleTags.includes(item.tag)
-												? "bg-pink text-white"
-												: "bg-white text-pink"
-												} border-2 border-pink p-2 rounded`}
+												? "bg-primary text-white"
+												: "bg-white text-primary"
+												} border-2 border-primary p-2 rounded`}
 											onClick={(e) => {
 												e.preventDefault();
 												if (!styleTags.includes(item.tag)) {
@@ -433,7 +463,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 									let displayCount = index + 1;
 									return (
 										<li
-											className="shadow border-2 border-off-white my-2 rounded-lg p-4"
+											className="shadow border-2 border-background my-2 rounded-lg p-4"
 											key={displayCount}
 										>
 											<div className="flex items-start justify-between">
@@ -442,25 +472,30 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 													onClick={(e: any) => handleRemoveItem(e, index)}
 												/>
 											</div>
+
 											<OutfitItemForm
+												previousOutfitItems={previousOutfitItems}
 												item={item}
 												index={index}
 												handleItemChange={handleItemChange}
+												handlePreviousItemSelect={handlePreviousItemSelect}
 											/>
+
+
 										</li>
 									);
 								})}
 							</ul>
 							<button
 								onClick={handleAddItem}
-								className="p-2 bg-pink text-white rounded float-right"
+								className="p-2 bg-primary text-white rounded float-right"
 							>
 								add item
 							</button>
 						</div>
 
 						<button
-							className="bg-pink hover:bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mt-8"
+							className="bg-primary hover:bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mt-8"
 							type="button"
 							onClick={handleSubmit}
 						>
@@ -492,7 +527,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, error }: Pr
 						<p>
 							Check out your post on the{" "}
 							<Link href="/">
-								<a className="text-pink underline">homepage</a>
+								<a className="text-primary underline">homepage</a>
 							</Link>{" "}
 							and rate outfits you like!
 						</p>
@@ -508,7 +543,36 @@ function OutfitItemForm(props: {
 	item: OutfitItem;
 	index: number;
 	handleItemChange: any;
+	previousOutfitItems: OutfitItem[];
+	handlePreviousItemSelect: any;
 }) {
+	const [createNewItem, setCreateNewItem] = useState(false);
+
+	if (props.previousOutfitItems && props.previousOutfitItems.length > 0 && !createNewItem) {
+		return (
+			<div>
+				<div className="flex flex-wrap"><div className="mr-2">Select previous clothing item</div>
+
+					<select
+					onChange={(e)=> props.handlePreviousItemSelect(e, props.index)}
+						className="border-2 overflow-x-scroll max-w-full">
+						{props.previousOutfitItems.map((item) =>
+							<option value={item.description} key={item.description}>{item.description} by {item.brand}</option>
+						)}
+					</select>
+				</div>
+
+				<div>or{" "}
+					<button className="text-primary underline"
+						onClick={(e) => {
+							e.preventDefault();
+							setCreateNewItem(true)
+						}
+						}>create new item</button></div>
+			</div>
+		)
+	}
+
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 			<div className="col-span-1">
@@ -521,7 +585,7 @@ function OutfitItemForm(props: {
 					value={props.item.description}
 					onChange={(e) => props.handleItemChange(e, props.index)}
 				></input>
-				<label htmlFor="" className="text-pink italic font-normal">
+				<label htmlFor="" className="text-primary italic font-normal">
 					Required
 				</label>
 
@@ -536,7 +600,7 @@ function OutfitItemForm(props: {
 					value={props.item.brand}
 					onChange={(e) => props.handleItemChange(e, props.index)}
 				></input>
-				<label htmlFor="" className="text-pink italic font-normal">
+				<label htmlFor="" className="text-primary italic font-normal">
 					Required
 				</label>
 
@@ -593,7 +657,7 @@ function OutfitItemForm(props: {
 							value={props.item.rating}
 						/>
 						<datalist
-							className="flex text-pink -mt-2 p-0 justify-between items-start"
+							className="flex text-primary -mt-2 p-0 justify-between items-start"
 							id="rating"
 						>
 							<option className="text-xs">|</option>
@@ -603,7 +667,7 @@ function OutfitItemForm(props: {
 							<option className="text-xs">|</option>
 						</datalist>
 					</div>
-					<h1 className="text-pink">{props.item.rating}</h1>
+					<h1 className="text-primary">{props.item.rating}</h1>
 				</div>
 
 				<label className="mt-2">Your Review</label>
@@ -615,7 +679,7 @@ function OutfitItemForm(props: {
 					onChange={(e) => props.handleItemChange(e, props.index)}
 					value={props.item.review}
 				></textarea>
-				<label className="text-pink italic font-normal">Required</label>
+				<label className="text-primary italic font-normal">Required</label>
 			</div>
 		</div>
 	);

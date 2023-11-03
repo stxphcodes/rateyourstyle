@@ -21,11 +21,12 @@ module.exports = {
     },
     extend: {
       colors: {
-        "off-white": "#f6f9fc",
-        "pink": "#f0789e",
+        "background": "#EDE2DA",
+        "primary": "#aa3c16",
       },
       maxHeight: {
         card: "400px",
+        table: "500px"
       },
     },
   },

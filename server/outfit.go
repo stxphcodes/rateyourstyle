@@ -29,6 +29,8 @@ type Outfit struct {
 	StyleTags  []string      `json:"style_tags"`
 	Items      []*OutfitItem `json:"items"`
 	Private    bool          `json:"private"`
+
+	UserProfile *UserProfile `json:"user_profile,omitempty"`
 }
 
 type OutfitIndices struct {

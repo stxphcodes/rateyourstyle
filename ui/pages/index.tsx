@@ -9,6 +9,7 @@ import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
 import { OutfitCard } from '../components/outfitcard';
 import { GetServerURL } from "../apis/get_server";
+import { GetUserProfile, User, UserProfile } from '../apis/get_user';
 
 type Props = {
     campaigns: Campaign[] | null;
@@ -17,26 +18,78 @@ type Props = {
     error: string | null;
     outfits: Outfit[] | null;
     ratings: Rating[] | null;
+    user: User | null;
 };
+
+function checkEmptyUserProfile(profile: UserProfile) {
+    if (!profile) {
+        return true
+    }
+
+    if (profile.age_range == "" && profile.department == "" && profile.height_range == "" && profile.weight_range == "") {
+        return true
+    }
+
+    return false
+}
+
+function findSimilarToMe(outfitUser: UserProfile, user: UserProfile) {
+    if (user.age_range !== "") {
+        if (outfitUser.age_range !== user.age_range) {
+            return false
+        }
+    }
+
+    if (user.department !== "") {
+        if (outfitUser.department !== user.department) {
+            return false
+        }
+    }
+
+    if (user.height_range !== "") {
+        if (outfitUser.height_range !== user.height_range) {
+            return false
+        }
+    }
+
+    if (user.weight_range !== "") {
+        if (outfitUser.weight_range !== user.weight_range) {
+            return false
+        }
+    }
+
+    return true
+}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
         campaigns: null,
         cookie: "",
+        user: null,
         ratings: null,
         error: null,
         outfits: null,
-        clientServer:"",
+        clientServer: "",
     };
 
     let server = GetServerURL()
     if (server instanceof Error) {
-        props.error = server.message; 
-        return {props};
+        props.error = server.message;
+        return { props };
     }
 
     if (context.req.cookies["rys-login"]) {
         props.cookie = context.req.cookies["rys-login"];
+    }
+
+    if (props.cookie) {
+        const userResp = await GetUserProfile(server, props.cookie);
+        if (userResp instanceof Error) {
+            props.error = userResp.message;
+            return { props };
+        }
+
+        props.user = userResp;
     }
 
     const campaignResp = await GetCampaigns(server);
@@ -61,7 +114,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props.ratings = ratingResp;
 
     const clientServer = GetServerURL(true);
-    if (clientServer instanceof Error ) {
+    if (clientServer instanceof Error) {
         props.error = clientServer.message;
         return { props };
     }
@@ -70,7 +123,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props };
 };
 
-function Home({ campaigns, cookie, outfits, ratings, clientServer, error }: Props) {
+function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }: Props) {
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
     const [readMore, setReadMore] = useState(() => {
         let intialState =
@@ -83,32 +136,43 @@ function Home({ campaigns, cookie, outfits, ratings, clientServer, error }: Prop
         return intialState;
     });
 
+    const [similarToMe, setSimilarToMe] = useState<boolean>(false);
+    const [similarToMeError, setSimilarToMeError] = useState<string | null>(null);
+
     const [outfitsFiltered, setOutfitsFiltered] = useState<Outfit[] | null>(outfits);
 
     useEffect(() => {
-        if (searchTerms.length == 0) {
+        if (searchTerms.length == 0 && !similarToMe) {
             setOutfitsFiltered(outfits)
             return
         }
 
         let filtered: Outfit[] = []
         outfits?.forEach(outfit => {
-            let tagFound = false
+            let include = false
             outfit.style_tags.forEach(tag => {
                 if (searchTerms.includes(tag)) {
-                    tagFound = true
+                    include = true
                     return;
                 }
             })
 
-            if (tagFound) {
+            if (include) {
                 filtered.push(outfit)
+                return;
+            }
+
+            if (similarToMe) {
+                if (outfit?.user_profile && user?.user_profile) {
+                    if (findSimilarToMe(outfit.user_profile, user.user_profile)) {
+                        filtered.push(outfit);
+                    }
+                }
             }
         })
 
         setOutfitsFiltered(filtered)
-
-    }, [searchTerms])
+    }, [searchTerms, similarToMe])
 
     if (error) {
         return <div>error {error} </div>;
@@ -116,37 +180,57 @@ function Home({ campaigns, cookie, outfits, ratings, clientServer, error }: Prop
 
     return (
         <>
-            <Navbar clientServer={clientServer} cookie={cookie} />
-            <main className="mt-6 p-8">
+            <Navbar clientServer={clientServer} cookie={cookie} user={user?.username} />
+            <main className="mt-6 p-3 md:p-8">
                 <section className="my-4">
                     <h1>Welcome to Rate Your Style</h1>
                     <div className="">
-                        A fashion site for style inspo, clothing links and outfit reviews. Check out currently active <Link href="/campaigns"><a className="text-pink underline">campaigns</a></Link> and win up to $500 in gift cards to fashion brands of your choice by <Link href="/post-outfit"><a className="underline text-pink">Posting an Outfit</a></Link>. 
+                        A fashion site for style inspo, clothing links and outfit reviews. Check out currently active <Link href="/campaigns"><a className="text-primary underline">campaigns</a></Link> and win up to $500 in gift cards to fashion brands of your choice by <Link href="/post-outfit"><a className="underline text-primary">Posting an Outfit</a></Link>.
                     </div>
                 </section>
 
                 <section className="my-4">
                     <h1>Discover</h1>
-                    <div className="mb-4">
-                        Click on a campaign hashtag to see the public outfits that have been uploaded for it so far. To rate an outfit, click on &apos;submit your rating&apos; in the outfit card.
-                    </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                    <div className="flex flex-wrap justify-start items-start gap-2">
+                        <div className="bg-black text-white p-2 rounded w-60">
+                            <div className="flex gap-2 items-center">
+                                Similar to me
+                                <input type="checkbox"
+                                    onChange={() => {
+                                        if (!user || !user.username) {
+                                            setSimilarToMeError("unknownUser")
+                                            return;
+                                        }
+
+                                        if (checkEmptyUserProfile(user.user_profile)) {
+                                            setSimilarToMeError("missingProfile")
+                                            return;
+                                        }
+
+                                        setSimilarToMe(!similarToMe)
+                                    }}
+                                    checked={similarToMe}>
+                                </input>
+
+                            </div>
+                            <div className="text-xs">Discover outfits from users that are similar in age, height, and weight.
+                            </div>
+                            {similarToMeError &&
+                                <div className="text-primary">{similarToMeError == "unknownUser" ? "You must be signed into an account to use this filter." : similarToMeError == "missingProfile" && "You must complete your user profile to use this filter."}</div>
+                            }
+                        </div>
+
                         {campaigns?.map((item) => (
                             <div
-                                className={`w-full  text-white p-4 rounded-lg h-fit `}
+                                className={`text-white p-2 rounded-lg h-fit w-48`}
                                 style={{ backgroundColor: `${item.background_img}` }}
                                 key={item.tag}
                             >
                                 <div className="flex gap-2 items-center">
-                                    <h3
-                                        className="hover:cursor-pointer"
-                                        onClick={() => {
-                                            setSearchTerms([...searchTerms, item.tag]);
-                                        }}
-                                    >
+                                    <div>
                                         {item.tag}
-                                    </h3>
+                                    </div>
                                     <input type="checkbox" onChange={() => {
                                         let checked = searchTerms.filter(term => item.tag == term).length > 0
 
@@ -164,12 +248,12 @@ function Home({ campaigns, cookie, outfits, ratings, clientServer, error }: Prop
 
                                     }} checked={searchTerms.filter(term => item.tag == term).length > 0}></input>
                                 </div>
-                                <p className="mb-2">Ends: {item.date_ending}</p>
+                                <div className="text-xs">Ends: {item.date_ending}</div>
                                 {readMore?.filter((i) => i.tag == item.tag)[0].readMore && (
-                                    <p className="mb-4">{item.description}</p>
+                                    <p className="mb-4 text-xs">{item.description}</p>
                                 )}
-                                <button
-                                    className="p-1 bg-white opacity-40 rounded text-pink hover:cursor-pointer"
+                                <a
+                                    className="text-white text-xs"
                                     onClick={() => {
                                         readMore?.forEach((i, index) => {
                                             if (i.tag == item.tag) {
@@ -181,13 +265,11 @@ function Home({ campaigns, cookie, outfits, ratings, clientServer, error }: Prop
                                         });
                                     }}
                                 >
-                                   Read{" "}
+                                    Read{" "}
                                     {readMore?.filter((i) => i.tag == item.tag)[0].readMore
                                         ? "less"
                                         : "more"}
-                                      
-                                       
-                                </button>
+                                </a>
                             </div>
                         ))}
                     </div>

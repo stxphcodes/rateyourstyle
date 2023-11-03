@@ -70,7 +70,7 @@ export function CreateAccount(props: {clientServer: string; cookie: string; hand
                             onChange={handleInputChange}
                             value={email}
                         />
-                        <label htmlFor="Email" className="text-pink italic font-normal">
+                        <label htmlFor="Email" className="text-primary italic font-normal">
                             Required
                         </label>
                     </div>
@@ -86,7 +86,7 @@ export function CreateAccount(props: {clientServer: string; cookie: string; hand
                             onChange={handleInputChange}
                             value={username}
                         />
-                        <label htmlFor="Email" className="text-pink italic font-normal">
+                        <label htmlFor="Email" className="text-primary italic font-normal">
                             Required
                         </label>
                     </div>
@@ -102,14 +102,14 @@ export function CreateAccount(props: {clientServer: string; cookie: string; hand
                             onChange={handleInputChange}
                             value={password}
                         />
-                        <label htmlFor="Email" className="text-pink italic font-normal">
+                        <label htmlFor="Email" className="text-primary italic font-normal">
                             Required
                         </label>
                     </div>
 
                     <div className="flex items-center justify-between">
                         <button
-                            className="bg-pink hover:bg-black text-white font-bold py-2 px-4 rounded"
+                            className="bg-primary hover:bg-black text-white font-bold py-2 px-4 rounded"
                             type="submit"
                             onClick={handleSubmit}
                         >

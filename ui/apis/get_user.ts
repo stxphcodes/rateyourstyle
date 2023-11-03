@@ -32,17 +32,31 @@ export async function GetUsername(server: string, cookie: string): Promise<strin
 export type User = {
     username: string;
     email: string;
+    user_profile: UserProfile;
 }
 
+export type UserProfile = {
+    department: string; 
+    age_range: string;
+    weight_range: string;
+    height_range: string;
+  }
 
-export async function GetUser(server: string, cookie: string): Promise<User | Error> { 
+
+export async function GetUserProfile(server: string, cookie: string): Promise<User | Error> { 
     let error: Error | null = null 
     let user: User = {
         username: "",
-        email: ""
+        email: "",
+        user_profile: {
+            department: "",
+            age_range: "",
+            weight_range: "",
+            height_range: ""
+        }
     }
 
-    await fetch(`${server}/api/user`, {
+    await fetch(`${server}/api/user-profile`, {
         method: "GET",
         headers: {
             'content-type': "text/plain",

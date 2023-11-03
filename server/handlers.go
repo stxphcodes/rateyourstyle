@@ -72,9 +72,20 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 				)
 			}
 
+			// get user profile of outfit poster
+			u := &User{Id: o.UserId}
+			upf, err := getUserProfileFile(ctx.Request().Context(), h.Gcs.Bucket, u)
+			if err == nil {
+				o.UserProfile = getRecentUserProfile(upf.UserProfiles)
+
+			}
+
 			username, ok := h.UserIndices.IdUsername[o.UserId]
 			if ok {
 				o.UserId = username
+			} else {
+				// user without account posted
+				o.UserId = ""
 			}
 
 			outfits = append(outfits, o)
@@ -84,6 +95,50 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 	}
 }
 
+// get only public outfits from user
+func (h Handler) GetPublicOutfitsByUser() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		username := ctx.QueryParam("username")
+		if username == "" {
+			return ctx.String(http.StatusBadRequest, "missing username query")
+		}
+
+		userId := ""
+		for id, user := range h.UserIndices.IdUsername {
+			if user == username {
+				userId = id
+			}
+		}
+
+		if userId == "" {
+			ctx.String(http.StatusBadRequest, username+" has no id")
+		}
+
+		outfitIds, ok := h.OutfitIndices.UserOutfit[userId]
+		if !ok {
+			log.Println("outfitids not found for user id " + userId)
+			return ctx.NoContent(http.StatusNotFound)
+		}
+
+		var outfits []*Outfit
+		for _, outfit := range outfitIds {
+			o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, outfit)
+			if err != nil {
+				log.Println(err.Error())
+				return ctx.NoContent(http.StatusInternalServerError)
+			}
+
+			// return public outfits
+			if !o.Private {
+				outfits = append(outfits, o)
+			}
+		}
+
+		return ctx.JSON(http.StatusOK, outfits)
+	}
+}
+
+// getoutfitsbyuser will get private and public outfits for user
 func (h Handler) GetOutfitsByUser() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		cookie, err := getCookie(ctx.Request())
@@ -158,7 +213,7 @@ func (h *Handler) GetUsername() echo.HandlerFunc {
 	}
 }
 
-func (h *Handler) GetUser() echo.HandlerFunc {
+func (h *Handler) GetUserProfile() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		cookie, err := getCookie(ctx.Request())
 		if err != nil {
@@ -172,13 +227,23 @@ func (h *Handler) GetUser() echo.HandlerFunc {
 
 		for _, user := range users {
 			if user.Cookie == cookie {
-				return ctx.JSON(http.StatusOK, user)
+				p, err := getUserProfileFile(ctx.Request().Context(), h.Gcs.Bucket, &user)
+				if err != nil {
+					return ctx.NoContent(http.StatusInternalServerError)
+				}
+
+				resp := UserProfileResponse{
+					Username:    p.User.Username,
+					Email:       p.User.Email,
+					UserProfile: getRecentUserProfile(p.UserProfiles),
+				}
+
+				return ctx.JSON(http.StatusOK, resp)
 			}
 		}
 
 		return ctx.String(http.StatusNotFound, "no user found with cookie "+cookie)
 	}
-
 }
 
 func (h Handler) PostSignIn() echo.HandlerFunc {
@@ -318,6 +383,75 @@ func (h Handler) PostOutfit() echo.HandlerFunc {
 	}
 }
 
+func (h *Handler) PostRating() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		var data Rating
+		if err := ctx.Bind(&data); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+		data.UserId = userId
+
+		// read original file
+		ratings, err := getRatingsByOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, "data/ratings/"+data.OutfitId+".json")
+		if err != nil {
+			// object doesn't exist
+			if !strings.Contains(err.Error(), "exist") {
+				log.Println(err.Error())
+				return ctx.NoContent(http.StatusInternalServerError)
+			}
+		}
+
+		found := false
+		for _, rating := range ratings {
+			if rating.UserId == data.UserId {
+				rating.Rating = data.Rating
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			ratings = append(ratings, data)
+		}
+
+		obj := h.Gcs.Bucket.Object(filepath.Join("data", "ratings", data.OutfitId+".json"))
+		writer := obj.NewWriter(ctx.Request().Context())
+		defer writer.Close()
+
+		if err := json.NewEncoder(writer).Encode(ratings); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		writer.Close()
+
+		// update indices
+		if !found {
+			h.RatingIndices.AllRatings = append(h.RatingIndices.AllRatings, &data)
+		} else {
+			for index, r := range h.RatingIndices.AllRatings {
+				if r.OutfitId == data.OutfitId && r.UserId == data.UserId {
+					h.RatingIndices.AllRatings[index].Rating = data.Rating
+				}
+			}
+		}
+		return ctx.NoContent(http.StatusCreated)
+	}
+}
+
 func (h *Handler) PostUser() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var data User
@@ -385,12 +519,31 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 		h.UserIndices.CookieId[data.Cookie] = data.Id
 		h.UserIndices.IdCookie[data.Id] = data.Cookie
 
+		// create blank user profile file
+		userProfile := UserProfileFile{
+			User: &data,
+			UserProfiles: []*UserProfile{
+				{
+					Date:        time.Now().Format("2006-01-02"),
+					Department:  "",
+					AgeRange:    "",
+					WeightRange: "",
+					HeightRange: "",
+				},
+			},
+		}
+
+		if err := createUserProfileFile(ctx.Request().Context(), h.Gcs.Bucket, &userProfile); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
 		// return user cookie in response
 		return ctx.String(http.StatusCreated, createCookieStr(data.Cookie))
 	}
 }
 
-func (h *Handler) PostRating() echo.HandlerFunc {
+func (h *Handler) PostUserProfile() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		cookie, err := getCookie(ctx.Request())
 		if err != nil {
@@ -404,57 +557,33 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusForbidden)
 		}
 
-		var data Rating
+		user, err := getUser(ctx.Request().Context(), h.Gcs.Bucket, userId)
+		if err != nil {
+			log.Println("user not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		f, err := getUserProfileFile(ctx.Request().Context(), h.Gcs.Bucket, user)
+		if err != nil {
+			log.Println("error getting user profile + " + err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		var data UserProfile
 		if err := ctx.Bind(&data); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusBadRequest)
 		}
-		data.UserId = userId
+		data.Date = time.Now().Format("2006-01-02")
 
-		// read original file
-		ratings, err := getRatingsByOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, "data/ratings/"+data.OutfitId+".json")
-		if err != nil {
-			// object doesn't exist
-			if !strings.Contains(err.Error(), "exist") {
-				log.Println(err.Error())
-				return ctx.NoContent(http.StatusInternalServerError)
-			}
-		}
+		f.User = user
+		f.UserProfiles = append(f.UserProfiles, &data)
 
-		found := false
-		for _, rating := range ratings {
-			if rating.UserId == data.UserId {
-				rating.Rating = data.Rating
-				found = true
-				break
-			}
-		}
-
-		if !found {
-			ratings = append(ratings, data)
-		}
-
-		obj := h.Gcs.Bucket.Object(filepath.Join("data", "ratings", data.OutfitId+".json"))
-		writer := obj.NewWriter(ctx.Request().Context())
-		defer writer.Close()
-
-		if err := json.NewEncoder(writer).Encode(ratings); err != nil {
+		if err := createUserProfileFile(ctx.Request().Context(), h.Gcs.Bucket, f); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		writer.Close()
-
-		// update indices
-		if !found {
-			h.RatingIndices.AllRatings = append(h.RatingIndices.AllRatings, &data)
-		} else {
-			for index, r := range h.RatingIndices.AllRatings {
-				if r.OutfitId == data.OutfitId && r.UserId == data.UserId {
-					h.RatingIndices.AllRatings[index].Rating = data.Rating
-				}
-			}
-		}
 		return ctx.NoContent(http.StatusCreated)
 	}
 }
