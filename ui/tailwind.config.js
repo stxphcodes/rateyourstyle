@@ -21,7 +21,7 @@ module.exports = {
     },
     extend: {
       colors: {
-        "background": "#ede0d4",
+        "background": "#EDE2DA",
         "primary": "#aa3c16",
       },
       maxHeight: {

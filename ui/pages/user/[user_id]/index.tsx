@@ -97,6 +97,45 @@ function Rating(props: { x: number, small?: boolean }) {
 }
 
 export default function Index({ clientServer, cookie, user, outfits, ratings, error }: Props) {
+    let outfitItemToIds: Map<string, string[]> = new Map<string, string[]>();
+    let outfitItems: OutfitItem[] = [];
+
+    outfits && outfits.map(outfit => {
+        outfit.items.map(item => {
+            if (!outfitItemToIds.has(item.description)) {
+                outfitItems.push(item);
+                outfitItemToIds.set(item.description, [outfit.id]);
+            } else {
+                let outfitIds = outfitItemToIds.get(item.description) || [];
+                outfitIds.push(outfit.id)
+                outfitItemToIds.set(item.description, outfitIds);
+            }
+        })
+    })
+
+    const [itemsSelected, setItemsSelected] = useState<string[] | null>(null);
+    const [outfitsToDisplay, setOutfitsToDisplay] = useState<Outfit[] | null>(null);
+
+    useEffect(() => {
+        if (!itemsSelected || !outfits) {
+            setOutfitsToDisplay(null);
+            return
+        }
+
+        let newOutfits: string[] = [];
+        itemsSelected.map((item) => {
+            let ids = outfitItemToIds.get(item)
+            if (ids) {
+                newOutfits.push(...ids)
+            }
+        })
+
+        setOutfitsToDisplay(outfits.filter(outfit =>
+            newOutfits.includes(outfit.id)));
+
+    }, [itemsSelected])
+
+
     if (error) {
         if (error == "forbidden") {
             return (
@@ -147,26 +186,6 @@ export default function Index({ clientServer, cookie, user, outfits, ratings, er
         );
     }
 
-
-    let outfitItemToIds: Map<string, string[]> = new Map<string, string[]>();
-    let outfitItems: OutfitItem[] = [];
-
-    outfits.map(outfit => {
-        outfit.items.map(item => {
-            if (!outfitItemToIds.has(item.description)) {
-                outfitItems.push(item);
-                outfitItemToIds.set(item.description, [outfit.id]);
-            } else {
-                let outfitIds = outfitItemToIds.get(item.description) || [];
-                outfitIds.push(outfit.id)
-                outfitItemToIds.set(item.description, outfitIds);
-            }
-        })
-    })
-
-    const [itemsSelected, setItemsSelected] = useState<string[] | null>(null);
-    const [outfitsToDisplay, setOutfitsToDisplay] = useState<Outfit[] | null>(null);
-
     const handleItemSelection = (itemDescription: string) => {
         if (!itemsSelected) {
             setItemsSelected([itemDescription])
@@ -187,25 +206,6 @@ export default function Index({ clientServer, cookie, user, outfits, ratings, er
             setItemsSelected(copy)
         }
     }
-
-    useEffect(() => {
-        if (!itemsSelected) {
-            setOutfitsToDisplay(null);
-            return
-        }
-
-        let newOutfits: string[] = [];
-        itemsSelected.map((item) => {
-            let ids = outfitItemToIds.get(item)
-            if (ids) {
-                newOutfits.push(...ids)
-            }
-        })
-
-        setOutfitsToDisplay(outfits.filter(outfit =>
-            newOutfits.includes(outfit.id)));
-
-    }, [itemsSelected])
 
     return (
         <>

@@ -557,7 +557,7 @@ function OutfitItemForm(props: {
 					onChange={(e)=> props.handlePreviousItemSelect(e, props.index)}
 						className="border-2 overflow-x-scroll max-w-full">
 						{props.previousOutfitItems.map((item) =>
-							<option value={item.description}>{item.description} by {item.brand}</option>
+							<option value={item.description} key={item.description}>{item.description} by {item.brand}</option>
 						)}
 					</select>
 				</div>
