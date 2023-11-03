@@ -83,6 +83,9 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 			username, ok := h.UserIndices.IdUsername[o.UserId]
 			if ok {
 				o.UserId = username
+			} else {
+				// user without account posted
+				o.UserId = ""
 			}
 
 			outfits = append(outfits, o)
@@ -108,7 +111,7 @@ func (h Handler) GetPublicOutfitsByUser() echo.HandlerFunc {
 		}
 
 		if userId == "" {
-			ctx.String(http.StatusNotFound, username+" has no id")
+			ctx.String(http.StatusBadRequest, username+" has no id")
 		}
 
 		outfitIds, ok := h.OutfitIndices.UserOutfit[userId]
