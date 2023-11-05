@@ -313,7 +313,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 						<div className="font-semibold mt-2">How will I be notified if I win a campaign?</div>
 						<p>You will be notified via the email associated to your user account the next day after a campaign ends.</p>
 						<div className="font-semibold mt-2">What should I include in the item review?</div>
-						<p>You can write about the item's fit, material quality and whether you would recommend the item. The item review and rating system is a great way to decide whether you want to keep something in your closet in the future, so try to be honest about how you feel!</p>
+						<p>You can write about the item&apos;s fit, material quality and whether you would recommend the item. The item review and rating system is a great way to decide whether you want to keep something in your closet in the future, so try to be honest about how you feel!</p>
 
 					</div>
 				</section>

@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next';
 import { useState, useEffect } from 'react';
-import Link from "next/link";
+import Link from 'next/link';
 
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
 import { GetOutfits, Outfit } from '../apis/get_outfits';
@@ -60,7 +60,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
     props.campaigns = campaignResp;
 
-    const outfitResp = await GetOutfits(server, 10);
+    const outfitResp = await GetOutfits(server, 8);
     if (outfitResp instanceof Error) {
         props.error = outfitResp.message;
         return { props };
@@ -111,8 +111,8 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                         <div className="col-span-2">
                             <h1>Welcome to Rate Your Style</h1>
                             <div className="mt-4">
-                                Launched in Oct 2023, RateYourStyle is for the everyday fashion enthusiast who likes to be chic, organized, and mindful of what's in their closet.  Use RateYourStyle to post outfits and share your thoughts about each clothing item. Every item in an outfit post will then populate a spreadsheet-like table to help you track and sort what's in your closet. Finally, check out how you can get rewarded for your style by reading more about campaigns below. <br /><br />
-                                (For our data-loving fashionistas, we plan to make the table more interactive in the future so you can analyze what's in your closet 🤓)
+                               RateYourStyle is for the everyday fashion enthusiast who likes to be chic, organized, and mindful of what&apos;s in their closet.  Use RateYourStyle to post outfits and share your thoughts about each clothing item. Every item in an outfit post will then populate a spreadsheet-like table to help you track and sort what&apos;s in your closet. Finally, check out how you can get rewarded for your style by reading more about campaigns below. <br /><br />
+                                (For our data-loving fashionistas, we plan to make the table interactive and query-able in the future so you can analyze your closet more meaningfully.🤓)
                             </div>
                         </div>
                         <div className="">
@@ -123,7 +123,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                         </div>
                     </div>
                 </section>
-                <section className="my-4 ">
+                <section className="my-8">
                     <h2>Find style inspo, get clothing links, and read outfit reviews</h2>
                     <Link href="discover">Discover more here</Link>
                     <div className="flex flex-nowrap flex-row gap-2 overflow-scroll">
@@ -144,12 +144,10 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                                 }
 
                                 return (
-                                    <div className="flex-none">
+                                    <div className="flex-none" key={item.id}>
                                         <OutfitCardMinimum
                                             cookie={cookie}
-
                                             data={item}
-                                            key={item.id}
                                             ratings={outfitRatings}
                                             userRating={userRating}
                                             clientServer={clientServer}
@@ -164,7 +162,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                 <section className="my-4 bg-primary -mx-8 px-8 py-8 text-white">
                     <h2>Campaigns</h2>
                     <div className="my-4">
-                        RateYourStyle partners with local boutiques and brands to create campaigns that celebrate, reward and showcase our users' style and fashion. Typically, at the end of the campaign, a few posts will be selected to win $100 gift cards. To apply to an active campaign, <Link href="/post-outfit"><span className="text-white underline hover:cursor-pointer hover:text-black">Post an Outfit</span></Link> according to the requirements listed in the campaign, and tag the outfit with the campaign #tag. Please note that both public and private posts are shared with the sponsor of the campaign, however only public posts are displayed on the Discover page. Winners of campaigns will be notified by email, so be sure to create an account before posting.
+                        RateYourStyle partners with local boutiques and brands to create campaigns that celebrate, reward and showcase our users&apos; style and fashion. Typically, at the end of the campaign, a few posts will be selected to win $100 gift cards. To apply to an active campaign, <Link href="/post-outfit"><span className="text-white underline hover:cursor-pointer hover:text-black">Post an Outfit</span></Link> according to the requirements listed in the campaign, and tag the outfit with the campaign #tag. Please note that both public and private posts are shared with the sponsor of the campaign, however only public posts are displayed on the Discover page. Winners of campaigns will be notified by email, so be sure to create an account before posting.
                     </div>
                     <h6>Active Campaigns:</h6>
                     <div className="flex flex-wrap justify-start items-start gap-2 mt-4">
@@ -204,13 +202,13 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                     </div>
                     <div className="mt-4"> 
              
-                                Creating a campaign on RateYourStyle is a direct way for your company to engage with and give back to the loyal consumers of your brand. A campaign is also a great way to conduct market research and doubles as a form of advertisement. If you're interested in starting a campaign on RateYourStyle, please send us an email: sitesbystephanie@gmail.com.
+                                Creating a campaign on RateYourStyle is a direct way for your company to engage with and give back to the loyal consumers of your brand. A campaign is also a great way to conduct market research and doubles as a form of advertisement. If you&apos;re interested in starting a campaign on RateYourStyle, please send us an email: sitesbystephanie@gmail.com.
                     </div>
                 </section>
 
                 <section className="mt-4">
                     <h2>Privacy</h2>
-                    <div>We value your privacy at RateYourStyle. That's why each outfit post has its own "visibility" setting, so that you can decide which outfits you'd like to be discover-able by the public. Likewise, the link that you use to share your closet will only display clothing items from public outfit posts as well. Private outfits and it's clothing items can only be viewed by you. However, if a prviate outfit uses a campaign #tag, then the campaign sponsor can view the outfit as well. <br /><br />
+                    <div>We value your privacy at RateYourStyle. That&apos;s why each outfit post has its own visibility setting, so that you can decide which outfits you&apos;d like to be discover-able by the public. Likewise, the link that you use to share your closet will only display clothing items from public outfit posts as well. Private outfits and its clothing items can only be viewed by you. However, if a prviate outfit uses a campaign #tag, then the campaign sponsor can view the outfit as well. <br /><br />
 
                         RateYourStyle also uses cookies to maintain your login session. The cookie is only used for the purpose of saving your login details.
                     </div>

@@ -184,7 +184,7 @@ function DiscoverPage({ campaigns, cookie, user, outfits, ratings, clientServer,
             <main className="mt-6 p-3 md:p-8">
                 <section className="my-4">
                     <h1>Discover</h1>
-                    <div>Select a username to see the user's closet. Submit a rating for an outfit by clicking &apos;submit your rating&apos;.</div>
+                    <div>Select a username to see the user&apos;s closet. Submit a rating for an outfit by clicking &apos;submit your rating&apos;.</div>
                     <div className="mb-2">Select the filter(s) below to see matching outfits.</div>
                     <div className="flex flex-wrap justify-start items-start gap-2">
                         <div className="bg-black text-white p-2 rounded w-60">
