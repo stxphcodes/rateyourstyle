@@ -7,12 +7,14 @@ export function ClosetTable(props: { outfitItems: OutfitItem[], itemsSelected: s
             <table className="w-full text-xs md:text-sm text-left overflow-x-scroll">
                 <thead className="text-xs uppercase bg-background">
                     <tr>
+                        {props.handleItemSelection != null && 
                         <th scope="col" className="p-2">
                             <div className="flex items-center">
 
                             </div>
                         </th>
-                        <th scope="col" className="p-2 ">
+}
+                        <th scope="col" className="p-2 py-4 ">
                             <div className="flex items-center">
                                 Clothing Item
                                 {/* <a href="#"><SortingArrowsIcon /></a> */}
@@ -52,14 +54,16 @@ export function ClosetTable(props: { outfitItems: OutfitItem[], itemsSelected: s
                 <tbody>
                     {props.outfitItems.map((item) => (
                         <tr className="bg-white border-b max-h-8 overflow-hidden" key={item.description}>
-                            <td className="p-2 ">
+                            {props.handleItemSelection != null && 
+                            <td className="p-2">
                                 <input type="checkbox"
                                     onChange={() => props.handleItemSelection(item.description)}
 
                                     checked={props.itemsSelected ? props.itemsSelected.includes(item.description) : false}>
                                 </input>
                             </td>
-                            <td className="p-2  font-medium w-52">
+}
+                            <td className="p-2 font-medium w-52">
                                 {item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="hover:cursor-not-allowed text-primary">{item.description}</span>}
 
                             </td>
