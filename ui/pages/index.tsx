@@ -167,9 +167,9 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                 </section>
 
                 <section className="mt-4 bg-primary  px-3 md:px-8 py-8">
-                    <h2 className="text-white">An Inventory of Your Closet</h2>
+                    <h2 className="text-white">Take Inventory of Your Closet</h2>
                     <div className="my-4 text-white">
-                        RateYourStyle will aggregate all of the clothing items in your outfits to create an inventory of your closet. You can sort, filter and search for items easily with our spreadsheet-like table. <br/><br/> Features to come include: more data science tools to enable meaningful analysis of your closet, an AI style assistant and more.
+                        RateYourStyle will aggregate all of the clothing items in your outfits to create an inventory of your closet. You can sort, filter and search for items easily with our spreadsheet-like table. Features to come include: more data science tools to enable meaningful analysis of your closet, an AI style assistant and more.
                     </div>
                     <div>
                         <ClosetTable outfitItems={outfitItems} itemsSelected={null} handleItemSelection={null} />
