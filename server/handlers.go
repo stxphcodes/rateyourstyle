@@ -150,6 +150,14 @@ func (h Handler) GetPublicOutfitsByUser() echo.HandlerFunc {
 				return ctx.NoContent(http.StatusInternalServerError)
 			}
 
+			username, ok := h.UserIndices.IdUsername[o.UserId]
+			if ok {
+				o.UserId = username
+			} else {
+				// user without account posted
+				o.UserId = ""
+			}
+
 			// return public outfits
 			if !o.Private {
 				outfits = append(outfits, o)
