@@ -86,19 +86,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }: Props) {
+    const [heroSectionImage, setHeroSectionImage] = useState(outfits ? outfits[0].picture_url : "/clothing-photo.jpg")
 
     let outfitItems: OutfitItem[] = [];
 
     outfits && outfits.map(outfit => {
         outfit.items.map(item => {
-            // if (!outfitItemToIds.has(item.description)) {
             outfitItems.push(item);
-            //     outfitItemToIds.set(item.description, [outfit.id]);
-            // } else {
-            //     let outfitIds = outfitItemToIds.get(item.description) || [];
-            //     outfitIds.push(outfit.id)
-            //     outfitItemToIds.set(item.description, outfitIds);
-            // }
         })
     })
 
@@ -113,6 +107,21 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
         return intialState;
     });
 
+
+    useEffect(() => {
+        const id = setInterval(() => {
+            if (outfits) {
+                let num = Math.floor(Math.random() * (outfits.length));
+                setHeroSectionImage(outfits[num].picture_url)
+            }
+
+        }, 3000)
+
+        return () => clearInterval(id);
+
+    }, [])
+
+
     if (error) {
         return <div>error {error} </div>;
     }
@@ -124,13 +133,13 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                 <section className="bg-primary text-white ">
                     <div className="grid grid-cols-1 md:grid-cols-5 items-center gap-x-0 md:gap-x-8">
                         <div className="col-span-3 px-3 md:px-8 py-16"><h1 >Welcome to Rate Your Style</h1><div className="text-xl mt-4">For the everyday fashion enthusiast who likes to be chic, organized and mindful of what&apos;s in their closet.</div></div>
-                        <img src="/clothing-photo.jpg" className="md:col-span-2 w-full h-auto"></img>
 
+                        <img src={heroSectionImage} className="md:col-span-2 w-full h-auto"></img>
                     </div>
 
-                 
                 </section>
-                <section className="my-8 px-3 md:px-8">
+                <section className="mt-4 px-3 md:px-8">
+
                     <h2>Find style inspo, get clothing links, and read outfit reviews</h2>
                     <Link href="discover">Discover more here</Link>
                     <div className="flex flex-nowrap flex-row gap-2 overflow-scroll">
@@ -178,7 +187,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                 </section>
 
                 <section className="bg-white px-3 md:px-8 py-8 ">
-                    <h2>Campaigns</h2>
+                    <h2>Get Rewarded for Your Style</h2>
                     <div className="my-4">
                         RateYourStyle partners with local boutiques and brands to create campaigns that celebrate, reward and showcase our users&apos; style and fashion. Typically, at the end of the campaign, a few posts will be selected to win $100 gift cards. To apply to an active campaign, <Link href="/post-outfit">Post an Outfit</Link> according to the requirements listed in the campaign, and tag the outfit with the campaign #tag. Winners of campaigns will be notified by email, so be sure to create an account before posting.
                     </div>
