@@ -1,15 +1,17 @@
 import { GetServerSideProps } from 'next';
 import { useState, useEffect } from 'react';
-import Link from "next/link";
+import Link from 'next/link';
 
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
-import { GetOutfits, Outfit } from '../apis/get_outfits';
+import { GetOutfits, Outfit, OutfitItem } from '../apis/get_outfits';
 import { GetRatings, Rating } from '../apis/get_ratings';
 import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
-import { OutfitCard } from '../components/outfitcard';
+import { OutfitCardMinimum } from '../components/outfitcard-minimum';
 import { GetServerURL } from "../apis/get_server";
 import { GetUserProfile, User, UserProfile } from '../apis/get_user';
+import { ChartIcon } from '../components/icons/chart';
+import { ClosetTable } from '../components/closet-table';
 
 type Props = {
     campaigns: Campaign[] | null;
@@ -20,46 +22,6 @@ type Props = {
     ratings: Rating[] | null;
     user: User | null;
 };
-
-function checkEmptyUserProfile(profile: UserProfile) {
-    if (!profile) {
-        return true
-    }
-
-    if (profile.age_range == "" && profile.department == "" && profile.height_range == "" && profile.weight_range == "") {
-        return true
-    }
-
-    return false
-}
-
-function findSimilarToMe(outfitUser: UserProfile, user: UserProfile) {
-    if (user.age_range !== "") {
-        if (outfitUser.age_range !== user.age_range) {
-            return false
-        }
-    }
-
-    if (user.department !== "") {
-        if (outfitUser.department !== user.department) {
-            return false
-        }
-    }
-
-    if (user.height_range !== "") {
-        if (outfitUser.height_range !== user.height_range) {
-            return false
-        }
-    }
-
-    if (user.weight_range !== "") {
-        if (outfitUser.weight_range !== user.weight_range) {
-            return false
-        }
-    }
-
-    return true
-}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
@@ -99,7 +61,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
     props.campaigns = campaignResp;
 
-    const outfitResp = await GetOutfits(server);
+    const outfitResp = await GetOutfits(server, 8);
     if (outfitResp instanceof Error) {
         props.error = outfitResp.message;
         return { props };
@@ -124,7 +86,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }: Props) {
-    const [searchTerms, setSearchTerms] = useState<string[]>([]);
+    const [heroSectionImage, setHeroSectionImage] = useState(outfits ? outfits[0].picture_url : "/clothing-photo.jpg")
+
+    let outfitItems: OutfitItem[] = [];
+
+    outfits && outfits.map(outfit => {
+        outfit.items.map(item => {
+            outfitItems.push(item);
+        })
+    })
+
     const [readMore, setReadMore] = useState(() => {
         let intialState =
             campaigns &&
@@ -136,43 +107,20 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
         return intialState;
     });
 
-    const [similarToMe, setSimilarToMe] = useState<boolean>(false);
-    const [similarToMeError, setSimilarToMeError] = useState<string | null>(null);
-
-    const [outfitsFiltered, setOutfitsFiltered] = useState<Outfit[] | null>(outfits);
 
     useEffect(() => {
-        if (searchTerms.length == 0 && !similarToMe) {
-            setOutfitsFiltered(outfits)
-            return
-        }
-
-        let filtered: Outfit[] = []
-        outfits?.forEach(outfit => {
-            let include = false
-            outfit.style_tags.forEach(tag => {
-                if (searchTerms.includes(tag)) {
-                    include = true
-                    return;
-                }
-            })
-
-            if (include) {
-                filtered.push(outfit)
-                return;
+        const id = setInterval(() => {
+            if (outfits) {
+                let num = Math.floor(Math.random() * (outfits.length));
+                setHeroSectionImage(outfits[num].picture_url)
             }
 
-            if (similarToMe) {
-                if (outfit?.user_profile && user?.user_profile) {
-                    if (findSimilarToMe(outfit.user_profile, user.user_profile)) {
-                        filtered.push(outfit);
-                    }
-                }
-            }
-        })
+        }, 3000)
 
-        setOutfitsFiltered(filtered)
-    }, [searchTerms, similarToMe])
+        return () => clearInterval(id);
+
+    }, [])
+
 
     if (error) {
         return <div>error {error} </div>;
@@ -181,72 +129,78 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
     return (
         <>
             <Navbar clientServer={clientServer} cookie={cookie} user={user?.username} />
-            <main className="mt-6 p-3 md:p-8">
-                <section className="my-4">
-                    <h1>Welcome to Rate Your Style</h1>
-                    <div className="">
-                        A fashion site for style inspo, clothing links and outfit reviews. Check out currently active <Link href="/campaigns"><a className="text-primary underline">campaigns</a></Link> and win up to $500 in gift cards to fashion brands of your choice by <Link href="/post-outfit"><a className="underline text-primary">Posting an Outfit</a></Link>.
+            <main className="mt-6 ">
+                <section className="bg-primary text-white ">
+                    <div className="grid grid-cols-1 md:grid-cols-5 items-center gap-x-0 md:gap-x-8">
+                        <div className="col-span-3 px-3 md:px-8 py-16"><h1 >Welcome to Rate Your Style</h1><div className="text-xl mt-4">For the everyday fashion enthusiast who likes to be chic, organized and mindful of what&apos;s in their closet.</div></div>
+
+                        <img src={heroSectionImage} className="md:col-span-2 w-full h-auto"></img>
+                    </div>
+
+                </section>
+                <section className="mt-4 px-3 md:px-8">
+
+                    <h2>Find style inspo, get clothing links, and read outfit reviews</h2>
+                    <Link href="discover">Discover more here</Link>
+                    <div className="flex flex-nowrap flex-row gap-2 overflow-scroll">
+                        {outfits &&
+                            outfits.map((item) => {
+                                let outfitRatings = ratings ?
+                                    ratings.filter((r) => r.outfit_id == item.id) :
+                                    null
+
+                                let userRatingFiltered = outfitRatings ? outfitRatings.filter(r => r.cookie == cookie) : null
+
+                                let userRating = 0
+                                if (
+                                    userRatingFiltered &&
+                                    userRatingFiltered.length > 0
+                                ) {
+                                    userRating = userRatingFiltered[0].rating
+                                }
+
+                                return (
+                                    <div className="flex-none" key={item.id}>
+                                        <OutfitCardMinimum
+                                            cookie={cookie}
+                                            data={item}
+                                            ratings={outfitRatings}
+                                            userRating={userRating}
+                                            clientServer={clientServer}
+                                        />
+                                    </div>
+                                )
+                            })}
+
                     </div>
                 </section>
 
-                <section className="my-4">
-                    <h1>Discover</h1>
+                <section className="mt-4 bg-primary  px-3 md:px-8 py-8">
+                    <h2 className="text-white">Take Inventory of Your Closet</h2>
+                    <div className="my-4 text-white">
+                        RateYourStyle will aggregate all of the clothing items in your outfits to create an inventory of your closet. You can sort, filter and search for items easily with our spreadsheet-like table. Features to come include: more data science tools to enable meaningful analysis of your closet, an AI style assistant and more.
+                    </div>
+                    <div>
+                        <ClosetTable outfitItems={outfitItems} itemsSelected={null} handleItemSelection={null} />
+                    </div>
 
-                    <div className="flex flex-wrap justify-start items-start gap-2">
-                        <div className="bg-black text-white p-2 rounded w-60">
-                            <div className="flex gap-2 items-center">
-                                Similar to me
-                                <input type="checkbox"
-                                    onChange={() => {
-                                        if (!user || !user.username) {
-                                            setSimilarToMeError("unknownUser")
-                                            return;
-                                        }
+                </section>
 
-                                        if (checkEmptyUserProfile(user.user_profile)) {
-                                            setSimilarToMeError("missingProfile")
-                                            return;
-                                        }
-
-                                        setSimilarToMe(!similarToMe)
-                                    }}
-                                    checked={similarToMe}>
-                                </input>
-
-                            </div>
-                            <div className="text-xs">Discover outfits from users that are similar in age, height, and weight.
-                            </div>
-                            {similarToMeError &&
-                                <div className="text-primary">{similarToMeError == "unknownUser" ? "You must be signed into an account to use this filter." : similarToMeError == "missingProfile" && "You must complete your user profile to use this filter."}</div>
-                            }
-                        </div>
-
+                <section className="bg-white px-3 md:px-8 py-8 ">
+                    <h2>Get Rewarded for Your Style</h2>
+                    <div className="my-4">
+                        RateYourStyle partners with local boutiques and brands to create campaigns that celebrate, reward and showcase our users&apos; style and fashion. Typically, at the end of the campaign, a few posts will be selected to win $100 gift cards. To apply to an active campaign, <Link href="/post-outfit">Post an Outfit</Link> according to the requirements listed in the campaign, and tag the outfit with the campaign #tag. Winners of campaigns will be notified by email, so be sure to create an account before posting.
+                    </div>
+                    <h6>Active Campaigns:</h6>
+                    <div className="flex flex-wrap justify-start items-start gap-2 mt-4">
                         {campaigns?.map((item) => (
                             <div
                                 className={`text-white p-2 rounded-lg h-fit w-48`}
                                 style={{ backgroundColor: `${item.background_img}` }}
                                 key={item.tag}
                             >
-                                <div className="flex gap-2 items-center">
-                                    <div>
-                                        {item.tag}
-                                    </div>
-                                    <input type="checkbox" onChange={() => {
-                                        let checked = searchTerms.filter(term => item.tag == term).length > 0
-
-                                        setSearchTerms(
-                                            searchTerms.filter((term) => term !== item.tag)
-                                        );
-
-                                        if (checked) {
-                                            setSearchTerms(
-                                                searchTerms.filter((term) => term !== item.tag)
-                                            );
-                                        } else {
-                                            setSearchTerms([...searchTerms, item.tag])
-                                        }
-
-                                    }} checked={searchTerms.filter(term => item.tag == term).length > 0}></input>
+                                <div>
+                                    {item.tag}
                                 </div>
                                 <div className="text-xs">Ends: {item.date_ending}</div>
                                 {readMore?.filter((i) => i.tag == item.tag)[0].readMore && (
@@ -273,42 +227,18 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                             </div>
                         ))}
                     </div>
+                    <div className="mt-4">
+
+                        Creating a campaign on RateYourStyle is a direct way for your company to engage with and give back to the loyal consumers of your brand. A campaign is also a great way to conduct market research and doubles as a form of advertisement. If you&apos;re interested in starting a campaign on RateYourStyle, please send us an email: sitesbystephanie@gmail.com.
+                    </div>
                 </section>
 
-                <section>
-                    {
-                        (!outfitsFiltered || outfitsFiltered.length == 0) &&
-                        <div className="h-screen">No results at this time </div>
-                    }
+                <section className="mt-4 bg-primary text-white px-3 md:px-8 py-4">
+                    <h2>Privacy</h2>
+                    <div>We value your privacy. That&apos;s why each outfit post has its own visibility setting and your closet will only display clothing items from public outfit posts. Private outfits and its clothing items can only be viewed by you and the sponsor of a campaign if it uses a campaign #tag. <br /><br />
 
-                    {outfitsFiltered &&
-                        outfitsFiltered.map((item) => {
-                            let outfitRatings = ratings ?
-                                ratings.filter((r) => r.outfit_id == item.id) :
-                                null
-
-                            let userRatingFiltered = outfitRatings ? outfitRatings.filter(r => r.cookie == cookie) : null
-
-                            let userRating = 0
-                            if (
-                                userRatingFiltered &&
-                                userRatingFiltered.length > 0
-                            ) {
-                                userRating = userRatingFiltered[0].rating
-                            }
-
-                            return (
-                                <OutfitCard
-                                    cookie={cookie}
-                                    asUser={false}
-                                    data={item}
-                                    key={item.id}
-                                    ratings={outfitRatings}
-                                    userRating={userRating}
-                                    clientServer={clientServer}
-                                />
-                            )
-                        })}
+                        RateYourStyle also uses cookies to maintain your login session. The cookie is only used for the purpose of saving your login details.
+                    </div>
                 </section>
             </main>
             <Footer />

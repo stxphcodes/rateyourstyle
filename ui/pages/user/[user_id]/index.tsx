@@ -11,6 +11,7 @@ import { GetServerURL } from "../../../apis/get_server";
 import { PostUserProfile } from '../../../apis/post_user';
 import { SortingArrowsIcon } from '../../../components/icons/sorting-arrows';
 import { ClosetTable } from '../../../components/closet-table';
+import { Footer } from '../../../components/footer';
 
 type Props = {
     cookie: string;
@@ -255,6 +256,7 @@ export default function Index({ clientServer, cookie, user, outfits, ratings, er
                         ))}
                 </section>
             </main >
+            <Footer />
         </>
     );
 }

@@ -3,10 +3,11 @@ export function Footer() {
 		<div className="col-span-1">
 			<h6>RateYourStyle&copy; 2023</h6>
 			<div>💌 sitesbystephanie@gmail.com</div>
+			<a href="https://www.buymeacoffee.com/rateyourstyle" target="_blank" className="hover:text-white">☕ Buy me a coffee</a>
 		</div>
 		<div className="col-span-2">
 			<h6 >About RateYourStyle</h6>
-			<div className="text-xs">RYS is a fashion database curated by and for the everyday fashion enthusiast. RYS partners with local boutiques and brands to create campaigns that reward and showcase users&apos; styles and fashion.</div>
+			<div className="text-xs">RYS is for the everyday fashion enthusiast. On RYS, you can keep inventory of what&apos;s in your closet, find style inspo, get clothing links and post outfit reviews. RYS partners with local boutiques and brands to create campaigns that reward and showcase users&apos; styles and fashion.</div>
 		</div>
 		
 	</div>
