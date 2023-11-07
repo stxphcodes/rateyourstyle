@@ -69,92 +69,78 @@ export function OutfitCardMinimum(props: {
 
 	return (
 		<>
-			<div className="w-72 shadow-md p-2 bg-background rounded-md my-4 break-words">
+			<div className="w-72 shadow-md my-4 break-words">
+			<div className="px-2 py-3 bg-background">
+					{props.data.user_id ? <a className="" href={`/closet/${props.data.user_id}`}>{props.data.user_id}&apos;s closet</a> : "anonymous"}<span className=" text-xs">{" | "} {props.data.date}</span>
+				</div>
+
+				<img
+					onClick={() => setExpandImage(true)}
+					className="object-contain hover:cursor-pointer"
+					src={props.data.picture_url}
+				/>
 			
-						<img
-							className="max-h-64 object-contain rounded mx-auto"
-							src={props.data.picture_url}
-						/>
-						<div className="flex flex-row-reverse">
-							<a className="" onClick={() => setExpandImage(true)}>
-								{" "}
-								expand img
-							</a>
+				<div className={`p-2 bg-white ${readMore ? "" : "overflow-y-hidden max-h-60"}`}>
+					<div className="col-span-1">
+						<h3 className="">{props.data.title}</h3>
+						
+						<div className="flex gap-2">
+							{props.data.style_tags.map((item) => (
+								<div className="" key={item}>{item}</div>
+							))}
 						</div>
-			
-
-						<div className={`p-4 rounded bg-white ${readMore ? "" : "overflow-y-hidden max-h-60"}`}>
-							<div className="col-span-1">
-								<h3 className="font-semibold">{props.data.title}</h3>
-
-
-								<p><span className="font-bold">by:{" "}</span>{props.data.user_id ? <a href={`/closet/${props.data.user_id}`}>{props.data.user_id}</a> : "anonymous"}
-								</p>
-
-
-								<PSpan p={props.data.date} span="date" />
-								<PSpan span={"visibility"} p={props.data.private ? "private 🔐" : "public 🌎"} />
-								<p className="font-bold">tags:</p>
-								<div className="flex gap-2">
-									{props.data.style_tags.map((item) => (
-										<div className="" key={item}>{item}</div>
-									))}
-								</div>
-							</div>
-							<div className="col-span-2">
-
-								<h4 className="font-semibold">Audience Rating:</h4>
-
-								<div className="flex items-center">
-									{!ratingAverage ? (
-										<>
-											<Rating x={0} />
-											<div className="mx-2">no ratings submitted yet</div>
-										</>
-									) : (
-										<>
-											<Rating x={ratingAverage} />
-											<div className="mx-2">
-												from {allRatings && allRatings.length} ratings
-											</div>
-										</>
-									)}
-								</div>
-							</div>
-							<hr className="col-span-3 my-2" />
-							{props.data.items.map((item, index) => {
-								let count = index + 1;
-								return (
-									<>
-										<div className="col-span-1" key={`col-1-${item.brand}`}>
-											<h4>
-												{count}.{" "}
-												{item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="hover:cursor-not-allowed text-primary">{item.description}</span>}
-											</h4>
-											<PSpan p={item.brand} span="from" />
-											<PSpan p={item.size ? item.size : "n/a"} span="size" />
-											<PSpan p={item.price ? item.price : "n/a"} span="price" />
-										</div>
-
-										<div className="col-span-2" key={`col-2-${item.brand}`}>
-											<div className="flex items-start">
-												<Rating x={item.rating} small={true} />
-
-												<div className="mx-2 break-words">&quot;{item.review}&quot;</div>
-											</div>
-										</div>
-										<hr className="col-span-3 my-2" />
-									</>
-								)
-							}
+					</div>
+					<div className="col-span-2">
+						<div className="flex items-center">
+							{!ratingAverage ? (
+								<>
+									<Rating x={0} />
+									<div className="mx-2">no ratings submitted yet</div>
+								</>
+							) : (
+								<>
+									<Rating x={ratingAverage} />
+									<div className="mx-2">
+										from {allRatings && allRatings.length} ratings
+									</div>
+								</>
 							)}
 						</div>
+					</div>
+					<hr className="col-span-3 my-2" />
+					{props.data.items.map((item, index) => {
+						let count = index + 1;
+						return (
+							<>
+								<div className="col-span-1" key={`col-1-${item.brand}`}>
+									<h4>
+										{count}.{" "}
+										{item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="hover:cursor-not-allowed text-primary">{item.description}</span>}
+									</h4>
+									<PSpan p={item.brand} span="from" />
+									<PSpan p={item.size ? item.size : "n/a"} span="size" />
+									<PSpan p={item.price ? item.price : "n/a"} span="price" />
+								</div>
 
-						<a className="mt-2 mx-1" onClick={(e) => {
-							e.preventDefault()
-							setReadMore(!readMore)
-						}}>read {readMore ? "less" : "more"}</a>
-				
+								<div className="col-span-2" key={`col-2-${item.brand}`}>
+									<div className="flex items-start">
+										<Rating x={item.rating} small={true} />
+
+										<div className="mx-2 break-words">&quot;{item.review}&quot;</div>
+									</div>
+								</div>
+								<hr className="col-span-3 my-2" />
+							</>
+						)
+					}
+					)}
+				</div>
+
+				<a className="mt-2 mx-1" onClick={(e) => {
+					e.preventDefault()
+					setReadMore(!readMore)
+				}}>read {readMore ? "less" : "more"}</a>
+
 			</div>
 
 			{expandImage && (
