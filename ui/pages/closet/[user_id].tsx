@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react';
 import { GetPublicOutfitsByUser, Outfit, OutfitItem } from '../../apis/get_outfits';
 import { GetRatings, Rating } from '../../apis/get_ratings';
 import { Navbar } from '../../components/navarbar';
-import { OutfitCard } from '../../components/outfitcard';
 import { GetServerURL } from "../../apis/get_server";
 import { ClosetTable } from '../../components/closet-table';
 import { GetUsername } from '../../apis/get_user';
 import { Footer } from '../../components/footer';
+import { OutfitCard } from '../../components/outfitcard';
 
 type Props = {
     cookie: string;
@@ -190,6 +190,7 @@ export default function UserClosetPage({ clientServer, cookie, outfits, ratings,
 
                     <div className="mt-4 p-1 bg-primary w-fit rounded text-white">Results: {outfitsToDisplay ? outfitsToDisplay.length : "none"}</div>
 
+<div className="flex flex-row flex-wrap gap-4 items-start">
                     {outfitsToDisplay &&
                         outfitsToDisplay.map((item) => (
                             <OutfitCard
@@ -202,6 +203,7 @@ export default function UserClosetPage({ clientServer, cookie, outfits, ratings,
                                 }
                             />
                         ))}
+                        </div>
                 </section>
             </main >
             <Footer />

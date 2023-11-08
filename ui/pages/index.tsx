@@ -7,7 +7,7 @@ import { GetOutfits, Outfit, OutfitItem } from '../apis/get_outfits';
 import { GetRatings, Rating } from '../apis/get_ratings';
 import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
-import { OutfitCardMinimum } from '../components/outfitcard-minimum';
+import { OutfitCard } from '../components/outfitcard';
 import { GetServerURL } from "../apis/get_server";
 import { GetUserProfile, User, UserProfile } from '../apis/get_user';
 import { ChartIcon } from '../components/icons/chart';
@@ -161,7 +161,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
 
                                 return (
                                     <div className="flex-none" key={item.id}>
-                                        <OutfitCardMinimum
+                                        <OutfitCard
                                             cookie={cookie}
                                             data={item}
                                             ratings={outfitRatings}
