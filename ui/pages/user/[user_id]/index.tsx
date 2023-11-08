@@ -6,12 +6,11 @@ import { GetOutfitsByUser, Outfit, OutfitItem } from '../../../apis/get_outfits'
 import { GetRatings, Rating } from '../../../apis/get_ratings';
 import { GetUserProfile, User, UserProfile } from '../../../apis/get_user';
 import { Navbar } from '../../../components/navarbar';
-import { OutfitCard } from '../../../components/outfitcard';
 import { GetServerURL } from "../../../apis/get_server";
 import { PostUserProfile } from '../../../apis/post_user';
-import { SortingArrowsIcon } from '../../../components/icons/sorting-arrows';
 import { ClosetTable } from '../../../components/closet-table';
 import { Footer } from '../../../components/footer';
+import { OutfitCard } from '../../../components/outfitcard';
 
 type Props = {
     cookie: string;
@@ -32,9 +31,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         error: null,
         outfits: null,
         ratings: null,
-
-        // outfitItems: null,
-        // outfitItemToIds: new Map<string, string[]>(),
     };
 
     let server = GetServerURL()
@@ -241,6 +237,7 @@ export default function Index({ clientServer, cookie, user, outfits, ratings, er
 
                     <div className="mt-4 p-1 bg-primary w-fit rounded text-white">Results: {outfitsToDisplay ? outfitsToDisplay.length : "none"}</div>
 
+<div className="flex items-start flex-row flex-wrap gap-4">
                     {outfitsToDisplay &&
                         outfitsToDisplay.map((item) => (
                             <OutfitCard
@@ -254,6 +251,7 @@ export default function Index({ clientServer, cookie, user, outfits, ratings, er
                                 }
                             />
                         ))}
+                        </div>
                 </section>
             </main >
             <Footer />

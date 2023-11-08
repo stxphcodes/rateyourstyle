@@ -7,9 +7,9 @@ import { GetOutfits, Outfit } from '../apis/get_outfits';
 import { GetRatings, Rating } from '../apis/get_ratings';
 import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
-import { OutfitCard } from '../components/outfitcard';
 import { GetServerURL } from "../apis/get_server";
 import { GetUserProfile, User, UserProfile } from '../apis/get_user';
+import { OutfitCard} from '../components/outfitcard';
 
 type Props = {
     campaigns: Campaign[] | null;
@@ -269,7 +269,7 @@ function DiscoverPage({ campaigns, cookie, user, outfits, ratings, clientServer,
                     </div>
                 </section>
 
-                <section>
+                <section className="flex flex-row flex-wrap items-start gap-4">
                     {
                         (!outfitsFiltered || outfitsFiltered.length == 0) &&
                         <div className="h-screen">No results at this time </div>
@@ -294,13 +294,12 @@ function DiscoverPage({ campaigns, cookie, user, outfits, ratings, clientServer,
                             return (
                                 <OutfitCard
                                     cookie={cookie}
-                                    asUser={false}
                                     data={item}
                                     key={item.id}
                                     ratings={outfitRatings}
                                     userRating={userRating}
                                     clientServer={clientServer}
-                                />
+                                    />
                             )
                         })}
                 </section>
