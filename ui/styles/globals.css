@@ -22,7 +22,7 @@ input, textarea {
 }
 
 input:focus, textarea:focus {
-  border: 2px solid #aa3c16;
+  border: 2px solid #f0789e;
   color: black;
   outline: none;
 }
@@ -68,7 +68,7 @@ p {
 }
 
 a {
-  color: #aa3c16;
+  color:  #f0789e;
   text-decoration: underline;
 }
 
