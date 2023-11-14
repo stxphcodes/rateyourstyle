@@ -8,15 +8,6 @@
         "background_img": "#ec994a"
     },
     {
-        "tag": "#halloween",
-        "date_starting": "2023-10-01",
-        "date_ending": "2023-11-07",
-        "ended": false,
-        "description": "B👀! Spooky season sure creeped up fast this year 👻.The costume with the highest number of ratings will win a $100 gift card to a clothing brand of your choice.",
-        "background_img": "#039776"
-
-    },
-    {
         "tag": "#weddings",
         "date_starting": "2023-10-01",
         "date_ending": "2023-12-01",
@@ -31,5 +22,13 @@
         "ended": false,
         "description": "Whether it's PJ's or business casual, we'd love to see what you're wearing to work. If you have a work fit that you'd like to share, please tag it with #work_fits. One outfit will be selected at random to win a $100 gift card to a clothing brand of your choice.",
         "background_img": "#3870b6"
+    },
+    {
+        "tag": "#sweater_weather",
+        "date_starting": "2023-11-08",
+        "date_ending": "2024-01-15",
+        "ended": false,
+        "description": "Do you have a cozy sweater that you live in? Or an ugly, holiday sweater that you bust out once a year? Whatever kind of sweater it is, post it here! One outfit will be selected at random to win a $40 gift card to a clothing brand of your choice.",
+        "background_img": "#e63b2f"
     }
 ]
