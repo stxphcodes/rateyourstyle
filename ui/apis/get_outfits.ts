@@ -24,6 +24,7 @@ export type Outfit = {
   description: string;
   style_tags: string[];
   items: OutfitItem[];
+  item_ids?: string[];
   private: boolean;
 
   user_profile?: UserProfile;
