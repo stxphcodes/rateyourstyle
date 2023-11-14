@@ -64,7 +64,7 @@ export function ClosetTable(props: { outfitItems: OutfitItem[], itemsSelected: s
                             </td>
 }
                             <td className="p-2 font-medium w-52">
-                                {item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="hover:cursor-not-allowed text-primary">{item.description}</span>}
+                                {item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="">{item.description}</span>}
 
                             </td>
                             <td className="p-2 ">
