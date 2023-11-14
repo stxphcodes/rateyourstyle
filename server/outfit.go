@@ -11,6 +11,11 @@ import (
 )
 
 type OutfitItem struct {
+	Id        string   `json:"id,omitempty"`
+	UserId    string   `json:"user_id,omitempty"`
+	DateAdded string   `json:"date_added,omitempty"`
+	OutfitIds []string `json:"outfit_ids,omitempty"`
+
 	Brand       string      `json:"brand"`
 	Link        string      `json:"link"`
 	Description string      `json:"description"`
@@ -27,7 +32,8 @@ type Outfit struct {
 	Title      string        `json:"title"`
 	PictureURL string        `json:"picture_url"`
 	StyleTags  []string      `json:"style_tags"`
-	Items      []*OutfitItem `json:"items"`
+	Items      []*OutfitItem `json:"items,omitempty"`
+	ItemIds    []string      `json:"item_ids"`
 	Private    bool          `json:"private"`
 
 	UserProfile *UserProfile `json:"user_profile,omitempty"`
@@ -68,7 +74,7 @@ func listAllOutfits(ctx context.Context, bucket *gcs.BucketHandle) ([]string, er
 	return outfits, nil
 }
 
-func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, id string) (*Outfit, error) {
+func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, userIdUsername map[string]string, id string) (*Outfit, error) {
 	path := "data/outfits/" + id + ".json"
 	obj := bucket.Object(path)
 	reader, err := obj.NewReader(ctx)
@@ -86,6 +92,22 @@ func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle
 	var o Outfit
 	if err := json.Unmarshal(bytes, &o); err != nil {
 		return nil, err
+	}
+
+	// get outfit items
+	items, err := getOutfitItemsFromOutfit(ctx, bucket, &o)
+	if err != nil {
+		return nil, err
+	}
+	o.Items = items
+
+	// change user id to username
+	username, ok := userIdUsername[o.UserId]
+	if ok {
+		o.UserId = username
+	} else {
+		// user without account posted, just leave user id blank
+		o.UserId = ""
 	}
 
 	return &o, nil
