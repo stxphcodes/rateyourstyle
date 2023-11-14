@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -373,9 +372,6 @@ func (h Handler) PostOutfit() echo.HandlerFunc {
 		}
 		data.UserId = userId
 		data.Date = time.Now().Format("2006-01-02")
-
-		fmt.Println("this is data items")
-		fmt.Println(data.ItemIds)
 
 		itemIds, err := createItemsFromOutfit(ctx.Request().Context(), h.Gcs.Bucket, &data)
 		if err != nil {

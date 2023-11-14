@@ -15,6 +15,7 @@ func getOutfitItemsFromOutfit(ctx context.Context, bucket *gcs.BucketHandle, out
 	year := strings.Split(outfit.Date, "-")[0]
 	path := filepath.Join("data", "outfit-items", year, outfit.UserId+".json")
 
+	// read user's outfit-item data
 	obj := bucket.Object(path)
 	reader, err := obj.NewReader(ctx)
 	if err != nil {
@@ -35,8 +36,9 @@ func getOutfitItemsFromOutfit(ctx context.Context, bucket *gcs.BucketHandle, out
 	items := []*OutfitItem{}
 	for _, itemId := range outfit.ItemIds {
 		item, ok := data[itemId]
+		// TODO: what to do?
 		if !ok {
-
+			fmt.Println("outfit-item " + itemId + "not found in file " + path)
 		} else {
 			items = append(items, item)
 		}
@@ -45,7 +47,6 @@ func getOutfitItemsFromOutfit(ctx context.Context, bucket *gcs.BucketHandle, out
 }
 
 func createItemsFromOutfit(ctx context.Context, bucket *gcs.BucketHandle, outfit *Outfit) ([]string, error) {
-	fmt.Println("we are in create items from outfit")
 	year := strings.Split(outfit.Date, "-")[0]
 	path := filepath.Join("data", "outfit-items", year, outfit.UserId+".json")
 
