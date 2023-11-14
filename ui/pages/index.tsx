@@ -91,7 +91,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
     let outfitItems: OutfitItem[] = [];
 
     outfits && outfits.map(outfit => {
-        outfit.items.map(item => {
+        outfit.items && outfit.items.map(item => {
             outfitItems.push(item);
         })
     })
@@ -142,7 +142,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
 
                     <h2>Find style inspo, get clothing links, and read outfit reviews</h2>
                     <Link href="discover">Discover more here</Link>
-                    <div className="flex flex-nowrap flex-row gap-2 overflow-scroll">
+                    <div className="flex flex-nowrap flex-row gap-2 overflow-scroll my-2">
                         {outfits &&
                             outfits.map((item) => {
                                 let outfitRatings = ratings ?

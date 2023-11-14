@@ -84,7 +84,7 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 				break
 			}
 
-			o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, outfit)
+			o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
 			if err != nil {
 				log.Println("error: " + err.Error())
 				return ctx.NoContent(
@@ -98,14 +98,6 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 			if err == nil {
 				o.UserProfile = getRecentUserProfile(upf.UserProfiles)
 
-			}
-
-			username, ok := h.UserIndices.IdUsername[o.UserId]
-			if ok {
-				o.UserId = username
-			} else {
-				// user without account posted
-				o.UserId = ""
 			}
 
 			outfits = append(outfits, o)
@@ -144,18 +136,10 @@ func (h Handler) GetPublicOutfitsByUser() echo.HandlerFunc {
 
 		var outfits []*Outfit
 		for _, outfit := range outfitIds {
-			o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, outfit)
+			o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
 			if err != nil {
 				log.Println(err.Error())
 				return ctx.NoContent(http.StatusInternalServerError)
-			}
-
-			username, ok := h.UserIndices.IdUsername[o.UserId]
-			if ok {
-				o.UserId = username
-			} else {
-				// user without account posted
-				o.UserId = ""
 			}
 
 			// return public outfits
@@ -192,7 +176,7 @@ func (h Handler) GetOutfitsByUser() echo.HandlerFunc {
 
 		var outfits []*Outfit
 		for _, outfit := range outfitIds {
-			o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, outfit)
+			o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
 			if err != nil {
 				log.Println(err.Error())
 				return ctx.NoContent(http.StatusInternalServerError)
@@ -386,9 +370,17 @@ func (h Handler) PostOutfit() echo.HandlerFunc {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
-
 		data.UserId = userId
 		data.Date = time.Now().Format("2006-01-02")
+
+		itemIds, err := createItemsFromOutfit(ctx.Request().Context(), h.Gcs.Bucket, &data)
+		if err != nil {
+			log.Println("error creating items ", err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+		data.ItemIds = itemIds
+		data.Items = nil
+
 		path := filepath.Join("data", "outfits", data.Id+".json")
 		obj := h.Gcs.Bucket.Object(path)
 

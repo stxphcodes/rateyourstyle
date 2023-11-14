@@ -1,6 +1,11 @@
 import { UserProfile } from "./get_user";
 
 export type OutfitItem = {
+  id: string;
+  date_added?: string;
+  user_id ?:string;
+  outfit_ids ?:string[];
+
   brand: string;
   link: string;
   description: string;
@@ -19,6 +24,7 @@ export type Outfit = {
   description: string;
   style_tags: string[];
   items: OutfitItem[];
+  item_ids?: string[];
   private: boolean;
 
   user_profile?: UserProfile;

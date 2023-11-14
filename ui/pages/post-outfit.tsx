@@ -117,6 +117,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 	const [formSubmissionStatus, setFormSubmissionStatus] = useState("");
 	const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([
 		{
+			id: "",
 			brand: "",
 			description: "",
 			size: "",
@@ -192,6 +193,25 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 	};
 
 	const handlePreviousItemSelect = (e: any, index: number) => {
+		if (e.target.value == "") {
+			setOutfitItems([
+				...outfitItems.slice(0, index),
+				{
+					id: "",
+					brand: "",
+					description: "",
+					size: "",
+					price: "",
+					review: "",
+					rating: 2.5,
+					link: ""
+				},
+				...outfitItems.slice(index + 1),
+			])
+			return
+		}
+
+
 		let item = previousOutfitItems.filter(item => item.description == e.target.value)[0];
 
 		setOutfitItems([
@@ -206,6 +226,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 		setOutfitItems([
 			...outfitItems,
 			{
+				id: "",
 				brand: "",
 				description: "",
 				size: "",
@@ -556,11 +577,13 @@ function OutfitItemForm(props: {
 				<div className="flex flex-wrap"><div className="mr-2">Select previous clothing item</div>
 
 					<select
-					onChange={(e)=> props.handlePreviousItemSelect(e, props.index)}
+						onChange={(e) => props.handlePreviousItemSelect(e, props.index)}
 						className="border-2 overflow-x-scroll max-w-full">
+						<option value="">--Please select an item--</option>
 						{props.previousOutfitItems.map((item) =>
 							<option value={item.description} key={item.description}>{item.description} by {item.brand}</option>
 						)}
+
 					</select>
 				</div>
 
