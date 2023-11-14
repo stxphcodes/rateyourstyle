@@ -21,8 +21,8 @@ module.exports = {
     },
     extend: {
       colors: {
-        "background": "#f6f9fc",
-        "primary": "#f0789e",
+        "background": "#f2e9e0",
+        "primary": "#aa3c16",
       },
       maxHeight: {
         card: "400px",

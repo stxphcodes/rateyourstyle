@@ -91,7 +91,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
     let outfitItems: OutfitItem[] = [];
 
     outfits && outfits.map(outfit => {
-        outfit.items.map(item => {
+        outfit.items && outfit.items.map(item => {
             outfitItems.push(item);
         })
     })
@@ -130,7 +130,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
         <>
             <Navbar clientServer={clientServer} cookie={cookie} user={user?.username} />
             <main className="mt-6 ">
-                <section className="bg-gray-500 text-white ">
+                <section className="bg-primary text-white ">
                     <div className="grid grid-cols-1 md:grid-cols-5 items-center gap-x-0 md:gap-x-8">
                         <div className="col-span-3 px-3 md:px-8 py-16"><h1 >Welcome to Rate Your Style</h1><div className="text-xl mt-4">For the everyday fashion enthusiast who likes to be chic, organized and mindful of what&apos;s in their closet.</div></div>
 
@@ -175,7 +175,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                     </div>
                 </section>
 
-                <section className="mt-4 bg-gray-500  px-3 md:px-8 py-8">
+                <section className="mt-4 bg-primary  px-3 md:px-8 py-8">
                     <h2 className="text-white">Take Inventory of Your Closet</h2>
                     <div className="my-4 text-white">
                         RateYourStyle will aggregate all of the clothing items in your outfits to create an inventory of your closet. You can sort, filter and search for items easily with our spreadsheet-like table. Features to come include: more data science tools to enable meaningful analysis of your closet, an AI style assistant and more.
@@ -233,7 +233,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                     </div>
                 </section>
 
-                <section className="mt-4 bg-gray-500 text-white px-3 md:px-8 py-4">
+                <section className="mt-4 bg-primary text-white px-3 md:px-8 py-4">
                     <h2>Privacy</h2>
                     <div>We value your privacy. That&apos;s why each outfit post has its own visibility setting and your closet will only display clothing items from public outfit posts. Private outfits and its clothing items can only be viewed by you and the sponsor of a campaign if it uses a campaign #tag. <br /><br />
 
