@@ -291,10 +291,6 @@ function DiscoverPage({ campaigns, cookie, user, outfits, ratings, clientServer,
                                 userRating = userRatingFiltered[0].rating
                             }
 
-                            // if (!item.items ) {
-                            //     item.items = []
-                            // }
-
                             return (
                                 <OutfitCard
                                     cookie={cookie}
