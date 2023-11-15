@@ -1,94 +1,203 @@
 import { SortingArrowsIcon } from "./icons/sorting-arrows"
-import { OutfitItem } from "../apis/get_outfits";
+import { OutfitItem, Outfit } from "../apis/get_outfits";
+import { useEffect, useState } from "react";
+import { Rating } from "../apis/get_ratings";
+import { OutfitCard } from "./outfitcard";
 
-export function ClosetTable(props: { outfitItems: OutfitItem[], itemsSelected: string[] | null, handleItemSelection: any }) {
+export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientServer: string, ratings: Rating[] | null, onlyTable?: boolean }) {
+    let outfitItemToIds: Map<string, string[]> = new Map<string, string[]>();
+    let outfitItems: OutfitItem[] = [];
+
+    props.outfits && props.outfits.map(outfit => {
+        outfit.items.map(item => {
+            if (!outfitItemToIds.has(item.description)) {
+                outfitItems.push(item);
+                outfitItemToIds.set(item.description, [outfit.id]);
+            } else {
+                let outfitIds = outfitItemToIds.get(item.description) || [];
+                outfitIds.push(outfit.id)
+                outfitItemToIds.set(item.description, outfitIds);
+            }
+        })
+    })
+
+    const [itemsSelected, setItemsSelected] = useState<string[] | null>(() => {
+        let items = outfitItems.map(item => { return item.description })
+        return items
+    });
+
+    const [outfitsToDisplay, setOutfitsToDisplay] = useState<Outfit[] | null>(props.outfits);
+
+    const handleItemSelection = (itemDescription: string) => {
+        if (!itemsSelected) {
+            setItemsSelected([itemDescription])
+            return
+        }
+
+        let idx = itemsSelected.indexOf(itemDescription)
+
+        if (idx < 0) {
+            setItemsSelected([
+                ...itemsSelected,
+                itemDescription,
+            ])
+        } else {
+            let copy = [...itemsSelected]
+            copy.splice(idx, 1)
+
+            setItemsSelected(copy)
+        }
+    }
+
+    const handleSelectAll = () => {
+        if (itemsSelected == null || itemsSelected.length == 0) {
+            setItemsSelected(outfitItems.map(item => item.description))
+            return
+        }
+
+
+        if (itemsSelected.length != outfitItems.length) {
+            setItemsSelected(outfitItems.map(item => item.description))
+        } else {
+            setItemsSelected(null);
+        }
+    }
+
+    useEffect(() => {
+        if (!itemsSelected || itemsSelected.length == 0) {
+            setOutfitsToDisplay(null);
+            return
+        }
+
+        let newOutfits: string[] = [];
+        itemsSelected.map((item) => {
+            let ids = outfitItemToIds.get(item)
+            if (ids) {
+                newOutfits.push(...ids)
+            }
+        })
+
+        setOutfitsToDisplay(props.outfits.filter(outfit =>
+            newOutfits.includes(outfit.id)));
+
+    }, [itemsSelected])
+
+
     return (
-        <div className="overflow-x-auto shadow-md rounded-lg max-h-table">
-            <table className="w-full text-xs md:text-sm text-left overflow-x-scroll">
-                <thead className="text-xs uppercase bg-background">
-                    <tr>
-                        {props.handleItemSelection != null && 
-                        <th scope="col" className="p-2">
-                            <div className="flex items-center">
-
-                            </div>
-                        </th>
-}
-                        <th scope="col" className="p-2 py-4 ">
-                            <div className="flex items-center">
-                                Clothing Item
-                                {/* <a href="#"><SortingArrowsIcon /></a> */}
-                            </div>
-                        </th>
-                        <th scope="col" className="p-2 ">
-                            <div className="flex items-center">
-                                Brand
-                                {/* <a href="#"><SortingArrowsIcon /></a> */}
-                            </div>
-                        </th>
-                        <th scope="col" className="p-2 ">
-                            <div className="flex items-center">
-                                Size
-                                {/* <a href="#"><SortingArrowsIcon /></a> */}
-                            </div>
-                        </th>
-                        <th scope="col" className="p-2 ">
-                            <div className="flex items-center">
-                                Price
-                                {/* <a href="#"><SortingArrowsIcon /></a> */}
-                            </div>
-                        </th>
-                        <th scope="col" className="p-2 ">
-                            <div className="flex items-center">
-                                Rating
-                                {/* <a href="#"><SortingArrowsIcon /></a> */}
-                            </div>
-                        </th>
-                        <th scope="col" className="p-2 ">
-                            <div className="flex items-center">
-                                Review
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {props.outfitItems.map((item) => (
-                        <tr className="bg-white border-b max-h-8 overflow-hidden" key={item.description}>
-                            {props.handleItemSelection != null && 
-                            <td className="p-2">
-                                <input type="checkbox"
-                                    onChange={() => props.handleItemSelection(item.description)}
-
-                                    checked={props.itemsSelected ? props.itemsSelected.includes(item.description) : false}>
-                                </input>
-                            </td>
-}
-                            <td className="p-2 font-medium w-52">
-                                {item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="">{item.description}</span>}
-
-                            </td>
-                            <td className="p-2 ">
-                                {item.brand}
-                            </td>
-                            <td className="p-2 ">
-                                {item.size}
-                            </td>
-                            <td className="p-2 ">
-                                {item.price}
-                            </td>
-                            <td className="p-2 ">
-                                {item.rating}
-                            </td>
-                            <td className="p-2 ">
-                                <div className="max-h-10 md:max-h-16 overflow-y-scroll">
-                                    {item.review}
+        <>
+            <div className="overflow-x-auto shadow-md rounded-lg max-h-table">
+                <table className="w-full text-xs md:text-sm text-left overflow-x-scroll">
+                    <thead className="text-xs uppercase bg-background">
+                        <tr>
+                            {/* {props.handleItemSelection != null && */}
+                            <th scope="col" className="p-2">
+                                <div className="flex items-center gap-1 text-xs">
+                                    <input type="checkbox"
+                                        onChange={handleSelectAll}
+                                        checked={itemsSelected ? itemsSelected.length == outfitItems.length : false}>
+                                    </input>
+                                    all
                                 </div>
-                            </td>
+                            </th>
+                            {/* } */}
+                            <th scope="col" className="p-2 py-4 ">
+                                <div className="flex items-center">
+                                    Clothing Item
+                                    {/* <a href="#"><SortingArrowsIcon /></a> */}
+                                </div>
+                            </th>
+                            <th scope="col" className="p-2 ">
+                                <div className="flex items-center">
+                                    Brand
+                                    {/* <a href="#"><SortingArrowsIcon /></a> */}
+                                </div>
+                            </th>
+                            <th scope="col" className="p-2 ">
+                                <div className="flex items-center">
+                                    Size
+                                    {/* <a href="#"><SortingArrowsIcon /></a> */}
+                                </div>
+                            </th>
+                            <th scope="col" className="p-2 ">
+                                <div className="flex items-center">
+                                    Price
+                                    {/* <a href="#"><SortingArrowsIcon /></a> */}
+                                </div>
+                            </th>
+                            <th scope="col" className="p-2 ">
+                                <div className="flex items-center">
+                                    Rating
+                                    {/* <a href="#"><SortingArrowsIcon /></a> */}
+                                </div>
+                            </th>
+                            <th scope="col" className="p-2 ">
+                                <div className="flex items-center">
+                                    Review
+                                </div>
+                            </th>
                         </tr>
-                    ))
-                    }
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {outfitItems.map((item) => (
+                            <tr className="bg-white border-b max-h-8 overflow-hidden" key={item.id}>
+                                {/* {props.handleItemSelection != null && */}
+                                <td className="p-2">
+                                    <input type="checkbox"
+                                        className={handleItemSelection == null ? "cursor-not-allowed" : ""}
+                                        onChange={() => handleItemSelection(item.description)}
+
+                                        checked={itemsSelected ? itemsSelected.includes(item.description) : false}>
+                                    </input>
+                                </td>
+                                {/* } */}
+                                <td className="p-2 font-medium w-52">
+                                    {item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="">{item.description}</span>}
+
+                                </td>
+                                <td className="p-2 ">
+                                    {item.brand}
+                                </td>
+                                <td className="p-2 ">
+                                    {item.size}
+                                </td>
+                                <td className="p-2 ">
+                                    {item.price}
+                                </td>
+                                <td className="p-2 ">
+                                    {item.rating}
+                                </td>
+                                <td className="p-2 ">
+                                    <div className="max-h-10 md:max-h-16 overflow-y-scroll">
+                                        {item.review}
+                                    </div>
+                                </td>
+                            </tr>
+                        ))
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            {!props.onlyTable &&
+                <>
+                    <div className="my-4 p-1 bg-primary w-fit rounded text-white">Results: {outfitsToDisplay ? outfitsToDisplay.length : "none"}</div>
+
+                    <div className="flex flex-row flex-wrap gap-4 items-start">
+                        {outfitsToDisplay &&
+                            outfitsToDisplay.map((item) => (
+                                <OutfitCard
+                                    clientServer={props.clientServer}
+                                    cookie={props.cookie}
+                                    data={item}
+                                    key={item.id}
+                                    ratings={
+                                        props.ratings ? props.ratings.filter((r) => r.outfit_id == item.id) : null
+                                    }
+                                />
+                            ))}
+                    </div>
+                </>
+            }
+        </>
     )
 }
