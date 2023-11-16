@@ -4,6 +4,7 @@ import { Outfit } from '../apis/get_outfits';
 import { GetRatings, Rating } from '../apis/get_ratings';
 import { Modal } from './modals';
 import { PostRating } from '../apis/post_rating';
+import { LinkIcon } from './icons/link-icon';
 
 function average(arr: number[]) {
 	let sum = 0;
@@ -107,7 +108,7 @@ export function OutfitCard(props: {
 							{!submitRating ? (
 								<>
 									<Rating x={userItemRating} />
-									<a className="underline hover:cursor-pointer" onClick={() => setSubmitRating(true)}>{userItemRating == 0 ? "submit your rating" : "edit your rating"}</a>
+									<a className="hover:cursor-pointer" onClick={() => setSubmitRating(true)}>{userItemRating == 0 ? "submit your rating" : "edit your rating"}</a>
 								</>
 							) : (
 								<>
@@ -167,9 +168,11 @@ export function OutfitCard(props: {
 							let count = index + 1;
 							return (
 								<div className="px-2 py-1" key={`col-1-${item.brand}`}>
-									<h4>
+									<h4 className="">
 										{count}.{" "}
-										{item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="hover:cursor-not-allowed text-primary">{item.description}</span>}
+										
+
+										{item.link ? <a href={item.link} target="_blank" className="">{item.description} </a> : <span className="hover:cursor-not-allowed">{item.description}</span>}
 									</h4>
 									<PSpan p={item.brand} span="from" />
 									<PSpan p={item.size ? item.size : "n/a"} span="size" />

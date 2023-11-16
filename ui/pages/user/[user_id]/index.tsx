@@ -78,11 +78,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
     props.clientServer = clientServer;
 
-
-
-
-
-
     return { props };
 };
 
@@ -94,45 +89,6 @@ function Rating(props: { x: number, small?: boolean }) {
 }
 
 export default function Index({ clientServer, cookie, user, outfits, ratings, error }: Props) {
-    let outfitItemToIds: Map<string, string[]> = new Map<string, string[]>();
-    let outfitItems: OutfitItem[] = [];
-
-    outfits && outfits.map(outfit => {
-        outfit.items.map(item => {
-            if (!outfitItemToIds.has(item.description)) {
-                outfitItems.push(item);
-                outfitItemToIds.set(item.description, [outfit.id]);
-            } else {
-                let outfitIds = outfitItemToIds.get(item.description) || [];
-                outfitIds.push(outfit.id)
-                outfitItemToIds.set(item.description, outfitIds);
-            }
-        })
-    })
-
-    const [itemsSelected, setItemsSelected] = useState<string[] | null>(null);
-    const [outfitsToDisplay, setOutfitsToDisplay] = useState<Outfit[] | null>(null);
-
-    useEffect(() => {
-        if (!itemsSelected || !outfits) {
-            setOutfitsToDisplay(null);
-            return
-        }
-
-        let newOutfits: string[] = [];
-        itemsSelected.map((item) => {
-            let ids = outfitItemToIds.get(item)
-            if (ids) {
-                newOutfits.push(...ids)
-            }
-        })
-
-        setOutfitsToDisplay(outfits.filter(outfit =>
-            newOutfits.includes(outfit.id)));
-
-    }, [itemsSelected])
-
-
     if (error) {
         if (error == "forbidden") {
             return (
@@ -183,26 +139,6 @@ export default function Index({ clientServer, cookie, user, outfits, ratings, er
         );
     }
 
-    const handleItemSelection = (itemDescription: string) => {
-        if (!itemsSelected) {
-            setItemsSelected([itemDescription])
-            return
-        }
-
-        let idx = itemsSelected.indexOf(itemDescription)
-
-        if (idx < 0) {
-            setItemsSelected([
-                ...itemsSelected,
-                itemDescription,
-            ])
-        } else {
-            let copy = [...itemsSelected]
-            copy.splice(idx, 1)
-
-            setItemsSelected(copy)
-        }
-    }
 
     return (
         <>
@@ -221,37 +157,12 @@ export default function Index({ clientServer, cookie, user, outfits, ratings, er
                 </section>
 
                 <section className="my-4">
-
                     <h2>Your Closet</h2>
                     <div>
                         <span className="font-bold">Share your closet: </span> <a target="_blank" href={`/closet/${user.username}`}>https://rateyourstyle.com/closet/{user.username}</a>
                     </div>
-                    <div className="text-xs mb-2">Only items from public outfits will be shared.</div>
-                    <ClosetTable outfitItems={outfitItems} handleItemSelection={handleItemSelection} itemsSelected={itemsSelected} />
-                </section>
-
-                <section className="mt-8">
-                    <h2>Your Outfits</h2>
-                    <div>Select item(s) from your closet to see all of your outfits that contain the item.</div>
-
-
-                    <div className="mt-4 p-1 bg-primary w-fit rounded text-white">Results: {outfitsToDisplay ? outfitsToDisplay.length : "none"}</div>
-
-<div className="flex items-start flex-row flex-wrap gap-4">
-                    {outfitsToDisplay &&
-                        outfitsToDisplay.map((item) => (
-                            <OutfitCard
-                                clientServer={clientServer}
-                                cookie={cookie}
-                                asUser={true}
-                                data={item}
-                                key={item.id}
-                                ratings={
-                                    ratings ? ratings.filter((r) => r.outfit_id == item.id) : null
-                                }
-                            />
-                        ))}
-                        </div>
+                    <div className="text-xs mb-2">Only items from public outfits will be shared. Select items from your closet to see items that contain them.</div>
+                    <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} ratings={ratings} />
                 </section>
             </main >
             <Footer />
@@ -449,8 +360,6 @@ function UserProfileForm(props: { clientServer: string, cookie: string, user: Us
                                 setWeightRange(props.user?.user_profile?.weight_range)
                                 setEditUserProfile(false)
                             }}>cancel</button>
-
-
                     </>
                 }
             </form>

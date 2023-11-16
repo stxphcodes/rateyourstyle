@@ -8,7 +8,6 @@ import { GetServerURL } from "../../apis/get_server";
 import { ClosetTable } from '../../components/closet-table';
 import { GetUsername } from '../../apis/get_user';
 import { Footer } from '../../components/footer';
-import { OutfitCard } from '../../components/outfitcard';
 
 type Props = {
     cookie: string;
@@ -86,45 +85,6 @@ function Rating(props: { x: number, small?: boolean }) {
 }
 
 export default function UserClosetPage({ clientServer, cookie, outfits, ratings, closetName, username, error }: Props) {
-    let outfitItemToIds: Map<string, string[]> = new Map<string, string[]>();
-    let outfitItems: OutfitItem[] = [];
-
-    outfits && outfits.map(outfit => {
-        outfit.items.map(item => {
-            if (!outfitItemToIds.has(item.description)) {
-                outfitItems.push(item);
-                outfitItemToIds.set(item.description, [outfit.id]);
-            } else {
-                let outfitIds = outfitItemToIds.get(item.description) || [];
-                outfitIds.push(outfit.id)
-                outfitItemToIds.set(item.description, outfitIds);
-            }
-        })
-    })
-
-    const [itemsSelected, setItemsSelected] = useState<string[] | null>(null);
-    const [outfitsToDisplay, setOutfitsToDisplay] = useState<Outfit[] | null>(null);
-
-    useEffect(() => {
-        if (!itemsSelected || !outfits) {
-            setOutfitsToDisplay(null);
-            return
-        }
-
-        let newOutfits: string[] = [];
-        itemsSelected.map((item) => {
-            let ids = outfitItemToIds.get(item)
-            if (ids) {
-                newOutfits.push(...ids)
-            }
-        })
-
-        setOutfitsToDisplay(outfits.filter(outfit =>
-            newOutfits.includes(outfit.id)));
-
-    }, [itemsSelected, outfitItemToIds, outfits])
- 
-
     if (error) {
         return (
             <>
@@ -153,26 +113,6 @@ export default function UserClosetPage({ clientServer, cookie, outfits, ratings,
         );
     }
 
-    const handleItemSelection = (itemDescription: string) => {
-        if (!itemsSelected) {
-            setItemsSelected([itemDescription])
-            return
-        }
-
-        let idx = itemsSelected.indexOf(itemDescription)
-
-        if (idx < 0) {
-            setItemsSelected([
-                ...itemsSelected,
-                itemDescription,
-            ])
-        } else {
-            let copy = [...itemsSelected]
-            copy.splice(idx, 1)
-
-            setItemsSelected(copy)
-        }
-    }
 
     return (
         <>
@@ -180,30 +120,8 @@ export default function UserClosetPage({ clientServer, cookie, outfits, ratings,
             <main className="mt-6 p-3 md:p-8">
                 <section className="my-4">
                     <h2 className="capitalize">{closetName}&apos;s Closet</h2>
-                    <ClosetTable outfitItems={outfitItems} itemsSelected={itemsSelected} handleItemSelection={handleItemSelection} />
-                </section>
-
-                <section className="mt-8">
-                    <h2 className="capitalize">{closetName}&apos;s Outfits</h2>
-                    <div>Select item(s) from their closet to see all of the outfits that contain the item.</div>
-
-
-                    <div className="mt-4 p-1 bg-primary w-fit rounded text-white">Results: {outfitsToDisplay ? outfitsToDisplay.length : "none"}</div>
-
-<div className="flex flex-row flex-wrap gap-4 items-start">
-                    {outfitsToDisplay &&
-                        outfitsToDisplay.map((item) => (
-                            <OutfitCard
-                                clientServer={clientServer}
-                                cookie={cookie}
-                                data={item}
-                                key={item.id}
-                                ratings={
-                                    ratings ? ratings.filter((r) => r.outfit_id == item.id) : null
-                                }
-                            />
-                        ))}
-                        </div>
+                    <div>Select items from the closet below to see outfits that contain them.</div>
+                    <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} ratings={ratings}/>
                 </section>
             </main >
             <Footer />

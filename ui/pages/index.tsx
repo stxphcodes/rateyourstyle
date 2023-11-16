@@ -181,7 +181,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                         RateYourStyle will aggregate all of the clothing items in your outfits to create an inventory of your closet. You can sort, filter and search for items easily with our spreadsheet-like table. Features to come include: more data science tools to enable meaningful analysis of your closet, an AI style assistant and more.
                     </div>
                     <div>
-                        <ClosetTable outfitItems={outfitItems} itemsSelected={null} handleItemSelection={null} />
+                        <ClosetTable outfits={outfits ? outfits : []} cookie={cookie} clientServer={clientServer} ratings={null} onlyTable={true}/> 
                     </div>
 
                 </section>
@@ -228,7 +228,6 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                         ))}
                     </div>
                     <div className="mt-4">
-
                         Creating a campaign on RateYourStyle is a direct way for your company to engage with and give back to the loyal consumers of your brand. A campaign is also a great way to conduct market research and doubles as a form of advertisement. If you&apos;re interested in starting a campaign on RateYourStyle, please send us an email: sitesbystephanie@gmail.com.
                     </div>
                 </section>

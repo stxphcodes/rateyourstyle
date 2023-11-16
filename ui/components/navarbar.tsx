@@ -63,20 +63,20 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 		<>
 			<div className="mb-20 shadow-sm px-3 py-2 md:py-4  top-0 w-screen bg-white flex flex-wrap items-center justify-between fixed z-50">
 				<div>
-					<Link href="/" >
+					<Link href="/" passHref={true}>
 						<a className="mr-2 md:ml-4">Home</a>
 					</Link>
-					<Link href="/discover">
+					<Link href="/discover" passHref={true}>
 						<a className="mx-2">Discover</a>
 					</Link>
-					<Link href="/post-outfit">
+					<Link href="/post-outfit" passHref={true}>
 						Post an Outfit
 					</Link>
 				</div>
 				<div className="float-right">
 					{username ? (
 						<>
-							<Link href={`/user/${username}`}><a>{username}</a></Link>
+							<Link href={`/user/${username}`} passHref={true}><a>{username}</a></Link>
 						</>
 					) : (
 						<>
