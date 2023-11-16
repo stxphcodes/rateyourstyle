@@ -1,13 +1,5 @@
 [
     {
-        "tag": "#fall_fits",
-        "date_starting": "2023-10-01",
-        "date_ending": "2023-11-15",
-        "ended": false,
-        "description": "Pumpkin spice lattes? ✅ Apple picking? ✅  Cozy vibes? ✅ Fall is officially here🍂🍁. We'd love to see your favorite fall fit! 3 outfits will be selected at random to win a $100 gift card to a clothing brand of your choice.",
-        "background_img": "#ec994a"
-    },
-    {
         "tag": "#weddings",
         "date_starting": "2023-10-01",
         "date_ending": "2023-12-01",
@@ -28,7 +20,16 @@
         "date_starting": "2023-11-08",
         "date_ending": "2024-01-15",
         "ended": false,
-        "description": "Do you have a cozy sweater that you live in? Or an ugly, holiday sweater that you bust out once a year? Whatever kind of sweater it is, post it here! One outfit will be selected at random to win a $40 gift card to a clothing brand of your choice.",
+        "description": "Do you have a cozy sweater that you live in? Or an ugly, holiday sweater that you bust out once a year? Whatever kind of sweater it is, post it here! One outfit will be selected at random to win a $50 gift card to a clothing brand of your choice.",
         "background_img": "#e63b2f"
+    },
+    {
+        "tag": "#winter_fits",
+        "date_starting": "2023-11-08",
+        "date_ending": "2024-01-31",
+        "ended": false,
+        "description": "Whether you want to show off your big puffer jacket or cute winter accessories, we would love to see what you're wearing this winter. Two outfits will be selected at random to win $50 gift cards to a clothing brand of your choice.",
+        "background_img": "#00aaff"
+
     }
 ]
