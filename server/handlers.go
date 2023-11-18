@@ -102,40 +102,6 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 				}
 			}
 		}
-
-		// var wg sync.WaitGroup
-		// wg.Add(count)
-		// index := 0
-		// for outfit := range h.OutfitIndices.PublicOutfits {
-		// 	if index == count {
-		// 		break
-		// 	}
-
-		// 	go func(outfit string, index int) {
-		// 		o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
-		// 		if err != nil {
-		// 			// log.Println("error: " + err.Error())
-		// 			// return ctx.NoContent(
-		// 			// 	http.StatusInternalServerError,
-		// 			// )
-		// 		}
-
-		// 		// get user profile of outfit poster
-		// 		u := &User{Id: o.UserId}
-		// 		upf, err := getUserProfileFile(ctx.Request().Context(), h.Gcs.Bucket, u)
-		// 		if err == nil {
-		// 			o.UserProfile = getRecentUserProfile(upf.UserProfiles)
-
-		// 		}
-
-		// 		outfits = append(outfits, o)
-		// 		index++
-		// 		wg.Done()
-		// 	}(outfit, index)
-		// 	index = index + 1
-		// }
-		// wg.Wait()
-
 	}
 }
 
