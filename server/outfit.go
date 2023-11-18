@@ -118,15 +118,6 @@ func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle
 
 	}
 
-	// arr := strings.Split(o.PictureURL, "/")
-	// filename := arr[len(arr)-1]
-	// splitname := strings.Split(filename, ".")
-	// newName := splitname[0] + "-resized" + "." + splitname[1]
-
-	// newUrl := strings.TrimSuffix(o.PictureURL, filename) + newName
-
-	// o.PictureURL = newUrl
-
 	return &o, nil
 }
 
