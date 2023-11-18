@@ -65,47 +65,77 @@ func (h Handler) GetCookie() echo.HandlerFunc {
 // GetOutfits will return up to that number of outfits.
 func (h Handler) GetOutfits() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		var outfits []*Outfit
-
 		countStr := ctx.QueryParam("count")
-		countReq := 0
+		count := len(h.OutfitIndices.PublicOutfits)
 		if countStr != "" {
 			countInt, err := strconv.Atoi(countStr)
-			if err != nil {
-				countReq = 0
-			} else {
-				countReq = countInt
+			if err == nil {
+				count = countInt
 			}
 		}
 
-		count := 0
+		errc := make(chan error, 1)
+		outfitsc := make(chan *Outfit)
 		for outfit := range h.OutfitIndices.PublicOutfits {
-			if countReq > 0 && count == countReq {
-				break
-			}
+			go func(outfit string) {
+				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
+				if err != nil {
+					errc <- err
+				}
 
-			o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
-			if err != nil {
-				log.Println("error: " + err.Error())
+				outfitsc <- o
+			}(outfit)
+		}
+
+		var outfits []*Outfit
+		for {
+			select {
+			case err := <-errc:
+				log.Println("Error with outfit, ", err.Error())
 				return ctx.NoContent(
 					http.StatusInternalServerError,
 				)
+			case o := <-outfitsc:
+				outfits = append(outfits, o)
+				if len(outfits) == count {
+					return ctx.JSON(http.StatusOK, outfits)
+				}
 			}
-
-			// get user profile of outfit poster
-			u := &User{Id: o.UserId}
-			upf, err := getUserProfileFile(ctx.Request().Context(), h.Gcs.Bucket, u)
-			if err == nil {
-				o.UserProfile = getRecentUserProfile(upf.UserProfiles)
-
-			}
-
-			outfits = append(outfits, o)
-			count++
-
 		}
 
-		return ctx.JSON(http.StatusOK, outfits)
+		// var wg sync.WaitGroup
+		// wg.Add(count)
+		// index := 0
+		// for outfit := range h.OutfitIndices.PublicOutfits {
+		// 	if index == count {
+		// 		break
+		// 	}
+
+		// 	go func(outfit string, index int) {
+		// 		o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
+		// 		if err != nil {
+		// 			// log.Println("error: " + err.Error())
+		// 			// return ctx.NoContent(
+		// 			// 	http.StatusInternalServerError,
+		// 			// )
+		// 		}
+
+		// 		// get user profile of outfit poster
+		// 		u := &User{Id: o.UserId}
+		// 		upf, err := getUserProfileFile(ctx.Request().Context(), h.Gcs.Bucket, u)
+		// 		if err == nil {
+		// 			o.UserProfile = getRecentUserProfile(upf.UserProfiles)
+
+		// 		}
+
+		// 		outfits = append(outfits, o)
+		// 		index++
+		// 		wg.Done()
+		// 	}(outfit, index)
+		// 	index = index + 1
+		// }
+		// wg.Wait()
+
 	}
 }
 
@@ -135,20 +165,38 @@ func (h Handler) GetPublicOutfitsByUser() echo.HandlerFunc {
 		}
 
 		var outfits []*Outfit
+		errc := make(chan error, 1)
+		done := make(chan struct{})
 		for _, outfit := range outfitIds {
-			o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
-			if err != nil {
-				log.Println(err.Error())
-				return ctx.NoContent(http.StatusInternalServerError)
-			}
+			go func(outfit string) {
+				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
+				if err != nil {
+					errc <- err
+					return
+				}
 
-			// return public outfits
-			if !o.Private {
-				outfits = append(outfits, o)
-			}
+				// return public outfits
+				if !o.Private {
+					outfits = append(outfits, o)
+				}
+
+				done <- struct{}{}
+			}(outfit)
 		}
 
-		return ctx.JSON(http.StatusOK, outfits)
+		doneCount := 0
+		for {
+			select {
+			case err := <-errc:
+				log.Println(err.Error())
+				return ctx.NoContent(http.StatusInternalServerError)
+			case <-done:
+				doneCount = doneCount + 1
+				if doneCount == len(outfitIds) {
+					return ctx.JSON(http.StatusOK, outfits)
+				}
+			}
+		}
 	}
 }
 
@@ -174,18 +222,37 @@ func (h Handler) GetOutfitsByUser() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusNotFound)
 		}
 
-		var outfits []*Outfit
-		for _, outfit := range outfitIds {
-			o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
-			if err != nil {
-				log.Println(err.Error())
-				return ctx.NoContent(http.StatusInternalServerError)
-			}
+		errc := make(chan error, 1)
+		outfitsc := make(chan *Outfit)
 
-			outfits = append(outfits, o)
+		// var outfits []*Outfit
+		for _, outfit := range outfitIds {
+			go func(outfit string) {
+				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
+				if err != nil {
+					errc <- err
+					return
+				}
+
+				outfitsc <- o
+
+			}(outfit)
 		}
 
-		return ctx.JSON(http.StatusOK, outfits)
+		var outfits []*Outfit
+		for {
+			select {
+			case err := <-errc:
+				log.Println(err.Error())
+				return ctx.NoContent(http.StatusInternalServerError)
+			case o := <-outfitsc:
+				outfits = append(outfits, o)
+				if len(outfits) == len(outfitIds) {
+					return ctx.JSON(http.StatusOK, outfits)
+				}
+			}
+
+		}
 	}
 }
 

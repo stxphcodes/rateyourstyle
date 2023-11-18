@@ -110,6 +110,23 @@ func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle
 		o.UserId = ""
 	}
 
+	// get user profile of outfit poster
+	u := &User{Id: o.UserId}
+	upf, err := getUserProfileFile(ctx, bucket, u)
+	if err == nil {
+		o.UserProfile = getRecentUserProfile(upf.UserProfiles)
+
+	}
+
+	// arr := strings.Split(o.PictureURL, "/")
+	// filename := arr[len(arr)-1]
+	// splitname := strings.Split(filename, ".")
+	// newName := splitname[0] + "-resized" + "." + splitname[1]
+
+	// newUrl := strings.TrimSuffix(o.PictureURL, filename) + newName
+
+	// o.PictureURL = newUrl
+
 	return &o, nil
 }
 
