@@ -21,8 +21,6 @@ type Props = {
     clientServer: string;
 };
 
-
-
 export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
         clientServer: "",
@@ -63,6 +61,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         return { props };
     }
     props.outfits = resp;
+    // sort outfits by date
+    props.outfits.sort((a,b) => a.date < b.date ? 1 : -1);
 
     const ratingResp = await GetRatings(server);
     if (ratingResp instanceof Error) {

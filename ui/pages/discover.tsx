@@ -120,6 +120,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
     props.clientServer = clientServer;
 
+    // sort outfits by date
+    props.outfits.sort((a,b) => a.date < b.date ? 1 : -1);
+
     return { props };
 };
 
