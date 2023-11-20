@@ -6,28 +6,23 @@ import { OutfitCard } from "./outfitcard";
 
 export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientServer: string, ratings: Rating[] | null, onlyTable?: boolean }) {
     let outfitItemToIds: Map<string, string[]> = new Map<string, string[]>();
+    let items: OutfitItem[] = []
 
-    const [outfitItems, setOutfitItems] = useState<OutfitItem[]>(() => {
-        if (!props.outfits) {
-            return []
-        }
+    props.outfits.map(outfit => {
+        outfit.items.map(item => {
+            if (!outfitItemToIds.has(item.description)) {
+                outfitItemToIds.set(item.description, [outfit.id]);
+                 items.push(item);
+            } else {
+                let outfitIds = outfitItemToIds.get(item.description) || [];
+                outfitItemToIds.set(item.description, outfitIds);
+                outfitIds.push(outfit.id)
 
-        let items: OutfitItem[] = []
-        props.outfits.map(outfit => {
-            outfit.items.map(item => {
-                if (!outfitItemToIds.has(item.description)) {
-                    outfitItemToIds.set(item.description, [outfit.id]);
-                    items.push(item);
-                } else {
-                    let outfitIds = outfitItemToIds.get(item.description) || [];
-                    outfitItemToIds.set(item.description, outfitIds);
-                    outfitIds.push(outfit.id)
-
-                }
-            })
+            }
         })
-        return items
     })
+
+    const [outfitItems, setOutfitItems] = useState<OutfitItem[]>(items )
 
     const [itemsSelected, setItemsSelected] = useState<string[] | null>(() => {
         let items = outfitItems.map(item => { return item.description })
@@ -173,7 +168,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
         <>
             <div className="overflow-x-auto shadow-md rounded-lg max-h-table">
                 <table className="w-full text-xs md:text-sm text-left overflow-x-scroll">
-                    <thead className="text-xs uppercase bg-background">
+                    <thead className="text-xs uppercase bg-background sticky top-0">
                         <tr>
 
                             <th scope="col" className="p-2">
@@ -231,13 +226,17 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                     <tbody>
                         {outfitItems.map((item) => (
                             <tr className="bg-white border-b max-h-8 overflow-hidden" key={item.id}>
-                                <td className="p-2">
+                                <td className="p-2 flex gap-1">
                                     <input type="checkbox"
                                         className={handleItemSelection == null ? "cursor-not-allowed" : ""}
                                         onChange={() => handleItemSelection(item.description)}
 
                                         checked={itemsSelected ? itemsSelected.includes(item.description) : false}>
                                     </input>
+                                    <div className="text-xs">
+                                    ({outfitItemToIds.get(item.description)?.length})
+                                    </div>
+
                                 </td>
                                 <td className="p-2 font-medium w-52">
                                     {item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="">{item.description}</span>}
