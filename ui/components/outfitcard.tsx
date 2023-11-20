@@ -4,7 +4,6 @@ import { Outfit } from '../apis/get_outfits';
 import { GetRatings, Rating } from '../apis/get_ratings';
 import { Modal } from './modals';
 import { PostRating } from '../apis/post_rating';
-import { LinkIcon } from './icons/link-icon';
 
 function average(arr: number[]) {
 	let sum = 0;

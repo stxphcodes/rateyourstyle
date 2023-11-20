@@ -6,19 +6,27 @@ import { OutfitCard } from "./outfitcard";
 
 export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientServer: string, ratings: Rating[] | null, onlyTable?: boolean }) {
     let outfitItemToIds: Map<string, string[]> = new Map<string, string[]>();
-    let outfitItems: OutfitItem[] = [];
 
-    props.outfits && props.outfits.map(outfit => {
-        outfit.items.map(item => {
-            if (!outfitItemToIds.has(item.description)) {
-                outfitItems.push(item);
-                outfitItemToIds.set(item.description, [outfit.id]);
-            } else {
-                let outfitIds = outfitItemToIds.get(item.description) || [];
-                outfitIds.push(outfit.id)
-                outfitItemToIds.set(item.description, outfitIds);
-            }
+    const [outfitItems, setOutfitItems] = useState<OutfitItem[]>(() => {
+        if (!props.outfits) {
+            return []
+        }
+
+        let items: OutfitItem[] = []
+        props.outfits.map(outfit => {
+            outfit.items.map(item => {
+                if (!outfitItemToIds.has(item.description)) {
+                    outfitItemToIds.set(item.description, [outfit.id]);
+                    items.push(item);
+                } else {
+                    let outfitIds = outfitItemToIds.get(item.description) || [];
+                    outfitItemToIds.set(item.description, outfitIds);
+                    outfitIds.push(outfit.id)
+
+                }
+            })
         })
+        return items
     })
 
     const [itemsSelected, setItemsSelected] = useState<string[] | null>(() => {
@@ -27,6 +35,8 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
     });
 
     const [outfitsToDisplay, setOutfitsToDisplay] = useState<Outfit[] | null>(props.outfits);
+
+    const [sortBy, setSortBy] = useState<string>('name');
 
     const handleItemSelection = (itemDescription: string) => {
         if (!itemsSelected) {
@@ -64,6 +74,82 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
     }
 
     useEffect(() => {
+        switch (sortBy) {
+            case "name":
+
+                setOutfitItems([...outfitItems.sort((a, b) => a.description.toLowerCase() < b.description.toLowerCase() ? -1 : 1)])
+                break;
+            case "name-reverse":
+                setOutfitItems([...outfitItems.sort((a, b) => a.description.toLowerCase() > b.description.toLowerCase() ? -1 : 1)])
+                break;
+            case "brand":
+                setOutfitItems([...outfitItems.sort((a, b) => a.brand.toLowerCase() < b.brand.toLowerCase() ? -1 : 1)])
+                break;
+            case "brand-reverse":
+                setOutfitItems([...outfitItems.sort((a, b) => a.brand.toLowerCase() > b.brand.toLowerCase() ? -1 : 1)])
+                break;
+            case "size":
+                setOutfitItems([...outfitItems.sort((a, b) => a.size.toLowerCase() < b.size.toLowerCase() ? -1 : 1)])
+                break;
+            case "size-reverse":
+                setOutfitItems([...outfitItems.sort((a, b) => a.size.toLowerCase() > b.size.toLowerCase() ? -1 : 1)])
+                break;
+
+            case "price":
+                setOutfitItems([...outfitItems.sort((a, b) => {
+                    let aPrice = a.price.replace(/[^0-9]/g, "");
+                    let bPrice = b.price.replace(/[^0-9]/g, "");
+
+                    let aNum = 0
+                    let bNum = 0
+                    if (aPrice) {
+                        aNum = Number(aPrice)
+                    }
+                    if (b) {
+                        bNum = Number(bPrice)
+                    }
+
+                    if (Number(aNum) < Number(bNum)) {
+                        return -1
+                    } else {
+                        return 1
+                    }
+                })]);
+                break;
+                case "price-reverse":
+                    setOutfitItems([...outfitItems.sort((a, b) => {
+                        let aPrice = a.price.replace(/[^0-9]/g, "");
+                        let bPrice = b.price.replace(/[^0-9]/g, "");
+    
+                        let aNum = 0
+                        let bNum = 0
+                        if (aPrice) {
+                            aNum = Number(aPrice)
+                        }
+                        if (b) {
+                            bNum = Number(bPrice)
+                        }
+    
+                        if (Number(aNum) > Number(bNum)) {
+                            return -1
+                        } else {
+                            return 1
+                        }
+                    })]);
+                    break;
+
+            case "rating":
+                setOutfitItems([...outfitItems.sort((a, b) => a.rating < b.rating ? -1 : 1)])
+                break;
+            case "rating-reverse":
+                setOutfitItems([...outfitItems.sort((a, b) => a.rating > b.rating ? -1 : 1)])
+                break;
+
+        }
+
+    }, [sortBy])
+
+    useEffect(() => {
         if (!itemsSelected || itemsSelected.length == 0) {
             setOutfitsToDisplay(null);
             return
@@ -89,7 +175,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                 <table className="w-full text-xs md:text-sm text-left overflow-x-scroll">
                     <thead className="text-xs uppercase bg-background">
                         <tr>
-                            {/* {props.handleItemSelection != null && */}
+
                             <th scope="col" className="p-2">
                                 <div className="flex items-center gap-1 text-xs">
                                     <input type="checkbox"
@@ -99,35 +185,40 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                                     all
                                 </div>
                             </th>
-                            {/* } */}
+
                             <th scope="col" className="p-2 py-4 ">
                                 <div className="flex items-center">
                                     Clothing Item
-                                    {/* <a href="#"><SortingArrowsIcon /></a> */}
+                                    <div className="hover:cursor-pointer" onClick={() => {
+                                        sortBy == "name" ? setSortBy("name-reverse") : setSortBy("name")
+
+                                    }}><SortingArrowsIcon /></div>
                                 </div>
                             </th>
                             <th scope="col" className="p-2 ">
                                 <div className="flex items-center">
                                     Brand
-                                    {/* <a href="#"><SortingArrowsIcon /></a> */}
+                                    <div className="hover:cursor-pointer" onClick={() => {
+                                        sortBy == "brand" ? setSortBy("brand-reverse") : setSortBy("brand")
+                                    }}><SortingArrowsIcon /></div>
                                 </div>
                             </th>
                             <th scope="col" className="p-2 ">
                                 <div className="flex items-center">
                                     Size
-                                    {/* <a href="#"><SortingArrowsIcon /></a> */}
+                                    <div className="hover:cursor-pointer" onClick={() => sortBy == "size" ? setSortBy("size-reverse") : setSortBy("size")}><SortingArrowsIcon /></div>
                                 </div>
                             </th>
                             <th scope="col" className="p-2 ">
                                 <div className="flex items-center">
                                     Price
-                                    {/* <a href="#"><SortingArrowsIcon /></a> */}
+                                    <div className="hover:cursor-pointer" onClick={() => sortBy == "price" ? setSortBy("price-reverse") : setSortBy("price")}><SortingArrowsIcon /></div>
                                 </div>
                             </th>
                             <th scope="col" className="p-2 ">
                                 <div className="flex items-center">
                                     Rating
-                                    {/* <a href="#"><SortingArrowsIcon /></a> */}
+                                    <div className="hover:cursor-pointer" onClick={() => sortBy == "rating" ? setSortBy("rating-reverse") : setSortBy("rating")}><SortingArrowsIcon /></div>
                                 </div>
                             </th>
                             <th scope="col" className="p-2 ">
@@ -140,7 +231,6 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                     <tbody>
                         {outfitItems.map((item) => (
                             <tr className="bg-white border-b max-h-8 overflow-hidden" key={item.id}>
-                                {/* {props.handleItemSelection != null && */}
                                 <td className="p-2">
                                     <input type="checkbox"
                                         className={handleItemSelection == null ? "cursor-not-allowed" : ""}
@@ -149,7 +239,6 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                                         checked={itemsSelected ? itemsSelected.includes(item.description) : false}>
                                     </input>
                                 </td>
-                                {/* } */}
                                 <td className="p-2 font-medium w-52">
                                     {item.link ? <a href={item.link} target="_blank">{item.description}</a> : <span className="">{item.description}</span>}
 
