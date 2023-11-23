@@ -10,6 +10,7 @@ import { Navbar } from '../components/navarbar';
 import { GetServerURL } from "../apis/get_server";
 import { GetUserProfile, User, UserProfile } from '../apis/get_user';
 import { OutfitCard} from '../components/outfitcard';
+import { PageMetadata } from './_app';
 
 type Props = {
     campaigns: Campaign[] | null;
@@ -19,6 +20,7 @@ type Props = {
     outfits: Outfit[] | null;
     ratings: Rating[] | null;
     user: User | null;
+    metadata: PageMetadata;
 };
 
 function checkEmptyUserProfile(profile: UserProfile) {
@@ -70,6 +72,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         error: null,
         outfits: null,
         clientServer: "",
+        metadata: {
+            title: "Discover",
+            description: "Find fashion inspo, get clothings links and read outfit reviews. Rate Your Style is an online fashion community for all of your style inspo needs."
+        }
     };
 
     let server = GetServerURL()

@@ -11,6 +11,7 @@ import { Footer } from '../components/footer';
 import { Modal, XButton } from '../components/modals';
 import { Navbar } from '../components/navarbar';
 import { GetServerURL } from '../apis/get_server';
+import { PageMetadata } from './_app';
 
 type Props = {
 	campaigns: Campaign[] | null;
@@ -19,6 +20,7 @@ type Props = {
 	username: string;
 	clientServer: string;
 	previousOutfitItems: OutfitItem[];
+	metadata: PageMetadata;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -29,6 +31,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		username: "",
 		clientServer: "",
 		previousOutfitItems: [],
+		metadata: {
+			title: "Post Outfit",
+			description: "Get rewarded for your style. Post outfit pics for a chance to win gift cards. Rate Your Style is an online fashion community for all of your style inspo needs."
+		}
 	};
 
 	let server = GetServerURL()

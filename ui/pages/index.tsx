@@ -10,8 +10,8 @@ import { Navbar } from '../components/navarbar';
 import { OutfitCard } from '../components/outfitcard';
 import { GetServerURL } from "../apis/get_server";
 import { GetUserProfile, User, UserProfile } from '../apis/get_user';
-import { ChartIcon } from '../components/icons/chart';
 import { ClosetTable } from '../components/closet-table';
+import { PageMetadata } from './_app';
 
 type Props = {
     campaigns: Campaign[] | null;
@@ -21,6 +21,7 @@ type Props = {
     outfits: Outfit[] | null;
     ratings: Rating[] | null;
     user: User | null;
+    metadata: PageMetadata;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -32,6 +33,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         error: null,
         outfits: null,
         clientServer: "",
+        metadata: {
+            title: "",
+            description: "Rate Your Style is an online fashion community for all of your style inspo needs. Post outfit pics to get fashion feedback, and give style advice to other users. Find new clothing brands and read reviews about each clothing item. Keep an e-inventory of all of your clothes through our closet table feature."
+        }
     };
 
     let server = GetServerURL()
