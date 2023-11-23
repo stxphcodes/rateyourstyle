@@ -18,6 +18,7 @@ type Rating struct {
 	UserId   string      `json:"user_id"`
 	OutfitId string      `json:"outfit_id"`
 	Rating   interface{} `json:"rating"`
+	Review   string      `json:"review"`
 }
 
 func listAllRatings(ctx context.Context, bucket *gcs.BucketHandle) ([]string, error) {

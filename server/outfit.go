@@ -32,7 +32,7 @@ type Outfit struct {
 	Title      string        `json:"title"`
 	PictureURL string        `json:"picture_url"`
 	StyleTags  []string      `json:"style_tags"`
-	Items      []*OutfitItem `json:"items,omitempty"`
+	Items      []*OutfitItem `json:"items,omitempty"` // outdated
 	ItemIds    []string      `json:"item_ids"`
 	Private    bool          `json:"private"`
 

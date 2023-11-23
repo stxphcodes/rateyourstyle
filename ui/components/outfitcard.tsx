@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Outfit } from '../apis/get_outfits';
-import { GetRatings, Rating } from '../apis/get_ratings';
+import { GetRatings, GetRatingsByOutfit, Rating } from '../apis/get_ratings';
 import { Modal } from './modals';
 import { PostRating } from '../apis/post_rating';
 
@@ -35,7 +35,10 @@ export function OutfitCard(props: {
 }) {
 	const [expandImage, setExpandImage] = useState<boolean>(false);
 	const [submitRating, setSubmitRating] = useState<boolean>(false);
-	const [userItemRating, setUserItemRating] = useState<number>(props.userRating ? props.userRating : 0);
+	const [userOutfitRating, setUserOutfitRating] = useState<number>(props.userRating ? props.userRating : 0);
+
+	const [userOutfitReview, setOutfitReview ] = useState<string>("")
+
 
 	const [allRatings, setAllRatings] = useState<Rating[] | null>(props.ratings)
 	const [ratingAverage, setRatingAverage] = useState<number | null>(null)
@@ -45,7 +48,7 @@ export function OutfitCard(props: {
 	const handleSubmitRating = async (e: any) => {
 		e.preventDefault();
 
-		const resp = await PostRating(props.clientServer, props.cookie, props.data.id, userItemRating)
+		const resp = await PostRating(props.clientServer, props.cookie, props.data.id, userOutfitRating)
 		if (resp instanceof Error) {
 			return;
 		}
@@ -65,6 +68,21 @@ export function OutfitCard(props: {
 		}
 
 	}, [allRatings])
+
+	useEffect(() => {
+		async function fetchData() {
+			let ratingsResp = await GetRatingsByOutfit(props.clientServer, props.data.id)
+			console.log("this is ratings resp")
+			console.log(ratingsResp)
+
+		}
+
+		if (expandImage) {
+			fetchData()
+		}
+
+
+	},[expandImage])
 
 	return (
 		<>
@@ -106,12 +124,15 @@ export function OutfitCard(props: {
 						<div className="flex gap-4 items-center">
 							{!submitRating ? (
 								<>
-									<Rating x={userItemRating} />
-									<a className="hover:cursor-pointer" onClick={() => setSubmitRating(true)}>{userItemRating == 0 ? "submit your rating" : "edit your rating"}</a>
+									<Rating x={userOutfitRating} />
+									<a className="hover:cursor-pointer" 
+									//onClick={() => setSubmitRating(true)}
+									onClick={() => setExpandImage(true)}
+									>{userOutfitRating == 0 ? "submit your rating" : "edit your rating"}</a>
 								</>
 							) : (
 								<>
-									<Rating x={userItemRating} />
+									<Rating x={userOutfitRating} />
 									<div className="w-fit">
 										<label>Your rating</label>
 										<input
@@ -122,10 +143,10 @@ export function OutfitCard(props: {
 											step="0.5"
 											className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer  p-0 m-0"
 											onChange={(e) =>
-												setUserItemRating(Number(e.target.value))
+												setUserOutfitRating(Number(e.target.value))
 											}
 											list="rating"
-											value={userItemRating}
+											value={userOutfitRating}
 										/>
 										<datalist
 											className="flex text-primary -mt-2 p-0 justify-between items-start"
@@ -169,7 +190,7 @@ export function OutfitCard(props: {
 								<div className="px-2 py-1" key={`col-1-${item.brand}`}>
 									<h4 className="">
 										{count}.{" "}
-										
+
 
 										{item.link ? <a href={item.link} target="_blank" className="">{item.description} </a> : <span className="hover:cursor-not-allowed">{item.description}</span>}
 									</h4>
@@ -208,8 +229,101 @@ export function OutfitCard(props: {
 
 			{expandImage && (
 				<Modal handleClose={() => setExpandImage(false)} fullHeight={true}>
-					<img src={props.data.picture_url}></img>
+					<>
+					<img className=""src={props.data.picture_url}></img>
+
+					<div className="p-2">
+						<h3 className="">{props.data.title}</h3>
+						<div className="flex gap-2">
+							{props.data.style_tags.map((item) => (
+								<div className="" key={item}>{item}</div>
+							))}
+						</div>
+
+						<div className="flex items-center">
+							{!ratingAverage ? (
+								<>
+									<Rating x={0} />
+									<div className="mx-2">no ratings submitted yet</div>
+								</>
+							) : (
+								<>
+									<Rating x={ratingAverage} />
+									<div className="mx-2">
+										from {allRatings && allRatings.length} ratings
+									</div>
+								</>
+							)}
+						</div>
+						{!props.asUser && (
+							<>
+							 {/* <div className="flex gap-4 items-center"> */}
+								{!submitRating ? (
+									<>
+									<div className="flex gap-4 items-center">
+										<Rating x={userOutfitRating} />
+										<a className="hover:cursor-pointer" onClick={() => setSubmitRating(true)}>{userOutfitRating == 0 ? "submit your rating" : "edit your rating"}</a>
+										</div>
+									</>
+								) : (
+									<>
+									<div className="flex gap-4 items-center">
+										<Rating x={userOutfitRating} />
+										<div className="w-fit">
+											<label>Your rating</label>
+											<input
+												id="rating"
+												type="range"
+												min="1"
+												max="5"
+												step="0.5"
+												className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer  p-0 m-0"
+												onChange={(e) =>
+													setUserOutfitRating(Number(e.target.value))
+												}
+												list="rating"
+												value={userOutfitRating}
+											/>
+											<datalist
+												className="flex text-primary -mt-2 p-0 justify-between items-start"
+												id="rating"
+											>
+												<option className="text-xs">|</option>
+												<option className="text-xs">|</option>
+												<option className="text-xs">|</option>
+												<option className="text-xs">|</option>
+												<option className="text-xs">|</option>
+											</datalist>
+										</div>
+										</div>
+
+<div>
+										<textarea className="m-2  w-fit" placeholder="Leave a comment" ></textarea>
+										</div>
+										<button
+											className="bg-primary text-white p-1 rounded hover:bg-black"
+											onClick={handleSubmitRating}
+										>
+											submit
+										</button>
+									</>
+								)
+								}
+							{/* </div> */}
+							</>
+						)}
+
+						{allRatings?.map(rating => (
+							<div>
+								{rating.user_id}  | 
+								{rating.rating}
+								</div>
+						))}
+					</div>
+				
+					</>
 				</Modal>
+				
 			)}
 		</>
 	);

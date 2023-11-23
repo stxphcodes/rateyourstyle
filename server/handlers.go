@@ -244,6 +244,35 @@ func (h Handler) GetRatings() echo.HandlerFunc {
 	}
 }
 
+func (h Handler) GetRatingsByOutfit() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		outfitId := ctx.Param("outfitid")
+		if outfitId == "" {
+			log.Println("outfit id missing")
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		ratings, err := getRatingsByOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, "data/ratings/"+outfitId+".json")
+		if err != nil {
+			log.Println("error getting ratings for outfit " + outfitId)
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		arr := []interface{}{}
+		for _, rating := range ratings {
+
+			arr = append(arr, map[string]interface{}{
+				"user_id":   rating.UserId,
+				"rating":    rating.Rating,
+				"outfit_id": rating.OutfitId,
+				"review":    rating.Review,
+			},
+			)
+		}
+		return ctx.JSON(http.StatusOK, arr)
+	}
+}
+
 func (h *Handler) GetUsername() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		cookie, err := getCookie(ctx.Request())
