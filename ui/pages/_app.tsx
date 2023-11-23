@@ -18,12 +18,12 @@ function MyApp({ Component, pageProps }: AppProps<any>) {
   return (
     <>
       <Head>
-        <title>{metadata.title ? metadata.title + " - Rate Your Style" : "Rate Your Style"}</title>
+        <title>{metadata && metadata.title ?  metadata.title + " - Rate Your Style" : "Rate Your Style"}</title>
         <link rel="icon" type="image/x-icon" href="/rys.png"></link>
         <meta
           name="description"
           content={
-           metadata.description
+           metadata && metadata.description
               ? metadata.description
               : "Rate Your Style is an online fashion community for all of your style inspo needs. Post outfit pics to get fashion feedback, and give style advice to other users. Find new clothing brands and read reviews about each clothing item. Keep an e-inventory of all of your clothes through our closet table feature."
           }
