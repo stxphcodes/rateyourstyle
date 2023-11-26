@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Outfit } from '../apis/get_outfits';
+import { Outfit, OutfitItem } from '../apis/get_outfits';
 import { GetRatings, GetRatingsByOutfit, Rating } from '../apis/get_ratings';
 import { Modal } from './modals';
 import { PostRating } from '../apis/post_rating';
@@ -118,30 +118,7 @@ export function OutfitCard(props: {
 
 				{readMore &&
 					<>
-						{props.data.items.map((item, index) => {
-							let count = index + 1;
-							return (
-								<div className="px-2 py-1" key={`col-1-${item.brand}`}>
-									<h4 className="">
-										{count}.{" "}
-										{item.link ? <a href={item.link} target="_blank" className="">{item.description} </a> : <span className="hover:cursor-not-allowed">{item.description}</span>}
-									</h4>
-									<PSpan p={item.brand} span="from" />
-									<PSpan p={item.size ? item.size : "n/a"} span="size" />
-									<PSpan p={item.price ? item.price : "n/a"} span="price" />
-
-									<div className="flex items-start">
-										<Rating x={item.rating} small={true} />
-
-										<div className="mx-2 break-words">&quot;{item.review}&quot;</div>
-									</div>
-
-									{count !== props.data.items.length && <hr className="my-1" />}
-								</div>
-							)
-						}
-						)
-						}
+						<OutfitItemList outfitItems={props.data.items} />
 						<div className="flex bg-background p-1 justify-center">
 							<a className="" onClick={(e) => {
 								e.preventDefault()
@@ -149,6 +126,7 @@ export function OutfitCard(props: {
 							}}>View less</a>
 						</div>
 					</>
+
 				}
 
 			</div>
@@ -163,7 +141,6 @@ export function OutfitCard(props: {
 						<div className="basis-1/2 w-full">
 							<div className="px-4">
 								<div>
-
 									{props.data.username ? <a className="" href={`/closet/${props.data.username}`}>{props.data.username}&apos;s closet</a> : "anonymous"}<span className=" text-xs">{" | "} {props.data.date}</span>
 								</div>
 								<h3 className="">{props.data.title}</h3>
@@ -172,6 +149,28 @@ export function OutfitCard(props: {
 										<div className="" key={item}>{item}</div>
 									))}
 								</div>
+
+
+
+
+								<div className="">
+									<a className="" onClick={(e) => {
+										e.preventDefault()
+										setReadMore(!readMore)
+									}}>{!readMore ? `View ${props.data.items.length} ${props.data.items.length > 1 ? "items" : "item"}` : `Collapse items:`}
+
+									</a>
+								</div>
+
+								{readMore &&
+									<div className="pl-6">
+										<OutfitItemList outfitItems={props.data.items} />
+									</div>
+								}
+
+
+
+
 
 								<div className="flex items-center">
 									<Rating x={props.data.rating_average ? props.data.rating_average : 0} />
@@ -248,7 +247,6 @@ export function OutfitCard(props: {
 											<div className="text-xs"><a >{rating.username ? rating.username : "anonymous"}</a> | {rating.date} </div>
 											<div className="text-base"><span className="text-primary">{rating.rating}</span> "{rating.review}"</div>
 										</div>
-
 									)
 								})}
 							</div>
@@ -258,4 +256,36 @@ export function OutfitCard(props: {
 			)}
 		</>
 	);
+}
+
+
+function OutfitItemList(props: { outfitItems: OutfitItem[] }) {
+	return (
+		<>
+			{props.outfitItems.map((item, index) => {
+				let count = index + 1;
+				return (
+					<div className="px-2 py-1" key={`col-1-${item.brand}`}>
+						<h4 className="">
+							{count}.{" "}
+							{item.link ? <a href={item.link} target="_blank" className="">{item.description} </a> : <span className="hover:cursor-not-allowed">{item.description}</span>}
+						</h4>
+						<PSpan p={item.brand} span="from" />
+						<PSpan p={item.size ? item.size : "n/a"} span="size" />
+						<PSpan p={item.price ? item.price : "n/a"} span="price" />
+
+						<div className="flex items-start">
+							<Rating x={item.rating} small={true} />
+
+							<div className="mx-2 break-words">&quot;{item.review}&quot;</div>
+						</div>
+
+						{count !== props.outfitItems.length && <hr className="my-1" />}
+					</div>
+				)
+			}
+			)
+			}
+		</>
+	)
 }
