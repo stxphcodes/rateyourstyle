@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -236,25 +235,11 @@ func (h Handler) GetRatingsByOutfit() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		// arr := []interface{}{}
 		for _, rating := range ratings {
 			username, ok := h.UserIndices.IdUsername[rating.UserId]
 			if ok {
 				rating.Username = username
-			} else {
-				fmt.Println("this is user indices")
-				fmt.Println(h.UserIndices.IdUsername)
-				fmt.Println("username not found for user id " + rating.UserId)
 			}
-
-			// arr = append(arr, map[string]interface{}{
-			// 	"user_id":   rating.UserId,
-			// 	"rating":    rating.Rating,
-			// 	"outfit_id": rating.OutfitId,
-			// 	"review":    rating.Review,
-			// 	"date":      rating.Date,
-			// },
-			// )
 		}
 		return ctx.JSON(http.StatusOK, ratings)
 	}
