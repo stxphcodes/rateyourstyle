@@ -43,8 +43,8 @@ export function OutfitCard(props: {
 		if (userOutfitReview == "") {
 			setUserReviewMissing(true)
 			return;
-		} 
-			
+		}
+
 		setUserReviewMissing(false)
 		const resp = await PostRating(props.clientServer, props.cookie, props.data.id, userOutfitRating, userOutfitReview)
 		if (resp instanceof Error) {
@@ -89,26 +89,20 @@ export function OutfitCard(props: {
 
 				<div className="p-2">
 					<h3 className="">{props.data.title}</h3>
-					<div className="flex gap-2">
+					<div className="flex gap-2 flex-wrap flex-row">
 						{props.data.style_tags.map((item) => (
 							<div className="" key={item}>{item}</div>
 						))}
 					</div>
 
 					<div className="flex items-center">
-						{!props.data.rating_average ? (
-							<>
-								<Rating x={0} />
-								<a className="mx-2" onClick={() => setExpandImage(true)}>no ratings submitted yet</a>
-							</>
-						) : (
-							<>
-								<Rating x={props.data.rating_average} />
-								<a className="mx-2" onClick={() => setExpandImage(true)}>
-									from {props.data.rating_count} ratings
-								</a>
-							</>
-						)}
+						<div className="hover:cursor-pointer" onClick={() => setExpandImage(true)}><Rating x={props.data.rating_average ? props.data.rating_average : 0} />
+						</div>
+						<a className="mx-2" onClick={() => setExpandImage(true)}>
+							{
+								!props.data.rating_count ? "no reviews submitted yet" : `from ${props.data.rating_count} ${props.data.rating_count > 1 ? "reviews" : "review"} `
+							}
+						</a>
 					</div>
 				</div>
 
@@ -180,19 +174,12 @@ export function OutfitCard(props: {
 								</div>
 
 								<div className="flex items-center">
-									{!props.data.rating_average ? (
-										<>
-											<Rating x={0} />
-											<div className="mx-2">no ratings submitted yet</div>
-										</>
-									) : (
-										<>
-											<Rating x={props.data.rating_average} />
-											<div className="mx-2">
-												from {props.data.rating_count} ratings
-											</div>
-										</>
-									)}
+									<Rating x={props.data.rating_average ? props.data.rating_average : 0} />
+									<div className="mx-2">
+										{
+											!props.data.rating_count ? "no reviews submitted yet" : `from ${props.data.rating_count} ${props.data.rating_count > 1 ? "reviews" : "review"} `
+										}
+									</div>
 								</div>
 								{!props.asUser && (
 									<>
@@ -200,7 +187,7 @@ export function OutfitCard(props: {
 											<>
 												<div className="flex gap-4 items-center">
 													<Rating x={userOutfitRating} />
-													<a className="hover:cursor-pointer" onClick={() => setSubmitRating(true)}>{userOutfitRating == 0 ? "submit your rating" : "edit your rating"}</a>
+													<a className="hover:cursor-pointer" onClick={() => setSubmitRating(true)}>{userOutfitRating == 0 ? "submit your review" : "edit your review"}</a>
 												</div>
 											</>
 										) : (
