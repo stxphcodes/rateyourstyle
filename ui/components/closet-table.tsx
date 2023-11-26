@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Rating } from "../apis/get_ratings";
 import { OutfitCard } from "./outfitcard";
 
-export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientServer: string, ratings: Rating[] | null, onlyTable?: boolean }) {
+export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientServer: string, userRatings: Rating[] | null, onlyTable?: boolean }) {
     let outfitItemToIds: Map<string, string[]> = new Map<string, string[]>();
     let items: OutfitItem[] = []
 
@@ -278,8 +278,8 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                                     cookie={props.cookie}
                                     data={item}
                                     key={item.id}
-                                    ratings={
-                                        props.ratings ? props.ratings.filter((r) => r.outfit_id == item.id) : null
+                                    userRating={
+                                        props.userRatings ? props.userRatings.filter((r) => r.outfit_id == item.id)[0] : null
                                     }
                                 />
                             ))}

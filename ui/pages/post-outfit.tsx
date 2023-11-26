@@ -282,6 +282,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 				private: privateMode,
 				date: "",
 				user_id: "",
+				username: "",
 				description: "",
 			};
 

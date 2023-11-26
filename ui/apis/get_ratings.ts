@@ -1,12 +1,14 @@
 export type Rating = {
   cookie: string;
   user_id: string;
+  username: string;
   outfit_id: string;
   rating: any;
   review?: string;
+  date?: string;
 };
 
-export async function GetRatings(server: string): Promise<Rating[] | Error> {
+export async function GetRatings(server: string, cookie: string): Promise<Rating[] | Error> {
   let error: Error | null = null;
   let ratings: Rating[] = [];
 
@@ -14,11 +16,17 @@ export async function GetRatings(server: string): Promise<Rating[] | Error> {
     method: "GET",
     headers: {
       "content-type": "application/json",
+      'rys-login': cookie,
     },
   })
     .then((response) => {
       if (!response.ok) {
         throw new Error("response not ok");
+      }
+
+      // user doesn't have any ratings
+      if (response.status == 204) {
+        return ratings;
       }
 
       return response.json();
