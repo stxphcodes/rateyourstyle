@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -75,7 +76,7 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 		}
 
 		errc := make(chan error, 1)
-		outfitsc := make(chan *Outfit)
+		outfitsc := make(chan *OutfitResponse)
 		for outfit := range h.OutfitIndices.PublicOutfits {
 			go func(outfit string) {
 				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
@@ -87,7 +88,7 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 			}(outfit)
 		}
 
-		var outfits []*Outfit
+		var outfits []*OutfitResponse
 		for {
 			select {
 			case err := <-errc:
@@ -130,7 +131,7 @@ func (h Handler) GetPublicOutfitsByUser() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusNotFound)
 		}
 
-		var outfits []*Outfit
+		var outfits []*OutfitResponse
 		errc := make(chan error, 1)
 		done := make(chan struct{})
 		for _, outfit := range outfitIds {
@@ -189,9 +190,8 @@ func (h Handler) GetOutfitsByUser() echo.HandlerFunc {
 		}
 
 		errc := make(chan error, 1)
-		outfitsc := make(chan *Outfit)
+		outfitsc := make(chan *OutfitResponse)
 
-		// var outfits []*Outfit
 		for _, outfit := range outfitIds {
 			go func(outfit string) {
 				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
@@ -205,7 +205,7 @@ func (h Handler) GetOutfitsByUser() echo.HandlerFunc {
 			}(outfit)
 		}
 
-		var outfits []*Outfit
+		var outfits []*OutfitResponse
 		for {
 			select {
 			case err := <-errc:
@@ -219,28 +219,6 @@ func (h Handler) GetOutfitsByUser() echo.HandlerFunc {
 			}
 
 		}
-	}
-}
-
-func (h Handler) GetRatings() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		arr := []interface{}{}
-
-		for _, rating := range h.RatingIndices.AllRatings {
-			cookie, ok := h.UserIndices.IdCookie[rating.UserId]
-			if !ok {
-				continue
-			}
-
-			arr = append(arr, map[string]interface{}{
-				"cookie":    cookie,
-				"user_id":   rating.UserId,
-				"rating":    rating.Rating,
-				"outfit_id": rating.OutfitId,
-			},
-			)
-		}
-		return ctx.JSON(http.StatusOK, arr)
 	}
 }
 
@@ -258,18 +236,53 @@ func (h Handler) GetRatingsByOutfit() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		arr := []interface{}{}
+		// arr := []interface{}{}
 		for _, rating := range ratings {
+			username, ok := h.UserIndices.IdUsername[rating.UserId]
+			if ok {
+				rating.Username = username
+			} else {
+				fmt.Println("this is user indices")
+				fmt.Println(h.UserIndices.IdUsername)
+				fmt.Println("username not found for user id " + rating.UserId)
+			}
 
-			arr = append(arr, map[string]interface{}{
-				"user_id":   rating.UserId,
-				"rating":    rating.Rating,
-				"outfit_id": rating.OutfitId,
-				"review":    rating.Review,
-			},
-			)
+			// arr = append(arr, map[string]interface{}{
+			// 	"user_id":   rating.UserId,
+			// 	"rating":    rating.Rating,
+			// 	"outfit_id": rating.OutfitId,
+			// 	"review":    rating.Review,
+			// 	"date":      rating.Date,
+			// },
+			// )
 		}
-		return ctx.JSON(http.StatusOK, arr)
+		return ctx.JSON(http.StatusOK, ratings)
+	}
+}
+
+func (h *Handler) GetRatingsByUser() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		ratings := []interface{}{}
+		outfitRatings, ok := h.RatingIndices.UserOutfitRating[userId]
+		if !ok {
+			return ctx.NoContent(http.StatusNoContent)
+		}
+
+		for _, rating := range outfitRatings {
+			ratings = append(ratings, rating)
+		}
+		return ctx.JSON(http.StatusOK, ratings)
+
 	}
 }
 
@@ -487,6 +500,7 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 		data.UserId = userId
+		data.Date = time.Now().Format("2006-01-02")
 
 		// read original file
 		ratings, err := getRatingsByOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, "data/ratings/"+data.OutfitId+".json")
@@ -499,16 +513,18 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 		}
 
 		found := false
-		for _, rating := range ratings {
+		for i, rating := range ratings {
 			if rating.UserId == data.UserId {
-				rating.Rating = data.Rating
+				ratings[i].Rating = data.Rating
+				ratings[i].Review = data.Review
+				ratings[i].Date = time.Now().Format("2006-01-02")
 				found = true
 				break
 			}
 		}
 
 		if !found {
-			ratings = append(ratings, data)
+			ratings = append(ratings, &data)
 		}
 
 		obj := h.Gcs.Bucket.Object(filepath.Join("data", "ratings", data.OutfitId+".json"))
@@ -524,14 +540,14 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 
 		// update indices
 		if !found {
-			h.RatingIndices.AllRatings = append(h.RatingIndices.AllRatings, &data)
+			m := make(map[string]interface{})
+			m[data.OutfitId] = data
+
+			h.RatingIndices.UserOutfitRating[data.UserId] = m
 		} else {
-			for index, r := range h.RatingIndices.AllRatings {
-				if r.OutfitId == data.OutfitId && r.UserId == data.UserId {
-					h.RatingIndices.AllRatings[index].Rating = data.Rating
-				}
-			}
+			h.RatingIndices.UserOutfitRating[data.UserId][data.OutfitId] = data
 		}
+
 		return ctx.NoContent(http.StatusCreated)
 	}
 }

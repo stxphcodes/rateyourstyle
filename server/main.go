@@ -111,7 +111,7 @@ func run() error {
 
 	mux.GET("/api/outfits", handler.GetOutfits())
 
-	mux.GET("/api/ratings", handler.GetRatings())
+	mux.GET("/api/ratings", handler.GetRatingsByUser())
 
 	mux.GET("/api/ratings/:outfitid", handler.GetRatingsByOutfit())
 

@@ -35,8 +35,23 @@ type Outfit struct {
 	Items      []*OutfitItem `json:"items,omitempty"` // outdated
 	ItemIds    []string      `json:"item_ids"`
 	Private    bool          `json:"private"`
+}
 
-	UserProfile *UserProfile `json:"user_profile,omitempty"`
+type OutfitResponse struct {
+	Id   string `json:"id"`
+	Date string `json:"date"`
+	//UserId     string   `json:"user_id"`
+	Username   string   `json:"username"`
+	Title      string   `json:"title"`
+	PictureURL string   `json:"picture_url"`
+	StyleTags  []string `json:"style_tags"`
+	//ItemIds    []string `json:"item_ids"`
+	Items   []*OutfitItem `json:"items"`
+	Private bool          `json:"private"`
+
+	UserProfile   *UserProfile `json:"user_profile,omitempty"`
+	RatingCount   interface{}  `json:"rating_count"`
+	RatingAverage interface{}  `json:"rating_average"`
 }
 
 type OutfitIndices struct {
@@ -74,7 +89,7 @@ func listAllOutfits(ctx context.Context, bucket *gcs.BucketHandle) ([]string, er
 	return outfits, nil
 }
 
-func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, userIdUsername map[string]string, id string) (*Outfit, error) {
+func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, userIdUsername map[string]string, id string) (*OutfitResponse, error) {
 	path := "data/outfits/" + id + ".json"
 	obj := bucket.Object(path)
 	reader, err := obj.NewReader(ctx)
@@ -93,32 +108,44 @@ func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle
 	if err := json.Unmarshal(bytes, &o); err != nil {
 		return nil, err
 	}
+	resp := &OutfitResponse{
+		Id:         o.Id,
+		Date:       o.Date,
+		Title:      o.Title,
+		PictureURL: o.PictureURL,
+		StyleTags:  o.StyleTags,
+		Private:    o.Private,
+	}
 
 	// get outfit items
-	items, err := getOutfitItemsFromOutfit(ctx, bucket, &o)
+	items, err := getOutfitItemsFromOutfit(ctx, bucket, o.ItemIds)
 	if err != nil {
 		return nil, err
 	}
-	o.Items = items
 
-	// change user id to username
+	resp.Items = items
+
+	// get username
 	username, ok := userIdUsername[o.UserId]
 	if ok {
-		o.UserId = username
-	} else {
-		// user without account posted, just leave user id blank
-		o.UserId = ""
+		resp.Username = username
 	}
 
 	// get user profile of outfit poster
 	u := &User{Id: o.UserId}
 	upf, err := getUserProfileFile(ctx, bucket, u)
 	if err == nil {
-		o.UserProfile = getRecentUserProfile(upf.UserProfiles)
-
+		resp.UserProfile = getRecentUserProfile(upf.UserProfiles)
 	}
 
-	return &o, nil
+	// get ratings
+	ratings, err := getRatingsByOutfit(ctx, client, bucket, "data/ratings/"+o.Id+".json")
+	if err == nil {
+		resp.RatingCount = len(ratings)
+		resp.RatingAverage = average(ratings)
+	}
+
+	return resp, nil
 }
 
 func createOutfitIndices(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle) (*OutfitIndices, error) {
