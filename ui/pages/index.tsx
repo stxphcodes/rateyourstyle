@@ -153,8 +153,6 @@ function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, err
                             outfits.map((item) => {
                                 let userRating: Rating | null = null
                                 if (userRatings) {
-                                    console.log("this is user ratings")
-                                    console.log(userRatings)
                                     userRating = userRatings?.filter(r => r.outfit_id == item.id)[0]
                                 }
     

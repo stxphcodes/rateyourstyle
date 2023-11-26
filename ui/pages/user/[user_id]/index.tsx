@@ -342,8 +342,6 @@ function UserProfileForm(props: { clientServer: string, cookie: string, user: Us
                                     setAgeRange(props.user?.user_profile?.age_range)
                                     setHeightRange(props.user?.user_profile?.height_range)
                                     setWeightRange(props.user?.user_profile?.weight_range)
-                                    console.log("this is submit error")
-                                    console.log(resp.message)
                                     setSubmitError(resp.message)
                                 } else {
                                     location.reload()
