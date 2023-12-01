@@ -10,9 +10,9 @@ import (
 	gcs "cloud.google.com/go/storage"
 )
 
-func getOutfitItemsFromOutfit(ctx context.Context, bucket *gcs.BucketHandle, outfit *Outfit) ([]*OutfitItem, error) {
+func getOutfitItemsFromOutfit(ctx context.Context, bucket *gcs.BucketHandle, outfitIds []string) ([]*OutfitItem, error) {
 	items := []*OutfitItem{}
-	for _, itemId := range outfit.ItemIds {
+	for _, itemId := range outfitIds {
 		path := filepath.Join("data", "outfit-items", itemId+".json")
 
 		// read outfit-item data

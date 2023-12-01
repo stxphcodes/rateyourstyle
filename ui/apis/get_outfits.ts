@@ -19,6 +19,7 @@ export type Outfit = {
   id: string;
   date: string;
   user_id: string;
+  username: string;
   title: string;
   picture_url: string;
   description: string;
@@ -28,6 +29,8 @@ export type Outfit = {
   private: boolean;
 
   user_profile?: UserProfile;
+  rating_count?: number;
+  rating_average?: number;
 };
 
 export async function GetOutfits(server: string, count?: number): Promise<Outfit[] | Error> {

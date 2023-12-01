@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 
@@ -11,13 +12,35 @@ import (
 )
 
 type RatingIndices struct {
-	AllRatings []*Rating
+	UserOutfitRating map[string]map[string]interface{}
 }
 
 type Rating struct {
 	UserId   string      `json:"user_id"`
 	OutfitId string      `json:"outfit_id"`
 	Rating   interface{} `json:"rating"`
+	Review   string      `json:"review"`
+	Date     string      `json:"date"`
+
+	Username string `json:"username,omitempty"`
+}
+
+func average(ratings []*Rating) string {
+	sum := float64(0)
+	for _, rating := range ratings {
+
+		ratingInt := float64(0)
+		if _, ok := rating.Rating.(float64); ok {
+			ratingInt = rating.Rating.(float64)
+		}
+
+		sum = sum + ratingInt
+	}
+
+	avg := sum / float64(len(ratings))
+
+	i := fmt.Sprintf("%.1f", avg)
+	return i
 }
 
 func listAllRatings(ctx context.Context, bucket *gcs.BucketHandle) ([]string, error) {
@@ -48,7 +71,7 @@ func listAllRatings(ctx context.Context, bucket *gcs.BucketHandle) ([]string, er
 	return reviewItemPaths, nil
 }
 
-func getRatingsByOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, path string) ([]Rating, error) {
+func getRatingsByOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, path string) ([]*Rating, error) {
 	obj := bucket.Object(path)
 	reader, err := obj.NewReader(ctx)
 
@@ -62,7 +85,7 @@ func getRatingsByOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.Buc
 		return nil, err
 	}
 
-	var r []Rating
+	var r []*Rating
 	if err := json.Unmarshal(bytes, &r); err != nil {
 		return nil, err
 	}
@@ -77,7 +100,7 @@ func createRatingIndices(ctx context.Context, client *gcs.Client, bucket *gcs.Bu
 	}
 
 	indices := &RatingIndices{
-		AllRatings: []*Rating{},
+		UserOutfitRating: make(map[string]map[string]interface{}),
 	}
 
 	for _, path := range ratingPaths {
@@ -87,12 +110,15 @@ func createRatingIndices(ctx context.Context, client *gcs.Client, bucket *gcs.Bu
 		}
 
 		for _, r := range ratings {
-			indices.AllRatings = append(indices.AllRatings, &Rating{
-				UserId:   r.UserId,
-				Rating:   r.Rating,
-				OutfitId: r.OutfitId,
-			})
+			outfitRatings, ok := indices.UserOutfitRating[r.UserId]
+			if !ok {
+				outfitRatings = make(map[string]interface{})
+			}
+
+			outfitRatings[r.OutfitId] = r
+			indices.UserOutfitRating[r.UserId] = outfitRatings
 		}
+
 	}
 
 	return indices, nil

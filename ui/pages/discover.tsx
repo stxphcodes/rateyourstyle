@@ -9,8 +9,9 @@ import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
 import { GetServerURL } from "../apis/get_server";
 import { GetUserProfile, User, UserProfile } from '../apis/get_user';
-import { OutfitCard} from '../components/outfitcard';
+import { OutfitCard } from '../components/outfitcard';
 import { PageMetadata } from './_app';
+
 
 type Props = {
     campaigns: Campaign[] | null;
@@ -18,7 +19,7 @@ type Props = {
     clientServer: string;
     error: string | null;
     outfits: Outfit[] | null;
-    ratings: Rating[] | null;
+    userRatings: Rating[] | null;
     user: User | null;
     metadata: PageMetadata;
 };
@@ -68,7 +69,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         campaigns: null,
         cookie: "",
         user: null,
-        ratings: null,
+        userRatings: null,
         error: null,
         outfits: null,
         clientServer: "",
@@ -96,6 +97,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
 
         props.user = userResp;
+
+        const ratingResp = await GetRatings(server, props.cookie);
+        if (ratingResp instanceof Error) {
+            props.error = ratingResp.message;
+            return { props };
+        }
+        props.userRatings = ratingResp;
     }
 
     const campaignResp = await GetCampaigns(server);
@@ -112,13 +120,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
     props.outfits = outfitResp;
 
-    const ratingResp = await GetRatings(server);
-    if (ratingResp instanceof Error) {
-        props.error = ratingResp.message;
-        return { props };
-    }
-    props.ratings = ratingResp;
-
     const clientServer = GetServerURL(true);
     if (clientServer instanceof Error) {
         props.error = clientServer.message;
@@ -127,12 +128,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props.clientServer = clientServer;
 
     // sort outfits by date
-    props.outfits.sort((a,b) => a.date < b.date ? 1 : -1);
+    props.outfits.sort((a, b) => a.date < b.date ? 1 : -1);
 
     return { props };
 };
 
-function DiscoverPage({ campaigns, cookie, user, outfits, ratings, clientServer, error }: Props) {
+function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientServer, error }: Props) {
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
     const [readMore, setReadMore] = useState(() => {
         let intialState =
@@ -286,18 +287,15 @@ function DiscoverPage({ campaigns, cookie, user, outfits, ratings, clientServer,
 
                     {outfitsFiltered &&
                         outfitsFiltered.map((item) => {
-                            let outfitRatings = ratings ?
-                                ratings.filter((r) => r.outfit_id == item.id) :
-                                null
+                            // let outfitRatings = ratings ?
+                            //     ratings.filter((r) => r.outfit_id == item.id) :
+                            //     null
 
-                            let userRatingFiltered = outfitRatings ? outfitRatings.filter(r => r.cookie == cookie) : null
+                            // let userRatingFiltered = outfitRatings ? outfitRatings.filter(r => r.cookie == cookie) : null
 
-                            let userRating = 0
-                            if (
-                                userRatingFiltered &&
-                                userRatingFiltered.length > 0
-                            ) {
-                                userRating = userRatingFiltered[0].rating
+                            let userRating: Rating | null = null
+                            if (userRatings) {
+                                userRating = userRatings?.filter(r => r.outfit_id == item.id)[0]
                             }
 
                             return (
@@ -305,10 +303,9 @@ function DiscoverPage({ campaigns, cookie, user, outfits, ratings, clientServer,
                                     cookie={cookie}
                                     data={item}
                                     key={item.id}
-                                    ratings={outfitRatings}
                                     userRating={userRating}
                                     clientServer={clientServer}
-                                    />
+                                />
                             )
                         })}
                 </section>

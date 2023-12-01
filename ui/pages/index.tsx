@@ -19,7 +19,7 @@ type Props = {
     clientServer: string;
     error: string | null;
     outfits: Outfit[] | null;
-    ratings: Rating[] | null;
+    userRatings: Rating[] | null;
     user: User | null;
     metadata: PageMetadata;
 };
@@ -29,7 +29,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         campaigns: null,
         cookie: "",
         user: null,
-        ratings: null,
+        userRatings: null,
         error: null,
         outfits: null,
         clientServer: "",
@@ -57,6 +57,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
 
         props.user = userResp;
+
+        const ratingResp = await GetRatings(server, props.cookie);
+        if (ratingResp instanceof Error) {
+            props.error = ratingResp.message;
+            return { props };
+        }
+        props.userRatings = ratingResp;
     }
 
     const campaignResp = await GetCampaigns(server);
@@ -73,12 +80,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
     props.outfits = outfitResp;
 
-    const ratingResp = await GetRatings(server);
-    if (ratingResp instanceof Error) {
-        props.error = ratingResp.message;
-        return { props };
-    }
-    props.ratings = ratingResp;
 
     const clientServer = GetServerURL(true);
     if (clientServer instanceof Error) {
@@ -90,7 +91,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props };
 };
 
-function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }: Props) {
+function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, error }: Props) {
     const [heroSectionImage, setHeroSectionImage] = useState(outfits ? outfits[0].picture_url : "/clothing-photo.jpg")
 
     let outfitItems: OutfitItem[] = [];
@@ -150,26 +151,16 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                     <div className="flex flex-nowrap flex-row gap-2 overflow-scroll my-2">
                         {outfits &&
                             outfits.map((item) => {
-                                let outfitRatings = ratings ?
-                                    ratings.filter((r) => r.outfit_id == item.id) :
-                                    null
-
-                                let userRatingFiltered = outfitRatings ? outfitRatings.filter(r => r.cookie == cookie) : null
-
-                                let userRating = 0
-                                if (
-                                    userRatingFiltered &&
-                                    userRatingFiltered.length > 0
-                                ) {
-                                    userRating = userRatingFiltered[0].rating
+                                let userRating: Rating | null = null
+                                if (userRatings) {
+                                    userRating = userRatings?.filter(r => r.outfit_id == item.id)[0]
                                 }
-
+    
                                 return (
                                     <div className="flex-none" key={item.id}>
                                         <OutfitCard
                                             cookie={cookie}
                                             data={item}
-                                            ratings={outfitRatings}
                                             userRating={userRating}
                                             clientServer={clientServer}
                                         />
@@ -186,7 +177,7 @@ function Home({ campaigns, cookie, user, outfits, ratings, clientServer, error }
                         RateYourStyle will aggregate all of the clothing items in your outfits to create an inventory of your closet. You can sort, filter and search for items easily with our spreadsheet-like table. Features to come include: more data science tools to enable meaningful analysis of your closet, an AI style assistant and more.
                     </div>
                     <div>
-                        <ClosetTable outfits={outfits ? outfits : []} cookie={cookie} clientServer={clientServer} ratings={null} onlyTable={true}/> 
+                        <ClosetTable outfits={outfits ? outfits : []} cookie={cookie} clientServer={clientServer} userRatings={null} onlyTable={true}/> 
                     </div>
 
                 </section>

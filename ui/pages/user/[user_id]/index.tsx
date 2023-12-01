@@ -10,14 +10,14 @@ import { GetServerURL } from "../../../apis/get_server";
 import { PostUserProfile } from '../../../apis/post_user';
 import { ClosetTable } from '../../../components/closet-table';
 import { Footer } from '../../../components/footer';
-import { OutfitCard } from '../../../components/outfitcard';
+
 
 type Props = {
     cookie: string;
     user: User;
     error: string | null;
     outfits: Outfit[] | null;
-    ratings: Rating[] | null;
+    userRatings: Rating[] | null;
     clientServer: string;
 };
 
@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         user: { username: "", email: "", user_profile: { age_range: "", department: "", weight_range: "", height_range: "" } },
         error: null,
         outfits: null,
-        ratings: null,
+        userRatings: null,
     };
 
     let server = GetServerURL()
@@ -48,6 +48,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
 
         props.user = userResp;
+
+        const ratingResp = await GetRatings(server, props.cookie);
+        if (ratingResp instanceof Error) {
+            props.error = ratingResp.message;
+            return { props };
+        }
+        props.userRatings = ratingResp;
     }
 
     if (context.query["user_id"] !== props.user.username) {
@@ -63,13 +70,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props.outfits = resp;
     // sort outfits by date
     props.outfits.sort((a,b) => a.date < b.date ? 1 : -1);
-
-    const ratingResp = await GetRatings(server);
-    if (ratingResp instanceof Error) {
-        props.error = ratingResp.message;
-        return { props };
-    }
-    props.ratings = ratingResp;
 
     const clientServer = GetServerURL(true);
     if (clientServer instanceof Error) {
@@ -88,7 +88,7 @@ function Rating(props: { x: number, small?: boolean }) {
     )
 }
 
-export default function Index({ clientServer, cookie, user, outfits, ratings, error }: Props) {
+export default function Index({ clientServer, cookie, user, outfits, userRatings, error }: Props) {
     if (error) {
         if (error == "forbidden") {
             return (
@@ -162,7 +162,7 @@ export default function Index({ clientServer, cookie, user, outfits, ratings, er
                         <span className="font-bold">Share your closet: </span> <a target="_blank" href={`/closet/${user.username}`}>https://rateyourstyle.com/closet/{user.username}</a>
                     </div>
                     <div className="text-xs mb-2">Only items from public outfits will be shared. Select items from your closet to see items that contain them.</div>
-                    <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} ratings={ratings} />
+                    <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} userRatings={userRatings} />
                 </section>
             </main >
             <Footer />
@@ -342,8 +342,6 @@ function UserProfileForm(props: { clientServer: string, cookie: string, user: Us
                                     setAgeRange(props.user?.user_profile?.age_range)
                                     setHeightRange(props.user?.user_profile?.height_range)
                                     setWeightRange(props.user?.user_profile?.weight_range)
-                                    console.log("this is submit error")
-                                    console.log(resp.message)
                                     setSubmitError(resp.message)
                                 } else {
                                     location.reload()

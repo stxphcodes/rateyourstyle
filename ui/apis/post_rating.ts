@@ -3,6 +3,7 @@ export async function PostRating(
     cookie: string,
     outfitId: string,
     rating: number,
+    review: string,
 ): Promise<string | Error> {
     let error: Error | null = null
 
@@ -12,6 +13,7 @@ export async function PostRating(
             body: JSON.stringify({
                 outfit_id: outfitId, 
                 rating: rating,
+                review: review,
             }),
             headers: { "content-type": "application/json",
             "rys-login": cookie },

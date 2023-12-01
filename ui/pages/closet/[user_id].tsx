@@ -1,7 +1,6 @@
 import { GetServerSideProps } from 'next';
-import { useState, useEffect } from 'react';
 
-import { GetPublicOutfitsByUser, Outfit, OutfitItem } from '../../apis/get_outfits';
+import { GetPublicOutfitsByUser, Outfit } from '../../apis/get_outfits';
 import { GetRatings, Rating } from '../../apis/get_ratings';
 import { Navbar } from '../../components/navarbar';
 import { GetServerURL } from "../../apis/get_server";
@@ -13,7 +12,7 @@ type Props = {
     cookie: string;
     error: string | null;
     outfits: Outfit[] | null;
-    ratings: Rating[] | null;
+    userRatings: Rating[] | null;
     clientServer: string;
     closetName: string;
     username: string;
@@ -25,7 +24,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         cookie: "",
         error: null,
         outfits: null,
-        ratings: null,
+        userRatings: null,
         closetName: "",
         username: "",
     };
@@ -44,6 +43,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         if (!(usernameResp instanceof Error)) {
             props.username = usernameResp;
         }
+
+        const ratingResp = await GetRatings(server, props.cookie);
+        if (ratingResp instanceof Error) {
+            props.error = ratingResp.message;
+            return { props };
+        }
+        props.userRatings = ratingResp;
     }
 
     let closetName = context.query["user_id"];
@@ -62,13 +68,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // sort outfits by date
     props.outfits.sort((a,b) => a.date < b.date ? 1 : -1);
 
-    const ratingResp = await GetRatings(server);
-    if (ratingResp instanceof Error) {
-        props.error = ratingResp.message;
-        return { props };
-    }
-    props.ratings = ratingResp;
-
     const clientServer = GetServerURL(true);
     if (clientServer instanceof Error) {
         props.error = clientServer.message;
@@ -86,7 +85,7 @@ function Rating(props: { x: number, small?: boolean }) {
     )
 }
 
-export default function UserClosetPage({ clientServer, cookie, outfits, ratings, closetName, username, error }: Props) {
+export default function UserClosetPage({ clientServer, cookie, outfits, userRatings, closetName, username, error }: Props) {
     if (error) {
         return (
             <>
@@ -123,7 +122,7 @@ export default function UserClosetPage({ clientServer, cookie, outfits, ratings,
                 <section className="my-4">
                     <h2 className="capitalize">{closetName}&apos;s Closet</h2>
                     <div>Select items from the closet below to see outfits that contain them.</div>
-                    <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} ratings={ratings}/>
+                    <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} userRatings={userRatings}/>
                 </section>
             </main >
             <Footer />
