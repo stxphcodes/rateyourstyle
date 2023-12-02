@@ -23,6 +23,8 @@ type OutfitItem struct {
 	Price       string      `json:"price"`
 	Review      string      `json:"review"`
 	Rating      interface{} `json:"rating"`
+	Color       string      `json:"color"`
+	Store       string      `json:"store"`
 }
 
 type Outfit struct {
