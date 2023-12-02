@@ -13,6 +13,8 @@ export type OutfitItem = {
   price: string;
   rating: number;
   review: string;
+  color: string;
+  store: string;
 };
 
 export type Outfit = {

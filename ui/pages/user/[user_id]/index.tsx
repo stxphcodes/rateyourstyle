@@ -162,7 +162,7 @@ export default function Index({ clientServer, cookie, user, outfits, userRatings
                         <span className="font-bold">Share your closet: </span> <a target="_blank" href={`/closet/${user.username}`}>https://rateyourstyle.com/closet/{user.username}</a>
                     </div>
                     <div className="text-xs mb-2">Only items from public outfits will be shared. Select items from your closet to see items that contain them.</div>
-                    <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} userRatings={userRatings} />
+                    <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} userRatings={userRatings} includeEdit={true} />
                 </section>
             </main >
             <Footer />
@@ -316,7 +316,7 @@ function UserProfileForm(props: { clientServer: string, cookie: string, user: Us
                 {submitError && <div className="bg-red-500 p-1 my-2 text-white rounded">Oh no! We apologize, it looks like we are having server issues. Please refresh the page and try again.</div>}
 
                 {!editUserProfile ? <button
-                    className="px-1 rounded bg-primary text-white"
+                    className="px-1 rounded border-2 border-primary text-primary hover:text-white hover:bg-primary"
                     onClick={(e) => {
                         e.preventDefault()
                         setEditUserProfile(true)
