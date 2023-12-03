@@ -76,3 +76,30 @@ a:hover {
   cursor: pointer;
 }
 
+.primaryButton {
+  background-color: #aa3c16;
+  padding: 0 4px;
+  border: 2px solid;
+  border-radius: 4px;
+  border-color: #aa3c16;
+  color: white;
+}
+
+.primaryButton:hover {
+  color: #aa3c16;
+  background-color: white;
+}
+
+.inverseButton {
+  color: #aa3c16;
+  padding: 0 4px;
+  border: 2px solid;
+  border-radius: 4px;
+  border-color: #aa3c16;
+}
+
+.inverseButton:hover {
+  color: white;
+  background-color: #aa3c16;
+}
+

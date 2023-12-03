@@ -135,6 +135,8 @@ func run() error {
 
 	mux.POST("/api/user-profile", handler.PostUserProfile())
 
+	mux.PUT("/api/outfit-item", handler.PutOutfitItem())
+
 	return mux.Start(cfg.HttpAddr)
 }
 

@@ -672,3 +672,60 @@ func (h *Handler) PostUserProfile() echo.HandlerFunc {
 		return ctx.NoContent(http.StatusCreated)
 	}
 }
+
+func (h Handler) PutOutfitItem() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		var data OutfitItem
+		if err := ctx.Bind(&data); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+		// lowercase color
+		data.Color = strings.ToLower(data.Color)
+
+		// person trying to edit outfit item is not
+		// the original outfit item creator
+		if data.UserId != userId {
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		path := filepath.Join("data", "outfit-items", data.Id+".json")
+		obj := h.Gcs.Bucket.Object(path)
+
+		_, err = obj.Attrs(ctx.Request().Context())
+		if err != nil {
+			if strings.Contains(err.Error(), "exist") {
+				// can only edit item that exists.
+				return ctx.NoContent(http.StatusConflict)
+			}
+
+			// not sure what the error is
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		writer := obj.NewWriter(ctx.Request().Context())
+		defer writer.Close()
+
+		if err := json.NewEncoder(writer).Encode(data); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		writer.Close()
+
+		return ctx.NoContent(http.StatusCreated)
+	}
+}

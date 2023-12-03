@@ -83,6 +83,9 @@ func createItemsFromOutfit(ctx context.Context, bucket *gcs.BucketHandle, outfit
 			data.OutfitIds = []string{outfit.Id}
 		}
 
+		// lowercase color
+		data.Color = strings.ToLower(data.Color)
+
 		writer := obj.NewWriter(ctx)
 		if err := json.NewEncoder(writer).Encode(data); err != nil {
 			return nil, err

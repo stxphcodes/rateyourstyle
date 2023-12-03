@@ -23,6 +23,21 @@ type Props = {
 	metadata: PageMetadata;
 };
 
+function defaultOutfitItem(): OutfitItem {
+	return {
+		id: "",
+		brand: "",
+		description: "",
+		size: "",
+		price: "",
+		review: "",
+		rating: 2.5,
+		link: "",
+		color: "",
+		store: "",
+	}
+}
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	let props: Props = {
 		campaigns: null,
@@ -65,9 +80,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		// filter item duplicates
 		props.previousOutfitItems = props.previousOutfitItems.filter((value, index, self) =>
 			index === self.findIndex((t) => (
-				t.description == value.description
+				t.id == value.id
 			))
 		)
+
+		// sort previous items by color then description,
+		props.previousOutfitItems.sort((a, b) => {
+			let aDescription: string = (a.color + a.description).toLowerCase()
+			let bDescription: string = (b.color + b.description).toLowerCase()
+			if (aDescription < bDescription) {
+				return -1
+			}
+			return 1
+		})
 	}
 
 	const resp = await GetCampaigns(server);
@@ -100,7 +125,7 @@ function validateForm(
 
 	let itemMissingField = false;
 	outfitItems.forEach((item) => {
-		if (!item.description || !item.brand || !item.review) {
+		if (!item.description || !item.brand || !item.review || !item.color) {
 			itemMissingField = true;
 			return;
 		}
@@ -122,24 +147,13 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 	const [styleTags, setStyleTags] = useState<string>("");
 	const [formSubmissionStatus, setFormSubmissionStatus] = useState("");
 	const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([
-		{
-			id: "",
-			brand: "",
-			description: "",
-			size: "",
-			price: "",
-			review: "",
-			rating: 2.5,
-			link: "",
-		},
+		defaultOutfitItem(),
 	]);
-	// const [createNewItem, setCreateNewItem] = useState<boolean>(false);
 
 	let server = GetServerURL(true)
 	if (server instanceof Error) {
 		server = ""
 	}
-
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		e.preventDefault();
@@ -191,6 +205,14 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 			item.brand = e.target.value;
 		}
 
+		if (e.target.id == "color") {
+			item.color = e.target.value;
+		}
+
+		if (e.target.id == "store") {
+			item.store = e.target.value;
+		}
+
 		setOutfitItems([
 			...outfitItems.slice(0, index),
 			item,
@@ -202,23 +224,14 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 		if (e.target.value == "") {
 			setOutfitItems([
 				...outfitItems.slice(0, index),
-				{
-					id: "",
-					brand: "",
-					description: "",
-					size: "",
-					price: "",
-					review: "",
-					rating: 2.5,
-					link: ""
-				},
+				defaultOutfitItem(),
 				...outfitItems.slice(index + 1),
 			])
 			return
 		}
 
 
-		let item = previousOutfitItems.filter(item => item.description == e.target.value)[0];
+		let item = previousOutfitItems.filter(item => item.id == e.target.value)[0];
 
 		setOutfitItems([
 			...outfitItems.slice(0, index),
@@ -231,16 +244,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 		e.preventDefault();
 		setOutfitItems([
 			...outfitItems,
-			{
-				id: "",
-				brand: "",
-				description: "",
-				size: "",
-				price: "",
-				review: "",
-				rating: 2.5,
-				link: "",
-			},
+			defaultOutfitItem(),
 		]);
 	};
 
@@ -262,6 +266,12 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 			setFormSubmissionStatus("");
 
 			let tags = styleTags.split(" ");
+			tags.forEach((tag, index) => {
+				if (!tag.startsWith("#")) {
+					tags[index] = "#" + tag
+				}
+			})
+
 			let outfitId = process.env.NODE_ENV == "development" ?
 				imageURL?.replace(
 					"https://storage.googleapis.com/rateyourstyle-dev/imgs/outfits/",
@@ -397,7 +407,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 									accept="image/*"
 									onChange={handleFileChange}
 								/>
-								<label className="text-primary italic font-normal">Required</label>
+								<label className="text-primary italic font-normal">Required*</label>
 							</>
 						)}
 						<div className="my-4">
@@ -439,7 +449,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 								value={outfitCaption}
 								onChange={handleFormInput}
 							></input>
-							<label className="text-primary italic font-normal">Required</label>
+							<label className="text-primary italic font-normal">Required*</label>
 						</div>
 
 						<div className="my-4">
@@ -455,7 +465,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 								value={styleTags}
 								onChange={handleFormInput}
 							></input>
-							<label className="text-primary italic font-normal">Required</label>
+							<label className="text-primary italic font-normal">Required*</label>
 							<div className="flex gap-2 mt-2 flex-wrap">
 								{campaigns &&
 									campaigns.map((item) => (
@@ -464,7 +474,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 											className={`${styleTags.includes(item.tag)
 												? "bg-primary text-white"
 												: "bg-white text-primary"
-												} border-2 border-primary p-2 rounded`}
+												} border-2 border-primary p-1 rounded`}
 											onClick={(e) => {
 												e.preventDefault();
 												if (!styleTags.includes(item.tag)) {
@@ -588,9 +598,9 @@ function OutfitItemForm(props: {
 						className="border-2 overflow-x-scroll max-w-full">
 						<option value="">--Please select an item--</option>
 						{props.previousOutfitItems.map((item) =>
-							<option value={item.description} key={item.description}>{item.description} by {item.brand}</option>
+							<option value={item.id} key={item.id}>{item.color}{" "}{item.description}{" "}{item.store && item.brand ? `(${item.brand} | ${item.store})` : item.store ? `(${item.store})` : `(${item.brand})`}
+							</option>
 						)}
-
 					</select>
 				</div>
 
@@ -608,21 +618,44 @@ function OutfitItemForm(props: {
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 			<div className="col-span-1">
-				<label>Please describe the item in a few words.</label>
-				<input
-					className="w-full"
-					id="description"
-					type="text"
-					placeholder="Description"
-					value={props.item.description}
-					onChange={(e) => props.handleItemChange(e, props.index)}
-				></input>
-				<label htmlFor="" className="text-primary italic font-normal">
-					Required
-				</label>
+				<div className="md:flex md:gap-4 items-end">
+					<div className="md:basis-1/4">
+						<label>Item Color?</label>
+						<input
+							className="w-full"
+							id="color"
+							type="text"
+							placeholder="Color"
+							value={props.item.color}
+							onChange={(e) => props.handleItemChange(e, props.index)}
+						></input>
+						<label htmlFor="" className="text-primary italic font-normal">
+							Required*
+						</label>
+					</div>
 
-				<label className="mt-2">
-					What brand is the item or where is it from?
+					<div>
+						<label>Please describe what the item is in a few words.</label>
+						<input
+							className="w-full"
+							id="description"
+							type="text"
+							placeholder="Description"
+							value={props.item.description}
+							onChange={(e) => props.handleItemChange(e, props.index)}
+						></input>
+						<label htmlFor="" className="text-primary italic font-normal">
+							Required*
+						</label>
+					</div>
+				</div>
+			
+
+				<label className="mt-2 mb-0">
+					What is the item&apos;s brand or designer?
+				</label>
+				<label htmlFor="" className="-mt-1 italic font-normal leading-tight">
+					(Use &quot;Unknown&quot; if brand is unknown.)
 				</label>
 				<input
 					className="w-full"
@@ -633,8 +666,23 @@ function OutfitItemForm(props: {
 					onChange={(e) => props.handleItemChange(e, props.index)}
 				></input>
 				<label htmlFor="" className="text-primary italic font-normal">
-					Required
+					Required*
 				</label>
+
+				<label className="mt-2 mb-0">
+					What store, or where did you purchase the item from?
+				</label>
+				<label htmlFor="" className="-mt-1 italic font-normal leading-tight">
+					(Leave blank if it&apos;s the same as the brand name. You can use online marketplaces like &quot;Depop&quot; or &quot;Poshmark&quot;. If there&apos;s no store name, generic phrases like &quot;Thrift shop&quot; or &quot;Hand me down&quot; are fine too.)
+				</label>
+				<input
+					className="w-full"
+					id="store"
+					type="text"
+					placeholder="Store"
+					value={props.item.store}
+					onChange={(e) => props.handleItemChange(e, props.index)}
+				></input>
 
 				<label className="mt-2">Link to the item</label>
 				<input
@@ -711,7 +759,7 @@ function OutfitItemForm(props: {
 					onChange={(e) => props.handleItemChange(e, props.index)}
 					value={props.item.review}
 				></textarea>
-				<label className="text-primary italic font-normal">Required</label>
+				<label className="text-primary italic font-normal">Required*</label>
 			</div>
 		</div>
 	);
