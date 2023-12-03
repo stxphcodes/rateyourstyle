@@ -652,10 +652,10 @@ function OutfitItemForm(props: {
 			
 
 				<label className="mt-2 mb-0">
-					What is the item's brand or designer?
+					What is the item&apos;s brand or designer?
 				</label>
 				<label htmlFor="" className="-mt-1 italic font-normal leading-tight">
-					(Use "Unknown" if brand is unknown.)
+					(Use &quot;Unknown&quot; if brand is unknown.)
 				</label>
 				<input
 					className="w-full"
@@ -673,7 +673,7 @@ function OutfitItemForm(props: {
 					What store, or where did you purchase the item from?
 				</label>
 				<label htmlFor="" className="-mt-1 italic font-normal leading-tight">
-					(Leave blank if it's the same as the brand name. You can use online marketplaces like "Depop" or "Poshmark". If there's no store name, generic phrases like "Thrift shop" or "Hand me down" are fine too.)
+					(Leave blank if it&apos;s the same as the brand name. You can use online marketplaces like &quot;Depop&quot; or &quot;Poshmark&quot;. If there&apos;s no store name, generic phrases like &quot;Thrift shop&quot; or &quot;Hand me down&quot; are fine too.)
 				</label>
 				<input
 					className="w-full"
