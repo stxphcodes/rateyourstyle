@@ -245,7 +245,7 @@ export function OutfitCard(props: {
 									return (
 										<div className="my-3" key={`${rating.outfit_id}-${rating.user_id}`}>
 											<div className="text-xs"><a >{rating.username ? rating.username : "anonymous"}</a> | {rating.date} </div>
-											<div className="text-base"><span className="text-primary">{rating.rating}</span>&quot;{rating.review}&quot;</div>
+											<div className=""><span className="text-primary text-base pr-2">{rating.rating}</span>&quot;{rating.review}&quot;</div>
 										</div>
 									)
 								})}
