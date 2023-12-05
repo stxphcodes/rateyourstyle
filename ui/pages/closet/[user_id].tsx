@@ -120,7 +120,7 @@ export default function UserClosetPage({ clientServer, cookie, outfits, userRati
             <Navbar clientServer={clientServer} cookie={cookie} user={username} />
             <main className="mt-6 p-3 md:p-8">
                 <section className="my-4">
-                    <h2 className="capitalize">{closetName}&apos;s Closet</h2>
+                    <h1 className="capitalize">{closetName}&apos;s Closet</h1>
                     <div>Select items from the closet below to see outfits that contain them.</div>
                     <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} userRatings={userRatings}/>
                 </section>

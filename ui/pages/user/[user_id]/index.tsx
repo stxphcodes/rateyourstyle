@@ -121,7 +121,7 @@ export default function Index({ clientServer, cookie, user, outfits, userRatings
                 <Navbar clientServer={clientServer} cookie={cookie} user={user.username} />
                 <main className="mt-6 p-3 md:p-8">
                     <section>
-                        <h2>Your Profile</h2>
+                        <h1>Your Profile</h1>
                         <div>Your profile is only visible and accessible to you. Your public outfits are shared on the homepage and  with campaign sponsors, while private outfits are only accessible to you and the campaign sponsor if it uses a campaign #tag.</div>
                         <UserProfileForm clientServer={clientServer} cookie={cookie} user={user} />
                     </section>
@@ -151,13 +151,13 @@ export default function Index({ clientServer, cookie, user, outfits, userRatings
                     </div>
                 </section>
                 <section>
-                    <h2>Your Profile</h2>
+                    <h1>Your Profile</h1>
                     <div>Your profile is only visible and accessible to you. Your public outfits are shared on the homepage and  with campaign sponsors, while private outfits are only accessible to you and the campaign sponsor if it uses a campaign #tag.</div>
                     <UserProfileForm clientServer={clientServer} cookie={cookie} user={user} />
                 </section>
 
                 <section className="my-4">
-                    <h2>Your Closet</h2>
+                    <h1>Your Closet</h1>
                     <div>
                         <span className="font-bold">Share your closet: </span> <a target="_blank" href={`/closet/${user.username}`}>https://rateyourstyle.com/closet/{user.username}</a>
                     </div>
