@@ -35,7 +35,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         clientServer: "",
         metadata: {
             title: "",
-            description: "Rate Your Style is a community of fashion lovers who help each other stay chic through outfit reviews and virtual closets. Build your own virtual closet to keep inventory of the clothes you own. Post outfit pics to get fashion feedback, and give style advice to other users. Find new clothing brands and read reviews about each clothing item."
+            description: "Rate Your Style is a fashion community where you can build your own virtual closet, receive feedback about your outfits, and get rewarded for your style. RateYourStyle is for the everyday fashion enthusiast who likes to stay chic, organized and mindful of what's in their closet."
         }
     };
 
@@ -140,7 +140,7 @@ function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, err
                     <div className="grid grid-cols-1 md:grid-cols-5 items-center gap-x-0 md:gap-x-8">
                         <div className="col-span-3 px-3 md:px-8 py-16">
                             <h1 >Welcome to Rate Your Style</h1>
-                            <h2 className="text-xl mt-4 ">A community of fashion lovers who help each other stay chic through outfit reviews and virtual closets.
+                            <h2 className="text-xl mt-4 ">A fashion community where you can build your own virtual closet, receive feedback about your outfits, and get rewarded for your style.
                             </h2>
                         </div>
                         <img src={heroSectionImage} className="md:col-span-2 w-full h-auto"></img>
