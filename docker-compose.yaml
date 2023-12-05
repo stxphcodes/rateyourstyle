@@ -14,8 +14,9 @@ services:
     command:
       # sh -c "tail -f /dev/null"
       - "./mnt/app"
-      - "--gcs.creds=/secrets/localdev_sa.json"
+      - "--gcs.creds=/secrets/rys-local-dev.json"
       - "--campaigns.path=/mnt/campaigns.json"
+      - "--gcs.bucket=rys-mockups"
   ui:
     build:
       context: ./ui
