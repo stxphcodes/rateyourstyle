@@ -75,7 +75,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         clientServer: "",
         metadata: {
             title: "Discover",
-            description: "Find fashion inspo, get clothings links and read outfit reviews. Rate Your Style is an online fashion community for all of your style inspo needs."
+            description: "Find fashion inspo, get clothings links and read outfit reviews. Rate Your Style is an online fashion community where you can share outfits and build your own virtual closet."
         }
     };
 
@@ -287,12 +287,6 @@ function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientSer
 
                     {outfitsFiltered &&
                         outfitsFiltered.map((item) => {
-                            // let outfitRatings = ratings ?
-                            //     ratings.filter((r) => r.outfit_id == item.id) :
-                            //     null
-
-                            // let userRatingFiltered = outfitRatings ? outfitRatings.filter(r => r.cookie == cookie) : null
-
                             let userRating: Rating | null = null
                             if (userRatings) {
                                 userRating = userRatings?.filter(r => r.outfit_id == item.id)[0]

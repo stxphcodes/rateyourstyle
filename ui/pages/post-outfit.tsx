@@ -48,7 +48,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		previousOutfitItems: [],
 		metadata: {
 			title: "Post Outfit",
-			description: "Get rewarded for your style. Post outfit pics for a chance to win gift cards. Rate Your Style is an online fashion community for all of your style inspo needs."
+			description: "Start building your virtual closet by posting an outfit and get rewarded for your style. Rate Your Style is an online fashion community for all of your style inspo needs."
 		}
 	};
 
@@ -272,9 +272,10 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 				}
 			})
 
+			/// !!!! make image URL env variable
 			let outfitId = process.env.NODE_ENV == "development" ?
 				imageURL?.replace(
-					"https://storage.googleapis.com/rateyourstyle-dev/imgs/outfits/",
+					"https://storage.googleapis.com/rys-mockups/imgs/outfits/",
 					""
 				) : imageURL?.replace(
 					"https://storage.googleapis.com/rateyourstyle/imgs/outfits/",
