@@ -69,9 +69,15 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 		count := len(h.OutfitIndices.PublicOutfits)
 		if countStr != "" {
 			countInt, err := strconv.Atoi(countStr)
-			if err == nil {
+			// make sure there's enough outfits to fulfill the count count query param
+			if count > countInt && err == nil {
 				count = countInt
 			}
+		}
+
+		var outfits []*OutfitResponse
+		if count == 0 {
+			return ctx.JSON(http.StatusOK, outfits)
 		}
 
 		errc := make(chan error, 1)
@@ -87,7 +93,6 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 			}(outfit)
 		}
 
-		var outfits []*OutfitResponse
 		for {
 			select {
 			case err := <-errc:
@@ -430,6 +435,11 @@ func (h Handler) PostOutfit() echo.HandlerFunc {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
+		// get id from request. id is the same as image id
+		if data.Id == "" {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
 		data.UserId = userId
 		data.Date = time.Now().Format("2006-01-02")
 

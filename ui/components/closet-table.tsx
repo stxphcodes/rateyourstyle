@@ -12,12 +12,12 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
 
     props.outfits.map(outfit => {
         outfit.items.map(item => {
-            if (!outfitItemToIds.has(item.description)) {
-                outfitItemToIds.set(item.description, [outfit.id]);
+            if (!outfitItemToIds.has(item.id)) {
+                outfitItemToIds.set(item.id, [outfit.id]);
                 items.push(item);
             } else {
-                let outfitIds = outfitItemToIds.get(item.description) || [];
-                outfitItemToIds.set(item.description, outfitIds);
+                let outfitIds = outfitItemToIds.get(item.id) || [];
+                outfitItemToIds.set(item.id, outfitIds);
                 outfitIds.push(outfit.id)
 
             }
@@ -27,7 +27,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
     const [outfitItems, setOutfitItems] = useState<OutfitItem[]>(items)
 
     const [itemsSelected, setItemsSelected] = useState<string[] | null>(() => {
-        let items = outfitItems.map(item => { return item.description })
+        let items = outfitItems.map(item => { return item.id })
         return items
     });
 
@@ -40,18 +40,18 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
     const [itemEditError, setItemEditError] = useState<string | null>(null);
 
 
-    const handleItemSelection = (itemDescription: string) => {
+    const handleItemSelection = (itemId: string) => {
         if (!itemsSelected) {
-            setItemsSelected([itemDescription])
+            setItemsSelected([itemId])
             return
         }
 
-        let idx = itemsSelected.indexOf(itemDescription)
+        let idx = itemsSelected.indexOf(itemId)
 
         if (idx < 0) {
             setItemsSelected([
                 ...itemsSelected,
-                itemDescription,
+                itemId,
             ])
         } else {
             let copy = [...itemsSelected]
@@ -63,12 +63,12 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
 
     const handleSelectAll = () => {
         if (itemsSelected == null || itemsSelected.length == 0) {
-            setItemsSelected(outfitItems.map(item => item.description))
+            setItemsSelected(outfitItems.map(item => item.id))
             return
         }
 
         if (itemsSelected.length != outfitItems.length) {
-            setItemsSelected(outfitItems.map(item => item.description))
+            setItemsSelected(outfitItems.map(item => item.id))
         } else {
             setItemsSelected(null);
         }
@@ -341,12 +341,12 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                                     <div className="flex gap-1">
                                         <input type="checkbox"
                                             className={handleItemSelection == null ? "cursor-not-allowed" : ""}
-                                            onChange={() => handleItemSelection(item.description)}
+                                            onChange={() => handleItemSelection(item.id)}
 
-                                            checked={itemsSelected ? itemsSelected.includes(item.description) : false}>
+                                            checked={itemsSelected ? itemsSelected.includes(item.id) : false}>
                                         </input>
                                         <div className="text-xs">
-                                            ({outfitItemToIds.get(item.description)?.length})
+                                            ({outfitItemToIds.get(item.id)?.length})
                                         </div>
                                     </div>
                                 </td>
