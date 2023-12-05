@@ -1,21 +1,5 @@
 [
     {
-        "tag": "#weddings",
-        "date_starting": "2023-10-01",
-        "date_ending": "2023-12-01",
-        "ended": false,
-        "description": "We love celebrating 💖, and we also love an opportunity to dress up 💃🏽. To apply to this campaign, post an outfit that you wore to a wedding. One outfit will be selected at random to win a $100 gift card to a clothing brand of your choice.",
-        "background_img": "#ba7c97"
-    },
-    {
-        "tag": "#work_fits",
-        "date_starting": "2023-10-01",
-        "date_ending": "2023-12-01",
-        "ended": false,
-        "description": "Whether it's PJ's or business casual, we'd love to see what you're wearing to work. If you have a work fit that you'd like to share, please tag it with #work_fits. One outfit will be selected at random to win a $100 gift card to a clothing brand of your choice.",
-        "background_img": "#3870b6"
-    },
-    {
         "tag": "#sweater_weather",
         "date_starting": "2023-11-08",
         "date_ending": "2024-01-15",
@@ -30,6 +14,14 @@
         "ended": false,
         "description": "Whether you want to show off your big puffer jacket or cute winter accessories, we would love to see what you're wearing this winter. Two outfits will be selected at random to win $50 gift cards to a clothing brand of your choice.",
         "background_img": "#00aaff"
+    },
+    {
+        "tag": "#party_fits",
+        "date_starting": "2023-11-08",
+        "date_ending": "2024-01-31",
+        "ended": false,
+        "description": "With the holidays and New Year's right around the corner, we're excited to see the cute fits you'll be wearing! Post an outfit using  #party_fits for a chance to win a $100 gift card to a clothing brnad of your choice.💃🪩🕺",
+        "background_img": "#a742f5"
 
     }
 ]
