@@ -34,13 +34,13 @@ body {
 
 
 h1 {
-  font-size: 40px;
+  font-size: 30px;
   font-family: 'custom-serif';
 }
 
 h2 {
   font-size: 30px;
-  font-family: 'custom-serif';
+  /* font-family: 'custom-serif'; */
 }
 
 h3 {
