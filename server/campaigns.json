@@ -5,7 +5,7 @@
         "date_ending": "2024-01-15",
         "ended": false,
         "description": "Do you have a cozy sweater that you live in? Or an ugly, holiday sweater that you bust out once a year? Whatever kind of sweater it is, post it here! One outfit will be selected at random to win a $50 gift card to a clothing brand of your choice.",
-        "background_img": "#e63b2f"
+        "background_img": "#9c0808"
     },
     {
         "tag": "#winter_fits",
@@ -13,15 +13,15 @@
         "date_ending": "2024-01-31",
         "ended": false,
         "description": "Whether you want to show off your big puffer jacket or cute winter accessories, we would love to see what you're wearing this winter. Two outfits will be selected at random to win $50 gift cards to a clothing brand of your choice.",
-        "background_img": "#00aaff"
+        "background_img": "#1f6632"
     },
     {
         "tag": "#party_fits",
         "date_starting": "2023-11-08",
-        "date_ending": "2024-01-31",
+        "date_ending": "2024-02-07",
         "ended": false,
         "description": "With the holidays and New Year's right around the corner, we're excited to see the cute fits you'll be wearing! Post an outfit using  #party_fits for a chance to win a $100 gift card to a clothing brnad of your choice.💃🪩🕺",
-        "background_img": "#a742f5"
+        "background_img": "#d4a704"
 
     }
 ]
