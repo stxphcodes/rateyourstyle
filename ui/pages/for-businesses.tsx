@@ -1,14 +1,7 @@
 import { GetServerSideProps } from 'next';
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
 
-import { Campaign, GetCampaigns } from '../apis/get_campaigns';
-import { GetOutfitsByUser, Outfit, OutfitItem } from '../apis/get_outfits';
 import { GetUsername } from '../apis/get_user';
-import { PostImage } from '../apis/post_image';
-import { PostOutfit } from '../apis/post_outfit';
 import { Footer } from '../components/footer';
-import { Modal, XButton } from '../components/modals';
 import { Navbar } from '../components/navarbar';
 import { GetServerURL } from '../apis/get_server';
 import { PageMetadata } from './_app';
