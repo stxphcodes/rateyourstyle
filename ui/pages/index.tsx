@@ -185,7 +185,7 @@ function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, err
                 <section className="bg-white px-3 md:px-8 mt-4">
                     <h1>Get Rewarded for Your Style</h1>
                     <div className="my-4">
-                        RateYourStyle partners with local boutiques and brands to create campaigns that celebrate, reward and showcase our users&apos; style and fashion. Typically, at the end of the campaign, a few posts will be selected to win $100 gift cards. To apply to an active campaign, <Link href="/post-outfit">Post an Outfit</Link> according to the requirements listed in the campaign, and tag the outfit with the campaign #tag. Winners of campaigns will be notified by email, so be sure to create an account before posting.
+                        RateYourStyle hosts campaigns that celebrate, reward and showcase our users&apos; style and fashion. Typically, at the end of the campaign, a few posts will be selected to win $100 gift cards. To apply to an active campaign, <Link href="/post-outfit">Post an Outfit</Link> according to the requirements listed in the campaign, and tag the outfit with the campaign #tag. Winners of campaigns will be notified by email, so be sure to create an account before posting.
                     </div>
                     <h6>Active Campaigns:</h6>
                     <div className="flex flex-wrap justify-start items-start gap-2 mt-4">
@@ -223,8 +223,15 @@ function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, err
                             </div>
                         ))}
                     </div>
-                    <div className="mt-4">
-                        Creating a campaign on RateYourStyle is a direct way for your company to engage with and give back to the loyal consumers of your brand. A campaign is also a great way to conduct market research and doubles as a form of advertisement. If you&apos;re interested in starting a campaign on RateYourStyle, please send us an email: sitesbystephanie@gmail.com.
+                    <div className="mt-8">
+                        <h1>For Businesses</h1>
+                        <div>See our
+                            <Link href="/for-businesses" passHref={true}>
+                                <a className="mx-2">business page</a>
+                            </Link>to learn how RateYourStyle can help you leverage user generated content to grow your business.
+
+
+                        </div>
                     </div>
                 </section>
 
