@@ -60,8 +60,8 @@ export default function ForBusinessesPage({ cookie, username, clientServer }: Pr
 			<Navbar clientServer={clientServer} cookie={cookie} user={username} />
 			<main className="mt-14 ">
 				<section className="bg-primary text-white ">
-					<div className="grid grid-cols-1 md:grid-cols-5 items-center gap-x-0 md:gap-x-8">
-						<div className="col-span-3 px-3 md:px-8 py-16">
+					<div className="grid grid-cols-1 md:grid-cols-7 items-center gap-x-0 md:gap-x-8">
+						<div className="col-span-5 px-3 md:px-8 py-16">
 							<h1 >Consumers Trust User Generated Content (UGC)</h1>
 							<h2 className="text-lg mt-4 ">UGC is any type of online material about products or brands that&apos;s made by customers without input from companies. UGC is valuable because it is authentic, engaging and influential for other consumers. In fact, 92% of shoppers trust UGC more than traditional advertising and those who interact with UGC are 2x more likely to convert.
 							</h2>

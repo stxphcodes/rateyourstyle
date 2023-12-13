@@ -9,9 +9,10 @@ import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
 import { OutfitCard } from '../components/outfitcard';
 import { GetServerURL } from "../apis/get_server";
-import { GetUserProfile, User, UserProfile } from '../apis/get_user';
+import { GetUserProfile, User } from '../apis/get_user';
 import { ClosetTable } from '../components/closet-table';
 import { PageMetadata } from './_app';
+import { GetBusinesses } from '../apis/get_businesses';
 
 type Props = {
     campaigns: Campaign[] | null;
@@ -22,6 +23,7 @@ type Props = {
     userRatings: Rating[] | null;
     user: User | null;
     metadata: PageMetadata;
+    businesses: string[] | null;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -33,6 +35,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         error: null,
         outfits: null,
         clientServer: "",
+        businesses: [],
         metadata: {
             title: "",
             description: "Rate Your Style is a fashion community where you can build your own virtual closet, receive feedback about your outfits, and get rewarded for your style. RateYourStyle is for the everyday fashion enthusiast who likes to stay chic, organized and mindful of what's in their closet."
@@ -73,6 +76,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
     props.campaigns = campaignResp;
 
+    const businessResp = await GetBusinesses(server, props.cookie);
+    if (businessResp instanceof Error) {
+        props.error = businessResp.message;
+        return { props };
+    }
+    props.businesses = businessResp;
+
     const outfitResp = await GetOutfits(server, 8);
     if (outfitResp instanceof Error) {
         props.error = outfitResp.message;
@@ -91,7 +101,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props };
 };
 
-function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, error }: Props) {
+function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, businesses, error }: Props) {
     const [heroSectionImage, setHeroSectionImage] = useState(outfits ? outfits[0].picture_url : "/clothing-photo.jpg")
 
     let outfitItems: OutfitItem[] = [];
@@ -135,20 +145,9 @@ function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, err
     return (
         <>
             <Navbar clientServer={clientServer} cookie={cookie} user={user?.username} />
-            <main className="mt-6 ">
-                <section className="bg-primary text-white">
-                    <div className="grid grid-cols-1 md:grid-cols-5 items-center gap-x-0 md:gap-x-8">
-                        <div className="col-span-3 px-3 md:px-8 py-16">
-                            <h1 >Welcome to Rate Your Style</h1>
-                            <h2 className="text-xl mt-4 ">A fashion community where you can build your own virtual closet, receive feedback about your outfits, and get rewarded for your style.
-                            </h2>
-                        </div>
-                        <img src={heroSectionImage} className="md:col-span-2 w-full h-auto"></img>
-                    </div>
-                </section>
-
-                <section className="mt-4 px-3 md:px-8">
-                    <h1>Find style inspo, get clothing links, and read outfit reviews</h1>
+            <main className="mt-20">
+                <section className="px-3 md:px-8 mb-8">
+                    <h1 >Read outfit reviews from real people</h1>
                     <Link href="discover">Discover more here</Link>
                     <div className="flex flex-nowrap flex-row gap-2 overflow-scroll my-2">
                         {outfits &&
@@ -165,6 +164,7 @@ function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, err
                                             data={item}
                                             userRating={userRating}
                                             clientServer={clientServer}
+                                            verifiedBusiness={businesses && businesses.filter(id => item.username == id).length > 0 ? true : false}
                                         />
                                     </div>
                                 )
@@ -172,9 +172,9 @@ function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, err
                     </div>
                 </section>
 
-                <section className="bg-primary px-3 md:px-8 py-8">
+                <section className="bg-background-2 px-3 md:px-8 py-8">
                     <h1 className="text-white">Build Your Virtual Closet</h1>
-                    <h2 className="my-4  text-white text-sm">
+                    <h2 className="my-4 text-white text-base">
                         RateYourStyle will aggregate all of the clothing items in your outfits to create an inventory of your closet. You can sort, filter and search your clothes easily with our spreadsheet-like table. Features to come include: more data science tools to enable meaningful analysis of your closet, an AI style assistant and more. Start your virtual closet by simply posting an outfit.
                     </h2>
                     <div>
@@ -235,7 +235,7 @@ function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, err
                     </div>
                 </section>
 
-                <section className="mt-4 bg-primary text-white px-3 md:px-8 py-4">
+                <section className="mt-4 bg-background-2 text-white px-3 md:px-8 py-4">
                     <h1>Privacy</h1>
                     <div>We value your privacy. That&apos;s why each outfit post has its own visibility setting and your closet will only display clothing items from public outfit posts. Private outfits and its clothing items can only be viewed by you and the sponsor of a campaign if it uses a campaign #tag. <br /><br />
 

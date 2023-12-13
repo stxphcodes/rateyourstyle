@@ -2,7 +2,7 @@ import { GetServerSideProps } from 'next';
 import Link from "next/link";
 import { useState, useEffect } from 'react';
 
-import { GetOutfitsByUser, Outfit, OutfitItem } from '../../../apis/get_outfits';
+import { GetOutfitsByUser, Outfit, GetBusinessOutfits, OutfitItem } from '../../../apis/get_outfits';
 import { GetRatings, Rating } from '../../../apis/get_ratings';
 import { GetUserProfile, User, UserProfile } from '../../../apis/get_user';
 import { Navbar } from '../../../components/navarbar';
@@ -10,6 +10,8 @@ import { GetServerURL } from "../../../apis/get_server";
 import { PostUserProfile } from '../../../apis/post_user';
 import { ClosetTable } from '../../../components/closet-table';
 import { Footer } from '../../../components/footer';
+import { BusinessProfile, GetBusinessProfile } from '../../../apis/get_businessprofile';
+import { BusinessAccount } from '../../../components/modals/businessaccount';
 
 
 type Props = {
@@ -19,6 +21,7 @@ type Props = {
     outfits: Outfit[] | null;
     userRatings: Rating[] | null;
     clientServer: string;
+    businessProfile: BusinessProfile | null;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -29,6 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         error: null,
         outfits: null,
         userRatings: null,
+        businessProfile: null,
     };
 
     let server = GetServerURL()
@@ -46,7 +50,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             props.error = userResp.message;
             return { props };
         }
-
         props.user = userResp;
 
         const ratingResp = await GetRatings(server, props.cookie);
@@ -55,6 +58,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             return { props };
         }
         props.userRatings = ratingResp;
+
+        const businessProfileResp = await GetBusinessProfile(server, cookie);
+        if (!(businessProfileResp instanceof Error)) {
+            props.businessProfile = businessProfileResp
+        }
     }
 
     if (context.query["user_id"] !== props.user.username) {
@@ -68,8 +76,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         return { props };
     }
     props.outfits = resp;
+
+
+    if (props.businessProfile) {
+        const businessOutfitsResp = await GetBusinessOutfits(server, props.cookie)
+        if (businessOutfitsResp instanceof Error) {
+            props.error = businessOutfitsResp.message;
+            return { props };
+        }
+
+        if (businessOutfitsResp && businessOutfitsResp.length > 0){
+            props.outfits.push(...businessOutfitsResp)
+        }
+    }
+
     // sort outfits by date
-    props.outfits.sort((a,b) => a.date < b.date ? 1 : -1);
+    props.outfits.sort((a, b) => a.date < b.date ? 1 : -1);
 
     const clientServer = GetServerURL(true);
     if (clientServer instanceof Error) {
@@ -88,13 +110,14 @@ function Rating(props: { x: number, small?: boolean }) {
     )
 }
 
-export default function Index({ clientServer, cookie, user, outfits, userRatings, error }: Props) {
+export default function Index({ clientServer, cookie, user, outfits, userRatings, businessProfile, error }: Props) {
+    const [switchToBusinessAccount, setSwitchToBusinessAccount] = useState(false)
     if (error) {
         if (error == "forbidden") {
             return (
                 <>
                     <Navbar clientServer={clientServer} cookie={cookie} user={user.username} />
-                    <main className="mt-6 p-3 md:p-8">
+                    <main className="mt-20 px-4 md:px-8">
                         <h1>✋ Forbidden </h1>
                         Please sign in as the user to view their posts.
                     </main>
@@ -105,7 +128,7 @@ export default function Index({ clientServer, cookie, user, outfits, userRatings
         return (
             <>
                 <Navbar clientServer={clientServer} cookie={cookie} user={user.username} />
-                <main className="mt-6 p-3 md:p-8">
+                <main className="mt-20 px-4 md:px-8">
                     <h1>😕 Oh no</h1>
                     Looks like there&apos;s an error on our end. Please refresh the page in a
                     few minutes. If the issue persists, please email
@@ -115,56 +138,53 @@ export default function Index({ clientServer, cookie, user, outfits, userRatings
         );
     }
 
-    if (!outfits || outfits.length == 0) {
-        return (
-            <>
-                <Navbar clientServer={clientServer} cookie={cookie} user={user.username} />
-                <main className="mt-6 p-3 md:p-8">
-                    <section>
-                        <h1>Your Profile</h1>
-                        <div>Your profile is only visible and accessible to you. Your public outfits are shared on the homepage and  with campaign sponsors, while private outfits are only accessible to you and the campaign sponsor if it uses a campaign #tag.</div>
-                        <UserProfileForm clientServer={clientServer} cookie={cookie} user={user} />
-                    </section>
-
-                    <h1 className="text-gray-200">Your outfits go here.</h1>
-                    <p>
-                        Click{" "}
-                        <Link href="/post-outfit">
-                            <a className="underline text-primary" >here</a>
-                        </Link>{" "}
-                        to post your first outfit.
-                    </p>
-                </main>
-            </>
-        );
-    }
-
 
     return (
         <>
             <Navbar clientServer={clientServer} cookie={cookie} user={user.username} />
-            <main className="mt-6 p-3 md:p-8">
-
-                <section className="my-4">
+            <main className="mt-20 px-4 md:px-8">
+                <section className="mb-4">
                     <div className="bg-red-700 p-2 rounded text-white">
                         RateYourStyle is still being developed and we currently don&apos;t support editing outfit posts. This feature is coming very soon, I promise! If you have an outfit post that you want to edit, please email sitesbystephanie@gmail.com. Thank you for your patience and understanding 💛.
                     </div>
                 </section>
                 <section>
+                    <button className="p-1 rounded hover:border-2 hover:border-primary text-white bg-primary hover:bg-white hover:text-primary" onClick={
+                        (e)=> {e.preventDefault(); setSwitchToBusinessAccount(true)}}>Switch to Business Account</button>
                     <h1>Your Profile</h1>
                     <div>Your profile is only visible and accessible to you. Your public outfits are shared on the homepage and  with campaign sponsors, while private outfits are only accessible to you and the campaign sponsor if it uses a campaign #tag.</div>
-                    <UserProfileForm clientServer={clientServer} cookie={cookie} user={user} />
+
+                    {businessProfile ? <div>{businessProfile.description}</div> :  <UserProfileForm clientServer={clientServer} cookie={cookie} user={user} />}
+                    
+                   
                 </section>
 
-                <section className="my-4">
-                    <h1>Your Closet</h1>
-                    <div>
-                        <span className="font-bold">Share your closet: </span> <a target="_blank" href={`/closet/${user.username}`}>https://rateyourstyle.com/closet/{user.username}</a>
-                    </div>
-                    <div className="text-xs mb-2">Only items from public outfits will be shared. Select items from your closet to see items that contain them.</div>
-                    <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} userRatings={userRatings} includeEdit={true} />
-                </section>
+                {!outfits || outfits.length == 0 ?
+                    <>
+                        <h1 className="text-gray-200">Your outfits go here.</h1>
+                        <p>
+                            Click{" "}
+                            <Link href="/post-outfit">
+                                <a className="underline text-primary" >here</a>
+                            </Link>{" "}
+                            to post your first outfit.
+                        </p>
+                    </> :
+                    <>
+                        <section className="my-4">
+                            <h1>Your Closet</h1>
+                            <div>
+                                <span className="font-bold">Share your closet: </span> <a target="_blank" href={`/closet/${user.username}`}>https://rateyourstyle.com/closet/{user.username}</a>
+                            </div>
+                            <div className="text-xs mb-2">Only items from public outfits will be shared. Select items from your closet to see items that contain them.</div>
+                            <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} userRatings={userRatings} includeEdit={true} />
+                        </section>
+                    </>
+                }
             </main >
+            {
+                switchToBusinessAccount && <BusinessAccount clientServer={clientServer} cookie={cookie} handleClose={()=>setSwitchToBusinessAccount(false)} />
+            }
             <Footer />
         </>
     );
@@ -315,12 +335,17 @@ function UserProfileForm(props: { clientServer: string, cookie: string, user: Us
 
                 {submitError && <div className="bg-red-500 p-1 my-2 text-white rounded">Oh no! We apologize, it looks like we are having server issues. Please refresh the page and try again.</div>}
 
-                {!editUserProfile ? <button
-                    className="px-1 rounded border-2 border-primary text-primary hover:text-white hover:bg-primary"
-                    onClick={(e) => {
-                        e.preventDefault()
-                        setEditUserProfile(true)
-                    }} >edit</button>
+                {!editUserProfile ?
+
+                    <button
+                        className="px-1 rounded border-2 border-primary text-primary hover:text-white hover:bg-primary"
+                        onClick={(e) => {
+                            e.preventDefault()
+                            setEditUserProfile(true)
+                        }} >edit</button>
+
+
+
                     :
                     <>
 

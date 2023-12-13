@@ -11,6 +11,7 @@ import { GetServerURL } from "../apis/get_server";
 import { GetUserProfile, User, UserProfile } from '../apis/get_user';
 import { OutfitCard } from '../components/outfitcard';
 import { PageMetadata } from './_app';
+import { GetBusinesses } from '../apis/get_businesses';
 
 
 type Props = {
@@ -22,6 +23,7 @@ type Props = {
     userRatings: Rating[] | null;
     user: User | null;
     metadata: PageMetadata;
+    businesses: string[];
 };
 
 function checkEmptyUserProfile(profile: UserProfile) {
@@ -73,10 +75,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         error: null,
         outfits: null,
         clientServer: "",
+        businesses: [],
         metadata: {
             title: "Discover",
             description: "Find fashion inspo, get clothings links and read outfit reviews. Rate Your Style is a  fashion community where you can share outfits and build your own virtual closet."
-        }
+        },
+        
     };
 
     let server = GetServerURL()
@@ -120,6 +124,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
     props.outfits = outfitResp;
 
+    const businessResp = await GetBusinesses(server, props.cookie);
+    if (businessResp instanceof Error) {
+        props.error = businessResp.message;
+        return { props };
+    }
+    props.businesses = businessResp;
+
     const clientServer = GetServerURL(true);
     if (clientServer instanceof Error) {
         props.error = clientServer.message;
@@ -133,7 +144,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props };
 };
 
-function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientServer, error }: Props) {
+function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientServer, businesses, error }: Props) {
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
     const [readMore, setReadMore] = useState(() => {
         let intialState =
@@ -191,8 +202,8 @@ function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientSer
     return (
         <>
             <Navbar clientServer={clientServer} cookie={cookie} user={user?.username} />
-            <main className="mt-6 p-3 md:p-8">
-                <section className="my-4">
+            <main className="mt-20 px-4 md:px-8">
+                <section className="mb-4">
                     <h1>Discover</h1>
                     <div>Select a username to see the user&apos;s closet. Submit a rating for an outfit by clicking &apos;submit your rating&apos;.</div>
                     <div className="mb-2">Select the filter(s) below to see matching outfits.</div>
@@ -292,6 +303,10 @@ function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientSer
                                 userRating = userRatings?.filter(r => r.outfit_id == item.id)[0]
                             }
 
+        console.log(item)
+
+
+
                             return (
                                 <OutfitCard
                                     cookie={cookie}
@@ -299,6 +314,7 @@ function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientSer
                                     key={item.id}
                                     userRating={userRating}
                                     clientServer={clientServer}
+                                    verifiedBusiness={businesses && businesses.filter(id => item.username == id).length > 0 ? true : false}
                                 />
                             )
                         })}
