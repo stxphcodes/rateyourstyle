@@ -6,7 +6,7 @@ import { OutfitCard } from "./outfitcard";
 import { PutOutfitItem } from "../apis/put_outfititem";
 import { Modal } from "./modals";
 
-export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientServer: string, userRatings: Rating[] | null, onlyTable?: boolean, includeEdit?: boolean }) {
+export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientServer: string, userRatings: Rating[] | null, onlyTable?: boolean, includeEdit?: boolean, businesses?: string[] }) {
     let outfitItemToIds: Map<string, string[]> = new Map<string, string[]>();
     let items: OutfitItem[] = []
 
@@ -446,6 +446,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                                     userRating={
                                         props.userRatings ? props.userRatings.filter((r) => r.outfit_id == item.id)[0] : null
                                     }
+                                    verifiedBusiness={props.businesses && props.businesses.filter(id => item.username == id).length > 0 ? true : false}
                                 />
                             ))}
                     </div>
