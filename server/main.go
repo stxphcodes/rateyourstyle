@@ -107,9 +107,15 @@ func run() error {
 		return ctx.JSON(200, a)
 	})
 
+	mux.GET("/api/business-profile", handler.GetBusinessProfile())
+
+	mux.GET("/api/businesses", handler.GetBusinessUsernames())
+
 	mux.GET("/api/cookie", handler.GetCookie())
 
 	mux.GET("/api/outfits", handler.GetOutfits())
+
+	mux.GET("/api/business-outfits", handler.GetBusinessOutfits())
 
 	mux.GET("/api/ratings", handler.GetRatingsByUser())
 
@@ -134,6 +140,10 @@ func run() error {
 	mux.POST("/api/user", handler.PostUser())
 
 	mux.POST("/api/user-profile", handler.PostUserProfile())
+
+	mux.POST("/api/business-profile", handler.PostBusinessProfile())
+
+	mux.POST("/api/business-outfits", handler.PostBusinessOutfit())
 
 	mux.PUT("/api/outfit-item", handler.PutOutfitItem())
 
@@ -174,9 +184,16 @@ func initiateIndices(ctx context.Context, h *Handler) error {
 	}
 	fmt.Println("created rating indices")
 
+	businessIndices, err := createBusinessIndices(ctx, h.Gcs.Client, h.Gcs.Bucket)
+	if err != nil {
+		return err
+	}
+	fmt.Println("created business indices")
+
 	h.UserIndices = userIndices
 	h.OutfitIndices = outfitIndices
 	h.RatingIndices = ratingIndices
+	h.BusinessIndices = businessIndices
 
 	return nil
 }

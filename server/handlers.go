@@ -21,9 +21,108 @@ type Handler struct {
 		Bucket *gcs.BucketHandle
 	}
 
-	UserIndices   *UserIndices
-	OutfitIndices *OutfitIndices
-	RatingIndices *RatingIndices
+	UserIndices     *UserIndices
+	OutfitIndices   *OutfitIndices
+	RatingIndices   *RatingIndices
+	BusinessIndices *BusinessIndices
+}
+
+func (h Handler) GetBusinessUsernames() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		businesses := []string{}
+
+		for id := range h.BusinessIndices.Businesses {
+			username, ok := h.UserIndices.IdUsername[id]
+			if ok {
+				businesses = append(businesses, username)
+			}
+		}
+
+		return ctx.JSON(http.StatusOK, businesses)
+	}
+}
+
+func (h Handler) GetBusinessOutfits() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		businessId := ""
+		businessRequested := ctx.QueryParam("business")
+		if businessRequested != "" {
+			for id, username := range h.UserIndices.IdUsername {
+				if username == businessRequested {
+					businessId = id
+				}
+			}
+		} else {
+			cookie, err := getCookie(ctx.Request())
+			if err != nil {
+				log.Println("error retrieving cookie")
+				return ctx.NoContent(http.StatusForbidden)
+			}
+
+			userId, ok := h.UserIndices.CookieId[cookie]
+			if !ok {
+				log.Println("user id not found for cookie " + cookie)
+				return ctx.NoContent(http.StatusForbidden)
+			}
+
+			businessId = userId
+		}
+
+		_, ok := h.BusinessIndices.Businesses[businessId]
+		if !ok {
+			log.Println("user id not business profile " + businessId)
+			return ctx.NoContent(http.StatusFailedDependency)
+		}
+
+		outfits, err := getBusinessOutfits(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, businessId)
+		if err != nil {
+			// object doesn't exist
+			if !strings.Contains(err.Error(), "exist") {
+				log.Println(err.Error())
+				return ctx.NoContent(http.StatusInternalServerError)
+			}
+
+			return ctx.JSON(http.StatusOK, outfits)
+		}
+
+		return ctx.JSON(http.StatusOK, outfits)
+	}
+}
+
+func (h Handler) GetBusinessProfile() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		businessId := ""
+		businessRequested := ctx.QueryParam("business")
+		if businessRequested != "" {
+			for id, username := range h.UserIndices.IdUsername {
+				if username == businessRequested {
+					businessId = id
+				}
+			}
+		} else {
+			cookie, err := getCookie(ctx.Request())
+			if err != nil {
+				log.Println("error retrieving cookie")
+				return ctx.NoContent(http.StatusForbidden)
+			}
+
+			userId, ok := h.UserIndices.CookieId[cookie]
+			if !ok {
+				log.Println("user id not found for cookie " + cookie)
+				return ctx.NoContent(http.StatusForbidden)
+			}
+
+			businessId = userId
+		}
+
+		business, ok := h.BusinessIndices.Businesses[businessId]
+		if !ok {
+			log.Println("user id not business profile " + businessId)
+			return ctx.NoContent(http.StatusFailedDependency)
+		}
+
+		return ctx.JSON(http.StatusOK, business)
+	}
 }
 
 func (h Handler) GetCookie() echo.HandlerFunc {
@@ -635,6 +734,94 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 
 		// return user cookie in response
 		return ctx.String(http.StatusCreated, createCookieStr(data.Cookie))
+	}
+}
+
+func (h *Handler) PostBusinessOutfit() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		businessId := ""
+		businessRequested := ctx.QueryParam("business")
+		if businessRequested != "" {
+			for id, username := range h.UserIndices.IdUsername {
+				if username == businessRequested {
+					businessId = id
+				}
+			}
+		}
+
+		if businessId == "" {
+			ctx.String(http.StatusBadRequest, businessRequested+" has no id")
+		}
+
+		var request []BusinessOutfitRequest
+		if err := ctx.Bind(&request); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		for _, data := range request {
+			businessOutfit := &BusinessOutfit{
+				BusinessId:  businessId,
+				UserId:      userId,
+				OutfitId:    data.OutfitId,
+				ItemIds:     data.ItemIds,
+				Approved:    true,
+				DateCreated: time.Now().Format("2006-01-02"),
+			}
+
+			if err := createBusinessOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, businessOutfit); err != nil {
+				log.Println(err.Error())
+				return ctx.NoContent(http.StatusInternalServerError)
+			}
+		}
+
+		return ctx.NoContent(http.StatusCreated)
+	}
+}
+
+func (h *Handler) PostBusinessProfile() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		var data BusinessProfile
+		if err := ctx.Bind(&data); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+		data.DateCreated = time.Now().Format("2006-01-02")
+		data.UserId = userId
+
+		if err := createBusinessProfile(ctx.Request().Context(), h.Gcs.Bucket, &data); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		// update indexes
+		h.BusinessIndices.Businesses[data.UserId] = &data
+
+		return ctx.NoContent(http.StatusCreated)
 	}
 }
 
