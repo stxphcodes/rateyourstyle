@@ -80,7 +80,7 @@ export function OutfitCard(props: {
 		<>
 			<div className="w-72 shadow-md break-words">
 				<div className="px-2 py-1 bg-background text-sm " style={{fontFamily: 'custom-serif'}}>
-					{props.data.username ? <a className="flex flex-wrap items-center" href={`/closet/${props.data.username}`}>{props.data.username}&apos;s closet {props.verifiedBusiness && <VerifiedCheckIcon small={true}/>}</a> : "anonymous"}
+					{props.data.username ? <a className="flex flex-wrap items-center gap-1" href={`/closet/${props.data.username}`}>{props.data.username}&apos;s closet {props.verifiedBusiness && <VerifiedCheckIcon small={true}/>}</a> : "anonymous"}
 					
 					
 					<div className="">{props.data.date}</div>
