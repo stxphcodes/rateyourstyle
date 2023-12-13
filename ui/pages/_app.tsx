@@ -18,8 +18,8 @@ function MyApp({ Component, pageProps }: AppProps<any>) {
   return (
     <>
       <Head>
-        <title>{metadata && metadata.title ?  metadata.title + " - Rate Your Style" : "Rate Your Style"}</title>
-        <link rel="icon" type="image/x-icon" href="/rys.png"></link>
+        <title>{metadata && metadata.title ?  metadata.title + " - Rate Your Style" : "RateYourStyle"}</title>
+        <link rel="icon" type="image/x-icon" href="/favicon.ico"></link>
         <meta
           name="description"
           content={
