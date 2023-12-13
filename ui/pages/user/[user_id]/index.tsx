@@ -85,7 +85,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             return { props };
         }
 
-        if (businessOutfitsResp && businessOutfitsResp.length > 0){
+        if (businessOutfitsResp && businessOutfitsResp.length > 0) {
             props.outfits.push(...businessOutfitsResp)
         }
     }
@@ -149,14 +149,29 @@ export default function Index({ clientServer, cookie, user, outfits, userRatings
                     </div>
                 </section>
                 <section>
-                    <button className="p-1 rounded hover:border-2 hover:border-primary text-white bg-primary hover:bg-white hover:text-primary" onClick={
-                        (e)=> {e.preventDefault(); setSwitchToBusinessAccount(true)}}>Switch to Business Account</button>
-                    <h1>Your Profile</h1>
+                    {!businessProfile && <button className="p-1 rounded hover:border-2 hover:border-primary text-white bg-primary hover:bg-white hover:text-primary" onClick={
+                        (e) => { e.preventDefault(); setSwitchToBusinessAccount(true) }}>Switch to Business Account</button>
+                    }
+                    <h1>Your {businessProfile && "Business"} Profile</h1>
                     <div>Your profile is only visible and accessible to you. Your public outfits are shared on the homepage and  with campaign sponsors, while private outfits are only accessible to you and the campaign sponsor if it uses a campaign #tag.</div>
 
-                    {businessProfile ? <div>{businessProfile.description}</div> :  <UserProfileForm clientServer={clientServer} cookie={cookie} user={user} />}
-                    
-                   
+                    {businessProfile ? <div className="mt-2">
+                    <div>
+                            <span className="font-bold mr-2">Username:</span>{user.username}
+                        </div>
+                        <div>
+                            <span className="font-bold mr-2">Email:</span>{user.email}
+                        </div>
+                        <div>
+                            <span className="font-bold mr-2">Business description:</span>{businessProfile.description}
+                        </div>
+                        <div>
+                            <span className="font-bold mr-2">Business address:</span>{businessProfile.address}
+                        </div>
+
+                    </div> : <UserProfileForm clientServer={clientServer} cookie={cookie} user={user} />}
+
+
                 </section>
 
                 {!outfits || outfits.length == 0 ?
@@ -183,7 +198,7 @@ export default function Index({ clientServer, cookie, user, outfits, userRatings
                 }
             </main >
             {
-                switchToBusinessAccount && <BusinessAccount clientServer={clientServer} cookie={cookie} handleClose={()=>setSwitchToBusinessAccount(false)} />
+                switchToBusinessAccount && <BusinessAccount clientServer={clientServer} cookie={cookie} handleClose={() => setSwitchToBusinessAccount(false)} />
             }
             <Footer />
         </>
