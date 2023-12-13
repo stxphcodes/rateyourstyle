@@ -6,6 +6,7 @@ import { GetUsername } from '../apis/get_user';
 import { CreateAccount } from './modals/createaccount';
 import { SignIn } from './modals/signin';
 import { GetServerURL } from '../apis/get_server';
+import { HamburgerMenuIcon } from './icons/menu-burger';
 
 // check if browser allows cookies to be set
 function cookieEnabled() {
@@ -61,39 +62,47 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 
 	return (
 		<>
-			<div className="mb-20 shadow-sm px-3 py-2 md:py-4  top-0 w-screen bg-white flex flex-wrap items-center justify-between fixed z-50">
-				<div>
+			<div className="mb-20 shadow-sm px-4 md:px-8 py-2   top-0 w-screen bg-white fixed z-50 text-xs text-primary" style={{ fontFamily: 'custom-serif' }}>
+				<div className="mb-1">
 					<Link href="/" passHref={true}>
-						<a className="mr-2 md:ml-4">Home</a>
+						<a className="text-lg">RateYourStyle</a>
 					</Link>
-					<Link href="/discover" passHref={true}>
-						<a className="mx-2">Discover</a>
-					</Link>
-					<Link href="/post-outfit" passHref={true}>
-						Post an Outfit
-					</Link>
-				</div>
-				<div className="float-right">
-					{username ? (
-						<>
-							<Link href={`/user/${username}`} passHref={true}><a>{username}</a></Link>
-						</>
-					) : (
-						<>
-							<button className="mx-2" onClick={() => setShowSignInModal(true)}>
-								<a>Sign in</a>
-							</button>
+					<div className="float-right">
+						{username ? (
+							<>
+								<Link href={`/user/${username}`} passHref={true}><a>{username}</a></Link>
+							</>
+						) : (
+							<>
+								<button className="mx-2" onClick={() => setShowSignInModal(true)}>
+									<a>Sign in</a>
+								</button>
 
-							<button
-								className="p-2 bg-primary text-white rounded-lg"
-								onClick={() => setShowCreateAccountModal(true)}
-							>
-								Create Account
-							</button>
-						</>
-					)}
+								<button
+									className="px-1 bg-primary text-white rounded-lg"
+									onClick={() => setShowCreateAccountModal(true)}
+								>
+									Create Account
+								</button>
+							</>
+						)}
+					</div>
 				</div>
+
+
+						<Link href="/discover" passHref={true}>
+							<a className="">Discover</a>
+						</Link>
+						<span className="mx-1">|</span>
+						<Link href="/post-outfit" passHref={true}>
+							Post an Outfit
+						</Link>
+						<span className="mx-1">|</span>
+						<Link href="/for-businesses" passHref={true}>
+							For Businesses
+						</Link>
 			</div>
+
 			{showSignInModal && (
 				<SignIn
 					handleClose={() => setShowSignInModal(false)} clientServer={props.clientServer}
