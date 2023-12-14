@@ -213,20 +213,18 @@ func getBusinessOutfits(ctx context.Context, client *gcs.Client, bucket *gcs.Buc
 			return nil, err
 		}
 
-		for index, item := range outfit.Items {
-			found := false
+		items := []*OutfitItem{}
+		for _, item := range outfit.Items {
+
 			for _, businessItemId := range businessOutfit.ItemIds {
 				if item.Id == businessItemId {
-					found = true
+					items = append(items, item)
 					break
 				}
 			}
-
-			// remove other items from outfit
-			if !found {
-				outfit.Items = append(outfit.Items[:index], outfit.Items[index+1:]...)
-			}
 		}
+
+		outfit.Items = items
 
 		response = append(response, outfit)
 	}
