@@ -5,7 +5,6 @@ import { GetCookie } from '../apis/get_cookie';
 import { GetUsername } from '../apis/get_user';
 import { CreateAccount } from './modals/createaccount';
 import { SignIn } from './modals/signin';
-import { GetServerURL } from '../apis/get_server';
 import { HamburgerMenuIcon } from './icons/menu-burger';
 
 // check if browser allows cookies to be set
@@ -21,13 +20,6 @@ function cookieEnabled() {
 	return enabled
 }
 
-function checkMobileScreenWidth() {
-	const { innerWidth: width, innerHeight: height } = window;
-	if (innerWidth < 600) {
-		return true
-	}
-	return false
-}
 
 export function Navbar(props: { clientServer: string; cookie: string; user?: string }) {
 	const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
@@ -42,7 +34,7 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 
 	const checkMobileScreenWidth = (window: any) => {
 		// const { innerWidth: width, innerHeight: height } = window;
-		if (window.innerWidth < 600) {
+		if (window.innerWidth <= 600) {
 			setUseMobileMenu(true)
 			return
 		}

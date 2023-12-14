@@ -99,14 +99,10 @@ export function OutfitCard(props: {
 							<div className="" key={item}>{item}</div>
 						))}
 					</div>
-
 					<div className="flex items-center mt-1">
-					
 							<div className="hover:cursor-pointer mr-2" onClick={() => setExpandImage(true)}>
-								<Rating x={props.data.rating_average ? props.data.rating_average : 0} />
+								<Rating x={props.data.rating_average ? props.data.rating_average : 0} small={true}/>
 							</div>
-					
-
 						<a className="" onClick={() => setExpandImage(true)}>
 							{
 								!props.data.rating_count ? "no reviews submitted yet" : `from ${props.data.rating_count} ${props.data.rating_count > 1 ? "reviews" : "review"} `
@@ -175,7 +171,7 @@ export function OutfitCard(props: {
 								}
 
 								<div className="flex items-center">
-									<Rating x={props.data.rating_average ? props.data.rating_average : 0} />
+									<Rating x={props.data.rating_average ? props.data.rating_average : 0}/>
 									<div className="mx-2">
 										{
 											!props.data.rating_count ? "no reviews submitted yet" : `from ${props.data.rating_count} ${props.data.rating_count > 1 ? "reviews" : "review"} `
