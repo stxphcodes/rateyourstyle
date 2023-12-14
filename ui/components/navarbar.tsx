@@ -86,7 +86,7 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 				</div>
 
 				{displayMobileMenu &&
-					<div className="top-0 bg-background w-fit z-80 px-4 pb-8 h-full absolute top-8 left-0 z-80 flex flex-col gap-2 shadow text-lg">
+					<div className="bg-background w-fit z-80 px-4 pb-8 h-full fixed top-8 left-0 z-80 flex flex-col gap-2 shadow text-lg" style={{ fontFamily: 'custom-serif' }}>
 						<div onClick={() => setDisplayMobileMenu(false)} className="self-end mt-4 hover:cursor-pointer">
 							&#10006;
 						</div>
