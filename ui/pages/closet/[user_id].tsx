@@ -55,6 +55,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
         const ratingResp = await GetRatings(server, props.cookie);
         if (ratingResp instanceof Error) {
+            console.log("this is rating resp")
+            console.log(ratingResp)
             props.error = ratingResp.message;
             return { props };
         }
@@ -127,7 +129,7 @@ export default function UserClosetPage({ clientServer, cookie, outfits, userRati
         return (
             <>
                 <Navbar clientServer={clientServer} cookie={cookie} user={username} />
-                <main className="mt-6 p-3 md:p-8">
+                <main className="mt-12 sm:mt-20 p-3 md:p-8">
                     <h1>😕 Oh no</h1>
                     Looks like there&apos;s an error on our end. Please refresh the page in a
                     few minutes. If the issue persists, please email
@@ -140,7 +142,7 @@ export default function UserClosetPage({ clientServer, cookie, outfits, userRati
     return (
         <>
             <Navbar clientServer={clientServer} cookie={cookie} user={username} />
-            <main className="mt-20 px-4 md:px-8">
+            <main className="mt-12 sm:mt-20 px-4 md:px-8">
                 <section className="mb-4">
                     <div className="flex flex-wrap gap-2 items-center mb-1">
                         <h1 className="capitalize">{closetName}&apos;s Closet</h1>

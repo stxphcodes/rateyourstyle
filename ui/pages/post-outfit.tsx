@@ -340,7 +340,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 		<>
 			<Navbar clientServer={clientServer} cookie={cookie} user={username} />
 
-			<main className="mt-20 px-4 md:px-8 w-full md:w-3/4">
+			<main className="mt-12 sm:mt-20 px-4 md:px-8 w-full md:w-3/4">
 				<section className="mb-4">
 					<h1>Outfit Post</h1>
 					{!username && (

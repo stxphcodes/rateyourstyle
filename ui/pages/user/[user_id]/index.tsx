@@ -117,7 +117,7 @@ export default function Index({ clientServer, cookie, user, outfits, userRatings
             return (
                 <>
                     <Navbar clientServer={clientServer} cookie={cookie} user={user.username} />
-                    <main className="mt-20 px-4 md:px-8">
+                    <main className="mt-12 sm:mt-20 px-4 md:px-8">
                         <h1>✋ Forbidden </h1>
                         Please sign in as the user to view their posts.
                     </main>
@@ -128,7 +128,7 @@ export default function Index({ clientServer, cookie, user, outfits, userRatings
         return (
             <>
                 <Navbar clientServer={clientServer} cookie={cookie} user={user.username} />
-                <main className="mt-20 px-4 md:px-8">
+                <main className="mt-12 sm:mt-20 px-4 md:px-8">
                     <h1>😕 Oh no</h1>
                     Looks like there&apos;s an error on our end. Please refresh the page in a
                     few minutes. If the issue persists, please email
@@ -142,7 +142,7 @@ export default function Index({ clientServer, cookie, user, outfits, userRatings
     return (
         <>
             <Navbar clientServer={clientServer} cookie={cookie} user={user.username} />
-            <main className="mt-20 px-4 md:px-8">
+            <main className="mt-12 sm:mt-20 px-4 md:px-8">
                 <section className="mb-4">
                     <div className="bg-red-700 p-2 rounded text-white">
                         RateYourStyle is still being developed and we currently don&apos;t support editing outfit posts. This feature is coming very soon, I promise! If you have an outfit post that you want to edit, please email sitesbystephanie@gmail.com. Thank you for your patience and understanding 💛.

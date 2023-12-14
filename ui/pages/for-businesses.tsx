@@ -5,6 +5,7 @@ import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
 import { GetServerURL } from '../apis/get_server';
 import { PageMetadata } from './_app';
+import Link from 'next/link';
 
 type Props = {
 	cookie: string;
@@ -58,7 +59,7 @@ export default function ForBusinessesPage({ cookie, username, clientServer }: Pr
 	return (
 		<>
 			<Navbar clientServer={clientServer} cookie={cookie} user={username} />
-			<main className="mt-14 ">
+			<main className="mt-10 ">
 				<section className="bg-primary text-white ">
 					<div className="grid grid-cols-1 md:grid-cols-7 items-center gap-x-0 md:gap-x-8">
 						<div className="col-span-5 px-3 md:px-8 py-16">
@@ -93,7 +94,11 @@ export default function ForBusinessesPage({ cookie, username, clientServer }: Pr
 								<h3>4. Engage</h3>
 								<div>Foster a tight knit community with your customers by engaging with their outfit submissions. You can like their outfits and leave comments. Another way to engage with your customers is to host campaigns that will reward them when they post outfits.</div>
 							</div>
-							<div>Please email sitesbystephanie@gmail.com to get started.</div>
+
+							<div className="bg-background rounded p-4">The quickest way to get started is to submit a<Link href="/request-closet" passHref={true}>
+                                <a className="mx-2">Closet Request</a>
+                            </Link>form and make sure to check the owner checkbox!  If you have any questions, please email sitesbystephanie@gmail.com </div>
+							
 						</div>
 					</div>
 				</section>

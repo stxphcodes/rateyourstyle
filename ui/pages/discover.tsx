@@ -80,7 +80,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             title: "Discover",
             description: "Find fashion inspo, get clothings links and read outfit reviews. Rate Your Style is a  fashion community where you can share outfits and build your own virtual closet."
         },
-        
+
     };
 
     let server = GetServerURL()
@@ -202,7 +202,7 @@ function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientSer
     return (
         <>
             <Navbar clientServer={clientServer} cookie={cookie} user={user?.username} />
-            <main className="mt-20 px-4 md:px-8">
+            <main className="mt-12 sm:mt-20 px-4 md:px-8">
                 <section className="mb-4">
                     <h1>Discover</h1>
                     <div>Select a username to see the user&apos;s closet. Submit a rating for an outfit by clicking &apos;submit your rating&apos;.</div>
@@ -302,10 +302,6 @@ function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientSer
                             if (userRatings) {
                                 userRating = userRatings?.filter(r => r.outfit_id == item.id)[0]
                             }
-
-        console.log(item)
-
-
 
                             return (
                                 <OutfitCard

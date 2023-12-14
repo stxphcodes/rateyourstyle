@@ -145,9 +145,9 @@ function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, bus
     return (
         <>
             <Navbar clientServer={clientServer} cookie={cookie} user={user?.username} />
-            <main className="mt-20">
+            <main className="mt-12 sm:mt-20">
                 <section className="px-3 md:px-8 mb-8">
-                    <h1 >Read outfit reviews from real people</h1>
+                    <h1>Read outfit reviews from real people</h1>
                     <Link href="discover">Discover more here</Link>
                     <div className="flex flex-nowrap flex-row gap-2 overflow-scroll my-2">
                         {outfits &&
@@ -229,8 +229,6 @@ function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, bus
                             <Link href="/for-businesses" passHref={true}>
                                 <a className="mx-2">business page</a>
                             </Link>to learn how RateYourStyle can help you leverage user generated content to grow your business.
-
-
                         </div>
                     </div>
                 </section>
