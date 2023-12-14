@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -421,6 +422,47 @@ func (h *Handler) GetUserProfile() echo.HandlerFunc {
 		}
 
 		return ctx.String(http.StatusNotFound, "no user found with cookie "+cookie)
+	}
+}
+
+func (h Handler) PostClosetRequest() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		var data map[string]interface{}
+		if err := ctx.Bind(&data); err != nil {
+			log.Println("error " + err.Error())
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		current_time := time.Now()
+		now := fmt.Sprintf("%d-%02d-%02dT%02d-%02d-%02d",
+			current_time.Year(), current_time.Month(), current_time.Day(),
+			current_time.Hour(), current_time.Minute(), current_time.Second())
+
+		data["user_id"] = userId
+		data["date_created"] = now
+
+		obj := h.Gcs.Bucket.Object("data/requests/" + now + ".json")
+		writer := obj.NewWriter(ctx.Request().Context())
+		defer writer.Close()
+
+		if err := json.NewEncoder(writer).Encode(data); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		return ctx.NoContent(http.StatusCreated)
 	}
 }
 
