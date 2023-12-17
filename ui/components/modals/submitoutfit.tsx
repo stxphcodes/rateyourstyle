@@ -154,7 +154,7 @@ export function SubmitOutfit(props: { clientServer: string; cookie: string; hand
                                     }
 
                                     return (
-                                        <div className={`w-48 shadow-md break-words  ${selected ? "border-4 border-primary" : "border-none"}`}  >
+                                        <div className={`w-48 shadow-md break-words  ${selected ? "border-4 border-primary" : "border-none"}`}  key={outfit.id}>
                                             <img
                                                 onClick={() => { handleOutfitClick(outfit.id) }}
                                                 className="object-contain hover:cursor-pointer"
@@ -169,7 +169,9 @@ export function SubmitOutfit(props: { clientServer: string; cookie: string; hand
                                                     outfit.items.map((i, count) => {
                                                         count = count + 1;
                                                         return (
-                                                            <div className="mb-4 flex gap-2 items-start">
+                                                            <div className="mb-4 flex gap-2 items-start"
+                                                            key={i.id+count}
+                                                            >
 
                                                                 <input className="mt-2" type="checkbox"
                                                                     onChange={() => handleOutfitItemClick(outfit.id, i.id)}

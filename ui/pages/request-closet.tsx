@@ -122,7 +122,7 @@ export default function RequestClosetPage({ cookie, username, clientServer }: Pr
             <main className="mt-12 sm:mt-20 px-4 md:px-8 w-full md:w-3/4">
                 <section className="mb-4">
                     <h1>Request A Closet</h1>
-                    <h5 className="my-2">Who, or what business do you want to see on RateYourStyle?</h5> <div>Whether it's an apparel brand, a celebrity, a local boutiqe, an influencer, a clothing designer, a fashion blogger, or anything in between, we will try to partner with them and curate their closet based on public outfits they've posted.</div>
+                    <h5 className="my-2">Who, or what business do you want to see on RateYourStyle?</h5> <div>Whether it&apos;s an apparel brand, a celebrity, a local boutiqe, an influencer, a clothing designer, a fashion blogger, or anything in between, we will try to partner with them and curate their closet based on public outfits they&apos;ve posted.</div>
 
                     <form className="grid grid-cols-4 w-full gap-x-2 gap-y-4 p-4 border-2 rounded mt-4">
                         {
@@ -189,7 +189,7 @@ export default function RequestClosetPage({ cookie, username, clientServer }: Pr
                                     rows={2}
                                     id="email"
                                     className="col-span-3"
-                                    placeholder="To contact you when they've been added."
+                                    placeholder="To contact you when they&apos;ve been added."
                                     required
                                     onChange={(e) => handleInputChange(e)}
                                     value={userEmail}
@@ -201,7 +201,7 @@ export default function RequestClosetPage({ cookie, username, clientServer }: Pr
                                         checked={owner}
                                         onChange={() => setOwner(!owner)}
                                     />
-                                    <label>This is my own brand, store and/or business, and I'd like RateYourStyle to start curating my closet for me.</label>
+                                    <label>This is my own brand, store and/or business, and I&apos;d like RateYourStyle to start curating my closet for me.</label>
                                 </div>
                                 {validationErr && <div className="col-span-4 w-fit p-2 bg-red-700 text-white">{validationErr}</div>}
 
