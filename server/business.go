@@ -21,19 +21,6 @@ type BusinessOutfitRequest struct {
 	ItemIds  []string `json:"item_ids"`
 }
 
-// 	BusinessName string `json:"business_name"`
-
-// 	Data []BusinessOutfitRequestData `json:"data"`
-
-// 	// OutfitId     string   `json:"outfit_id"`
-// 	// ItemIds      []string `json:"item_ids"`
-// }
-
-// type BusinessOutfitRequestData struct {
-// 	OutfitId string   `json:"outfit_id"`
-// 	ItemIds  []string `json:"item_ids"`
-// }
-
 type BusinessOutfit struct {
 	BusinessId  string   `json:"business_id"` // id of business submitted to
 	UserId      string   `json:"user_id"`     // id of user who submitted outfit
