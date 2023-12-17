@@ -55,8 +55,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
         const ratingResp = await GetRatings(server, props.cookie);
         if (ratingResp instanceof Error) {
-            console.log("this is rating resp")
-            console.log(ratingResp)
             props.error = ratingResp.message;
             return { props };
         }
