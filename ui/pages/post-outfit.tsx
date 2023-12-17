@@ -267,6 +267,11 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 
 			let tags = styleTags.split(" ");
 			tags.forEach((tag, index) => {
+				if (tag == "" || tag == " ") {
+					tags.splice(index, 1);
+					return;
+				}
+
 				if (!tag.startsWith("#")) {
 					tags[index] = "#" + tag
 				}
@@ -335,11 +340,11 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 		<>
 			<Navbar clientServer={clientServer} cookie={cookie} user={username} />
 
-			<main className="mt-6 p-4 md:p-8 w-full md:w-3/4">
-				<section className="my-4">
+			<main className="mt-12 sm:mt-20 px-4 md:px-8 w-full md:w-3/4">
+				<section className="mb-4">
 					<h1>Outfit Post</h1>
 					{!username && (
-						<div className="bg-red-700 p-2 rounded text-white">
+						<div className="bg-red-700 p-2 rounded text-white mb-2">
 							You are not currently signed into an account. You can still create
 							a post but your post will be inelible for campaign giveaways since we don&apos;t have an email to contact you with if you were to win. If you are applying to a campaign, please sign in or create an account if
 							you don&apos;t have one!

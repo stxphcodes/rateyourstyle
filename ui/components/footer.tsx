@@ -7,8 +7,9 @@ export function Footer() {
 		</div>
 		<div className="col-span-2">
 			<h6 >About RateYourStyle</h6>
-			<div className="text-xs">RYS is for the everyday fashion enthusiast. On RYS, you can keep inventory of what&apos;s in your closet, find style inspo, get clothing links and post outfit reviews. RYS partners with local boutiques and brands to create campaigns that reward and showcase users&apos; styles and fashion.</div>
+			<div className="text-xs">A fashion community where you can build your own virtual closet, rate & review your clothes,  and get rewarded for your style. <br /> For businesses, RateYourStyle is a one-stop platform to gather user generated content, derive meaningful market insights, and engage with consumers through rewards and feedback.
+			</div>
 		</div>
-		
+
 	</div>
 }

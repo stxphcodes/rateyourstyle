@@ -140,3 +140,40 @@ export async function GetPublicOutfitsByUser(server: string, cookie: string, use
 
   return outfits;
 }
+
+
+export async function GetBusinessOutfits(server: string, cookie: string, businessName ?: string): Promise<Outfit[] | Error> { 
+  let error: Error | null = null 
+  let outfits: Outfit[] = []
+
+  let url = `${server}/api/business-outfits`
+  if (businessName) {
+      url = url + `?business=${businessName}`
+  }
+  
+  await fetch(url, {
+      method: "GET",
+      headers: {
+          'content-type': "text/plain",
+          'rys-login': cookie,
+      },
+  })
+      .then((response) => {
+          if (!response.ok) {
+              throw new Error("response not ok");
+          }
+
+          return response.json()
+      }).then(data => {
+          outfits = data
+      })
+      .catch((err: Error) => {
+          error = err
+      });
+
+  if (error) {
+      return error
+  }
+
+  return outfits
+}

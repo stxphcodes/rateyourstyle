@@ -4,6 +4,7 @@ import { Outfit, OutfitItem } from '../apis/get_outfits';
 import { GetRatings, GetRatingsByOutfit, Rating } from '../apis/get_ratings';
 import { Modal } from './modals';
 import { PostRating } from '../apis/post_rating';
+import { VerifiedCheckIcon } from './icons/verified-check-icon';
 
 
 function Rating(props: { x: number, small?: boolean }) {
@@ -25,6 +26,7 @@ export function OutfitCard(props: {
 	username?: string;
 	clientServer: string;
 	asUser?: boolean;
+	verifiedBusiness: boolean;
 }) {
 
 	const [expandImage, setExpandImage] = useState<boolean>(false);
@@ -77,8 +79,11 @@ export function OutfitCard(props: {
 	return (
 		<>
 			<div className="w-72 shadow-md break-words">
-				<div className="px-2 py-3 bg-background">
-					{props.data.username ? <a className="" href={`/closet/${props.data.username}`}>{props.data.username}&apos;s closet</a> : "anonymous"}<span className=" text-xs">{" | "} {props.data.date}</span>
+				<div className="px-2 py-1 bg-background text-sm " style={{fontFamily: 'custom-serif'}}>
+					{props.data.username ? <a className="flex flex-wrap items-center gap-1" href={`/closet/${props.data.username}`}>{props.data.username}&apos;s closet {props.verifiedBusiness && <VerifiedCheckIcon small={true}/>}</a> : "anonymous"}
+					
+					
+					<div className="">{props.data.date}</div>
 				</div>
 
 				<img
@@ -88,20 +93,16 @@ export function OutfitCard(props: {
 				/>
 
 				<div className="p-2">
-					<h3 className="">{props.data.title}</h3>
+					<h6 className="">{props.data.title}</h6>
 					<div className="flex gap-2 flex-wrap flex-row">
 						{props.data.style_tags.map((item) => (
 							<div className="" key={item}>{item}</div>
 						))}
 					</div>
-
 					<div className="flex items-center mt-1">
-					
 							<div className="hover:cursor-pointer mr-2" onClick={() => setExpandImage(true)}>
-								<Rating x={props.data.rating_average ? props.data.rating_average : 0} />
+								<Rating x={props.data.rating_average ? props.data.rating_average : 0} small={true}/>
 							</div>
-					
-
 						<a className="" onClick={() => setExpandImage(true)}>
 							{
 								!props.data.rating_count ? "no reviews submitted yet" : `from ${props.data.rating_count} ${props.data.rating_count > 1 ? "reviews" : "review"} `
@@ -154,9 +155,6 @@ export function OutfitCard(props: {
 									))}
 								</div>
 
-
-
-
 								<div className="">
 									<a className="" onClick={(e) => {
 										e.preventDefault()
@@ -173,7 +171,7 @@ export function OutfitCard(props: {
 								}
 
 								<div className="flex items-center">
-									<Rating x={props.data.rating_average ? props.data.rating_average : 0} />
+									<Rating x={props.data.rating_average ? props.data.rating_average : 0}/>
 									<div className="mx-2">
 										{
 											!props.data.rating_count ? "no reviews submitted yet" : `from ${props.data.rating_count} ${props.data.rating_count > 1 ? "reviews" : "review"} `
@@ -266,10 +264,10 @@ function OutfitItemList(props: { outfitItems: OutfitItem[] }) {
 				let count = index + 1;
 				return (
 					<div className="px-2 py-1" key={`col-1-${item.brand}`}>
-						<h4 className="capitalize">
+						<h6 className="capitalize">
 							{count}.{" "}
 							{item.link ? <a href={item.link} target="_blank" className="">{item.color}{" "}{item.description} </a> : <span className="hover:cursor-not-allowed">{item.color}{" "}{item.description}</span>}
-						</h4>
+						</h6>
 						{item.brand && <PSpan p={item.brand}  span="Brand" />}
 						{item.store && <PSpan p={item.store}  span="Store" />}
 						<PSpan p={item.size ? item.size : "n/a"} span="Size" />

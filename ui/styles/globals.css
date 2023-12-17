@@ -4,8 +4,13 @@
 
 @font-face {
   font-family: "custom-serif";
-  src: url("/fonts/SourceSerif4-Variable.ttf")
+  src:  url("/fonts/RobotoMono-VariableFont_wght.ttf")
 }
+
+/* @font-face {
+  font-family: "custom-body";
+src: url("/fonts/RobotoMono-VariableFont_wght.ttf")
+} */
 
 label {
   font-size: 12px;
@@ -34,12 +39,12 @@ body {
 
 
 h1 {
-  font-size: 30px;
+  font-size: 24px;
   font-family: 'custom-serif';
 }
 
 h2 {
-  font-size: 30px;
+  font-size: 24px;
   /* font-family: 'custom-serif'; */
 }
 
@@ -60,7 +65,7 @@ h5 {
 
 h6 {
   font-family: 'custom-serif';
-  font-size: 16px;
+  font-size: 14px;
 }
 
 p {

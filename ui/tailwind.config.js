@@ -5,13 +5,16 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    fontFamily: {
+      'mono': ['custom-mono'],
+    },
     fontSize: {
-      xs: ".75rem",
-      sm: ".875rem",
-      tiny: ".9rem",
-      base: "1rem",
-      lg: "1.125rem",
-      xl: "1.25rem",
+      xs: ".7rem",
+      sm: ".75rem",
+      tiny: ".8rem",
+      base: ".85rem",
+      lg: "1rem",
+      xl: "1.15rem",
       "2xl": "1.5rem",
       "3xl": "1.875rem",
       "4xl": "2.25rem",
@@ -21,8 +24,9 @@ module.exports = {
     },
     extend: {
       colors: {
-        "background": "#f2e9e0",
+        "background": "#f2f1eb",
         "primary": "#aa3c16",
+        "background-2": "#b5ada2",
       },
       maxHeight: {
         card: "400px",
