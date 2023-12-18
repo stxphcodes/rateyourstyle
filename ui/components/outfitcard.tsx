@@ -5,7 +5,6 @@ import { GetRatings, GetRatingsByOutfit, Rating } from '../apis/get_ratings';
 import { Modal } from './modals';
 import { PostRating } from '../apis/post_rating';
 import { VerifiedCheckIcon } from './icons/verified-check-icon';
-import Image from 'next/image'
 import Link from 'next/link';
 
 
@@ -88,14 +87,11 @@ export function OutfitCard(props: {
 					</Link> : <div>anonymous</div>}
 					<div className="">{props.data.date}</div>
 				</div>
-				<div className="relative   h-96 " onClick={() => setExpandImage(true)}>
-					<Image
-
-						alt={props.data.title}
+				<div className="overflow-hidden h-96 hover:cursor-pointer">
+					<img
+						onClick={() => setExpandImage(true)}
+						className="object-cover w-full h-full"
 						src={props.data.picture_url}
-						layout="fill"
-						objectFit="cover"
-						sizes="(max-width: 768px) 60vw, 25vw"
 					/>
 				</div>
 				<div className="p-2">
