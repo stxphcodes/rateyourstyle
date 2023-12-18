@@ -6,6 +6,7 @@ import { Modal } from './modals';
 import { PostRating } from '../apis/post_rating';
 import { VerifiedCheckIcon } from './icons/verified-check-icon';
 import Image from 'next/image'
+import Link from 'next/link';
 
 
 function Rating(props: { x: number, small?: boolean }) {
@@ -110,7 +111,6 @@ export function OutfitCard(props: {
 						</a>
 					</div>
 				</div>
-
 
 				{!readMore ?
 					<div className="flex bg-background p-1 justify-center">
@@ -241,7 +241,10 @@ export function OutfitCard(props: {
 								{allRatings?.map(rating => {
 									return (
 										<div className="my-3" key={`${rating.outfit_id}-${rating.user_id}`}>
-											<div className="text-xs"><a >{rating.username ? rating.username : "anonymous"}</a> | {rating.date} </div>
+											<div className="text-xs">
+												{!rating.username ? <span className="text-primary">anonymous</span> : <Link href={`/closet/${rating.username}`} passHref={true}>
+													<a className="">{rating.username}</a>
+												</Link>} | {rating.date} </div>
 											<div className=""><span className="text-primary text-base pr-2">{rating.rating}</span>&quot;{rating.review}&quot;</div>
 										</div>
 									)
