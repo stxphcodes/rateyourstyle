@@ -5,9 +5,6 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    fontFamily: {
-      'mono': ['custom-mono'],
-    },
     fontSize: {
       xs: ".7rem",
       sm: ".75rem",
