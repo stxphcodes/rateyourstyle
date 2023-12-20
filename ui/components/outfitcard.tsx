@@ -91,7 +91,7 @@ export function OutfitCard(props: {
 					<img
 						onClick={() => setExpandImage(true)}
 						className="object-cover w-full h-full"
-						src={props.data.picture_url}
+						src={props.data.picture_url_resized}
 					/>
 				</div>
 				<div className="p-2">

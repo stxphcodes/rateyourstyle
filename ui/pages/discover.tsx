@@ -290,7 +290,7 @@ function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientSer
                     </div>
                 </section>
 
-                <section className="flex flex-row flex-wrap items-start gap-4">
+                <section className="flex flex-row flex-wrap items-start justify-center md:justify-start gap-4">
                     {
                         (!outfitsFiltered || outfitsFiltered.length == 0) &&
                         <div className="h-screen">No results at this time </div>
