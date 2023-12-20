@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"io"
 	"log"
-	"net/url"
-	"strings"
 
 	gcs "cloud.google.com/go/storage"
 	"google.golang.org/api/iterator"
@@ -124,17 +122,13 @@ func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle
 	}
 
 	// get URL of picture resized
-	pictureURL, err := url.Parse(o.PictureURL)
-	if err != nil {
-		return nil, err
+	resizedURL, err := getResizedImageURL(ctx, bucket, o.PictureURL)
+	if err == nil && resizedURL != "" {
+		resp.PictureURLResized = resizedURL
+	} else {
+		// just use original if there's no resized image availble
+		resp.PictureURLResized = o.PictureURL
 	}
-
-	urlSplit := strings.Split(pictureURL.Path, "/")
-	pictureName := urlSplit[len(urlSplit)-1]
-	pictureNameSplit := strings.Split(pictureName, ".")
-	resizePictureName := pictureNameSplit[0] + "-w600." + pictureNameSplit[1]
-
-	resp.PictureURLResized = strings.Replace(o.PictureURL, pictureName, resizePictureName, 1)
 
 	// get outfit items
 	items, err := getOutfitItemsFromOutfit(ctx, bucket, o.ItemIds)
