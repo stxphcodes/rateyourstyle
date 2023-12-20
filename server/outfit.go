@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"io"
 	"log"
+	"net/url"
+	"strings"
 
 	gcs "cloud.google.com/go/storage"
 	"google.golang.org/api/iterator"
@@ -54,6 +56,8 @@ type OutfitResponse struct {
 	UserProfile   *UserProfile `json:"user_profile,omitempty"`
 	RatingCount   interface{}  `json:"rating_count"`
 	RatingAverage interface{}  `json:"rating_average"`
+
+	PictureURLResized string `json:"picture_url_resized"`
 }
 
 type OutfitIndices struct {
@@ -118,6 +122,19 @@ func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle
 		StyleTags:  o.StyleTags,
 		Private:    o.Private,
 	}
+
+	// get URL of picture resized
+	pictureURL, err := url.Parse(o.PictureURL)
+	if err != nil {
+		return nil, err
+	}
+
+	urlSplit := strings.Split(pictureURL.Path, "/")
+	pictureName := urlSplit[len(urlSplit)-1]
+	pictureNameSplit := strings.Split(pictureName, ".")
+	resizePictureName := pictureNameSplit[0] + "-w600." + pictureNameSplit[1]
+
+	resp.PictureURLResized = strings.Replace(o.PictureURL, pictureName, resizePictureName, 1)
 
 	// get outfit items
 	items, err := getOutfitItemsFromOutfit(ctx, bucket, o.ItemIds)

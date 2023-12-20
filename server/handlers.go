@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -11,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"cloud.google.com/go/storage"
 	gcs "cloud.google.com/go/storage"
 	"github.com/labstack/echo"
 )
@@ -520,30 +518,17 @@ func (h Handler) PostImage() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 
-		src, err := file.Open()
-		if err != nil {
-			log.Println(err.Error())
+		filename := uuid()
+		fullpath := filepath.Join("imgs", "outfits", userId, filename+ext)
+		resizedPath := filepath.Join("imgs", "outfits", userId, filename+"-w600"+ext)
+
+		if err := createImage(ctx.Request().Context(), h.Gcs.Bucket, file, fullpath); err != nil {
+			log.Println("error creating img ", err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
-		defer src.Close()
 
-		filename := filepath.Join("imgs", "outfits", userId, uuid()+ext)
-
-		obj := h.Gcs.Bucket.Object(filename)
-		writer := obj.NewWriter(ctx.Request().Context())
-		defer writer.Close()
-
-		_, err = io.Copy(writer, src)
-		if err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
-		}
-		writer.Close()
-
-		// make image public
-		if err := obj.ACL().Set(ctx.Request().Context(), storage.AllUsers, storage.RoleReader); err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
+		if err := createResizeImage(ctx.Request().Context(), h.Gcs.Bucket, fullpath, resizedPath); err != nil {
+			log.Println("error creating resized img ", err.Error())
 		}
 
 		attr, err := h.Gcs.Bucket.Attrs(ctx.Request().Context())
@@ -552,8 +537,8 @@ func (h Handler) PostImage() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		path := "https://storage.googleapis.com/" + attr.Name + "/" + filename
-		return ctx.String(http.StatusCreated, path)
+		url := "https://storage.googleapis.com/" + attr.Name + "/" + fullpath
+		return ctx.String(http.StatusCreated, url)
 	}
 }
 
