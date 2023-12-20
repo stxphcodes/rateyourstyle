@@ -4,13 +4,9 @@
 
 @font-face {
   font-family: "custom-serif";
-  src:  url("/fonts/RobotoMono-VariableFont_wght.ttf")
+  src:  url("/fonts/RobotoMono-VariableFont_wght.ttf");
+  font-display: "swap";
 }
-
-/* @font-face {
-  font-family: "custom-body";
-src: url("/fonts/RobotoMono-VariableFont_wght.ttf")
-} */
 
 label {
   font-size: 12px;
