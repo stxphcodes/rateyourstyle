@@ -78,15 +78,40 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 	if (useMobileMenu) {
 		return (
 			<>
-				<div className="mb-20 shadow-sm px-4 md:px-8 py-2   top-0 w-screen bg-white fixed z-50 text-xs text-primary flex items-center gap-2" style={{ fontFamily: 'custom-serif' }}>
-					<div className="hover:cursor-pointer" onClick={() => setDisplayMobileMenu(!displayMobileMenu)}><HamburgerMenuIcon /></div>
-					<Link href="/" passHref={true}>
-						<a className="text-base">RateYourStyle</a>
-					</Link>
+				<div className="mb-20 shadow-sm px-4 md:px-8 py-2  top-0 w-screen bg-white fixed z-50 text-xs text-primary flex items-center gap-2 justify-between" style={{ fontFamily: 'custom-serif' }}>
+
+					<div className="flex flex-row gap-2">
+						<div className="hover:cursor-pointer" onClick={() => setDisplayMobileMenu(!displayMobileMenu)}><HamburgerMenuIcon /></div>
+						<Link href="/" passHref={true}>
+							<a className="text-base">RateYourStyle</a>
+						</Link>
+					</div>
+
+
+
+					{username ? (
+						<>
+							<Link href={`/user/${username}`} passHref={true}><a>{username}</a></Link>
+						</>
+					) : (
+						<div className="flex flex-row gap-2 items-center">
+							<button className="mr-2 w-fit" onClick={() => setShowSignInModal(true)}>
+								<a>Sign in</a>
+							</button>
+
+							<button
+								className="px-1 bg-primary text-white rounded-lg"
+								onClick={() => setShowCreateAccountModal(true)}
+							>
+								Create <br />Account
+							</button>
+						</div>
+					)}
+
 				</div>
 
 				{displayMobileMenu &&
-					<div className="bg-background w-fit z-80 px-4 pb-8 h-full fixed top-8 left-0 z-80 flex flex-col gap-2 shadow text-lg" style={{ fontFamily: 'custom-serif' }}>
+					<div className="bg-background w-fit z-50 px-4 pb-8 h-full fixed top-8 left-0 flex flex-col gap-2 shadow text-lg" style={{ fontFamily: 'custom-serif' }}>
 						<div onClick={() => setDisplayMobileMenu(false)} className="self-end mt-4 hover:cursor-pointer">
 							&#10006;
 						</div>
@@ -107,7 +132,7 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 							For Businesses
 						</Link>
 
-						{username ? (
+						{/* {username ? (
 							<>
 								<Link href={`/user/${username}`} passHref={true}><a>{username}</a></Link>
 							</>
@@ -124,7 +149,7 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 									Create Account
 								</button>
 							</>
-						)}
+						)} */}
 
 					</div>
 				}
