@@ -54,6 +54,8 @@ type OutfitResponse struct {
 	UserProfile   *UserProfile `json:"user_profile,omitempty"`
 	RatingCount   interface{}  `json:"rating_count"`
 	RatingAverage interface{}  `json:"rating_average"`
+
+	PictureURLResized string `json:"picture_url_resized"`
 }
 
 type OutfitIndices struct {
@@ -117,6 +119,15 @@ func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle
 		PictureURL: o.PictureURL,
 		StyleTags:  o.StyleTags,
 		Private:    o.Private,
+	}
+
+	// get URL of picture resized
+	resizedURL, err := getResizedImageURL(ctx, bucket, o.PictureURL)
+	if err == nil && resizedURL != "" {
+		resp.PictureURLResized = resizedURL
+	} else {
+		// just use original if there's no resized image availble
+		resp.PictureURLResized = o.PictureURL
 	}
 
 	// get outfit items

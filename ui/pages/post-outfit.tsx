@@ -280,7 +280,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 			/// !!!! make image URL env variable
 			let outfitId = process.env.NODE_ENV == "development" ?
 				imageURL?.replace(
-					"https://storage.googleapis.com/rys-mockups/imgs/outfits/",
+					"https://storage.googleapis.com/rateyourstyle-dev/imgs/outfits/",
 					""
 				) : imageURL?.replace(
 					"https://storage.googleapis.com/rateyourstyle/imgs/outfits/",
@@ -293,6 +293,7 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 				id: outfitId,
 				title: outfitCaption,
 				picture_url: imageURL,
+				picture_url_resized: "",
 				style_tags: tags,
 				items: outfitItems,
 				private: privateMode,

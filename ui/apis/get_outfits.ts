@@ -24,6 +24,7 @@ export type Outfit = {
   username: string;
   title: string;
   picture_url: string;
+  picture_url_resized: string;
   description: string;
   style_tags: string[];
   items: OutfitItem[];
