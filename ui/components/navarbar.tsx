@@ -79,16 +79,7 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 		return (
 			<>
 				<div className="mb-20 shadow-sm px-4 md:px-8 py-2  top-0 w-screen bg-white fixed z-50 text-xs text-primary flex items-center gap-2 justify-between" style={{ fontFamily: 'custom-serif' }}>
-
-					<div className="flex flex-row gap-2">
-						<div className="hover:cursor-pointer" onClick={() => setDisplayMobileMenu(!displayMobileMenu)}><HamburgerMenuIcon /></div>
-						<Link href="/" passHref={true}>
-							<a className="text-base">RateYourStyle</a>
-						</Link>
-					</div>
-
-
-
+					<div className="hover:cursor-pointer" onClick={() => setDisplayMobileMenu(!displayMobileMenu)}><HamburgerMenuIcon /></div>
 					{username ? (
 						<>
 							<Link href={`/user/${username}`} passHref={true}><a>{username}</a></Link>
@@ -115,6 +106,10 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 						<div onClick={() => setDisplayMobileMenu(false)} className="self-end mt-4 hover:cursor-pointer">
 							&#10006;
 						</div>
+
+						<Link href="/" passHref={true}>
+							<a className="">Home</a>
+						</Link>
 
 						<Link href="/discover" passHref={true}>
 							<a className="">Discover</a>
