@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"log"
 
 	gcs "cloud.google.com/go/storage"
-	"google.golang.org/api/iterator"
 )
+
+const outfitsDir = "data/outfits"
 
 type OutfitItem struct {
 	Id        string   `json:"id,omitempty"`
@@ -59,38 +59,9 @@ type OutfitResponse struct {
 }
 
 type OutfitIndices struct {
-	Outfits       map[string]struct{}
+	OutfitUser    map[string]string
 	UserOutfit    map[string][]string
 	PublicOutfits map[string]struct{}
-}
-
-func listAllOutfits(ctx context.Context, bucket *gcs.BucketHandle) ([]string, error) {
-	outfits := []string{}
-	objIter := bucket.Objects(ctx, &gcs.Query{
-		Versions: false,
-		Prefix:   "data/outfits",
-	})
-
-	for {
-		attrs, err := objIter.Next()
-		if err == iterator.Done {
-			break
-		}
-
-		// skip directory
-		if attrs.Name == "data/outfits/" {
-			continue
-		}
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		outfits = append(outfits, attrs.Name)
-
-	}
-
-	return outfits, nil
 }
 
 func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, userIdUsername map[string]string, id string) (*OutfitResponse, error) {
@@ -162,27 +133,19 @@ func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle
 }
 
 func createOutfitIndices(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle) (*OutfitIndices, error) {
-	outfits, err := listAllOutfits(ctx, bucket)
+	outfits, err := getFilepaths(ctx, bucket, outfitsDir)
 	if err != nil {
 		return nil, err
 	}
 
 	indices := &OutfitIndices{
-		Outfits:       make(map[string]struct{}),
+		OutfitUser:    make(map[string]string),
 		PublicOutfits: make(map[string]struct{}),
 		UserOutfit:    make(map[string][]string),
 	}
 
 	for _, outfit := range outfits {
-		obj := bucket.Object(outfit)
-		reader, err := obj.NewReader(ctx)
-
-		if err != nil {
-			return nil, err
-		}
-		defer reader.Close()
-
-		bytes, err := io.ReadAll(reader)
+		bytes, err := readObjectBytes(ctx, bucket, outfit)
 		if err != nil {
 			return nil, err
 		}
@@ -192,7 +155,7 @@ func createOutfitIndices(ctx context.Context, client *gcs.Client, bucket *gcs.Bu
 			return nil, err
 		}
 
-		indices.Outfits[o.Id] = struct{}{}
+		indices.OutfitUser[o.Id] = o.UserId
 		if !o.Private {
 			indices.PublicOutfits[o.Id] = struct{}{}
 		}

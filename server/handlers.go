@@ -20,10 +20,11 @@ type Handler struct {
 		Bucket *gcs.BucketHandle
 	}
 
-	UserIndices     *UserIndices
-	OutfitIndices   *OutfitIndices
-	RatingIndices   *RatingIndices
-	BusinessIndices *BusinessIndices
+	UserIndices         *UserIndices
+	OutfitIndices       *OutfitIndices
+	RatingIndices       *RatingIndices
+	BusinessIndices     *BusinessIndices
+	NotificationIndices *NotificationIndices
 }
 
 func (h Handler) GetBusinessUsernames() echo.HandlerFunc {
@@ -591,7 +592,7 @@ func (h Handler) PostOutfit() echo.HandlerFunc {
 		writer.Close()
 
 		// update indices
-		h.OutfitIndices.Outfits[data.Id] = struct{}{}
+		h.OutfitIndices.OutfitUser[data.Id] = data.UserId
 		h.OutfitIndices.UserOutfit[userId] = append(h.OutfitIndices.UserOutfit[userId], data.Id)
 		if !data.Private {
 			h.OutfitIndices.PublicOutfits[data.Id] = struct{}{}
@@ -623,44 +624,42 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 		data.UserId = userId
 		data.Date = time.Now().Format("2006-01-02")
 
-		// read original file
-		ratings, err := getRatingsByOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, "data/ratings/"+data.OutfitId+".json")
+		userRatedBefore, err := createRating(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, &data)
 		if err != nil {
-			// object doesn't exist
-			if !strings.Contains(err.Error(), "exist") {
-				log.Println(err.Error())
-				return ctx.NoContent(http.StatusInternalServerError)
-			}
-		}
-
-		found := false
-		for i, rating := range ratings {
-			if rating.UserId == data.UserId {
-				ratings[i].Rating = data.Rating
-				ratings[i].Review = data.Review
-				ratings[i].Date = time.Now().Format("2006-01-02")
-				found = true
-				break
-			}
-		}
-
-		if !found {
-			ratings = append(ratings, &data)
-		}
-
-		obj := h.Gcs.Bucket.Object(filepath.Join("data", "ratings", data.OutfitId+".json"))
-		writer := obj.NewWriter(ctx.Request().Context())
-		defer writer.Close()
-
-		if err := json.NewEncoder(writer).Encode(ratings); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		writer.Close()
+		forUserId, ok := h.OutfitIndices.OutfitUser[data.OutfitId]
+		if !ok {
+			log.Println("outfit id not found in index")
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		forUsername, ok := h.UserIndices.IdUsername[forUserId]
+		if !ok {
+			log.Println("userid  id not found in index")
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		n := Notification{
+			ForOutfitId:  data.OutfitId,
+			ForUserId:    forUserId,
+			ForUsername:  forUsername,
+			FromUserId:   data.UserId,
+			FromUsername: data.Username,
+			Date:         time.Now().Format("2006-01-02"),
+			Message:      fmt.Sprintf("%s rated your outfit", data.Username),
+			Seen:         false,
+			SeenAt:       "",
+		}
+		if err := createNotification(ctx.Request().Context(), h.Gcs.Bucket, &n); err != nil {
+			log.Println("error creating notification " + err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
 
 		// update indices
-		if !found {
+		if !userRatedBefore {
 			m := make(map[string]interface{})
 			m[data.OutfitId] = data
 
@@ -668,6 +667,8 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 		} else {
 			h.RatingIndices.UserOutfitRating[data.UserId][data.OutfitId] = data
 		}
+
+		h.NotificationIndices.UserHasNotifications[n.ForUserId] = true
 
 		return ctx.NoContent(http.StatusCreated)
 	}

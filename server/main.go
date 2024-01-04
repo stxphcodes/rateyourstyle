@@ -192,10 +192,17 @@ func initiateIndices(ctx context.Context, h *Handler) error {
 	}
 	fmt.Println("created business indices")
 
+	notificationIndices, err := createNotificationIndices(ctx, h.Gcs.Bucket)
+	if err != nil {
+		return err
+	}
+	fmt.Println("created notifications indices")
+
 	h.UserIndices = userIndices
 	h.OutfitIndices = outfitIndices
 	h.RatingIndices = ratingIndices
 	h.BusinessIndices = businessIndices
+	h.NotificationIndices = notificationIndices
 
 	return nil
 }
