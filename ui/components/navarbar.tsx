@@ -232,7 +232,7 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 
 function NotificationMenu(props: { clientServer: string; cookie: string; handleClose: any, notifications: Notification[] }) {
 	return (
-		<div className="bg-background w-1/2 md:w-1/3 z-50 overflow-scroll fixed top-8 right-0 flex flex-col shadow text-lg" style={{ fontFamily: 'custom-serif' }}>
+		<div className="bg-background w-1/2 md:w-1/3 z-50 overflow-scroll fixed top-8 right-0 flex flex-col shadow text-lg max-h-screen" style={{ fontFamily: 'custom-serif' }}>
 			<div onClick={props.handleClose} className="self-end mt-4 hover:cursor-pointer pr-2">
 				&#10006;
 			</div>
