@@ -1,11 +1,18 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+
 
 import { GetCookie } from '../apis/get_cookie';
-import { GetUsername } from '../apis/get_user';
+import { GetUsername, GetUsernameAndNotifications, UserNotifResp } from '../apis/get_user';
 import { CreateAccount } from './modals/createaccount';
 import { SignIn } from './modals/signin';
 import { HamburgerMenuIcon } from './icons/menu-burger';
+import { GetNotifications, Notification } from '../apis/get_notifications';
+import { NotificationFilledIcon } from './icons/notification-filled';
+import { NotificationEmptyIcon } from './icons/notification-empty';
+import { GetOutfit, GetOutfits, Outfit } from '../apis/get_outfits';
+import { OutfitModal } from './outfit-modal';
 
 // check if browser allows cookies to be set
 function cookieEnabled() {
@@ -21,16 +28,35 @@ function cookieEnabled() {
 }
 
 
-export function Navbar(props: { clientServer: string; cookie: string; user?: string }) {
+export function Navbar(props: { clientServer: string; cookie: string; user?: string; userNotifs?: UserNotifResp }) {
+	const router = useRouter();
+
 	const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
+
 	const [showCreateAccountModal, setShowCreateAccountModal] =
 		useState<boolean>(false);
+
 	const [error, setError] = useState<string | null>(null);
+
 	const [username, setUsername] = useState<string>(
-		props.user ? props.user : ""
+		props.userNotifs ? props.userNotifs.username : ""
 	);
+
+	const [hasNotifs, setHasNotifs] = useState<boolean>(props.userNotifs ? props.userNotifs.has_notifications : false)
+
+	// const [notifications, setNotifications] = useState<Notification[]>(() => {
+	// 	if (props.userNotifs && props.userNotifs.notifications) {
+	// 		return props.userNotifs.notifications
+	// 	}
+	// 	return []
+	// });
+
 	const [useMobileMenu, setUseMobileMenu] = useState(false)
+
 	const [displayMobileMenu, setDisplayMobileMenu] = useState(false);
+
+	const [outfit, setOutfit] = useState<Outfit | null>(null);
+
 
 	const checkMobileScreenWidth = (window: any) => {
 		// const { innerWidth: width, innerHeight: height } = window;
@@ -40,6 +66,7 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 		}
 
 		setUseMobileMenu(false)
+		setDisplayMobileMenu(false)
 	}
 
 	useEffect(() => {
@@ -55,10 +82,14 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 			location.reload();
 		}
 
-		async function getusername() {
-			const resp = await GetUsername(props.clientServer, props.cookie);
+		async function getusernotif() {
+			const resp = await GetUsernameAndNotifications(props.clientServer, props.cookie)
 			if (!(resp instanceof Error)) {
-				setUsername(resp);
+				setUsername(resp.username);
+				setHasNotifs(resp.has_notifications);
+				// if (resp.notifications && resp.notifications.length > 0) {
+				// 	setNotifications(resp.notifications)
+				// }
 				return;
 			}
 		}
@@ -68,22 +99,53 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 				getcookie();
 			}
 		} else {
-			!username && getusername();
+			!username && getusernotif();
 		}
 
 		checkMobileScreenWidth(window);
 		window.addEventListener('resize', () => { checkMobileScreenWidth(window) });
 	}, []);
 
-	if (useMobileMenu) {
-		return (
-			<>
-				<div className="mb-20 shadow-sm px-4 md:px-8 py-2  top-0 w-screen bg-white fixed z-50 text-xs text-primary flex items-center gap-2 justify-between" style={{ fontFamily: 'custom-serif' }}>
-					<div className="hover:cursor-pointer" onClick={() => setDisplayMobileMenu(!displayMobileMenu)}><HamburgerMenuIcon /></div>
+	useEffect(() => {
+		async function getoutfit(id: string) {
+			const resp = await GetOutfit(props.clientServer, id)
+			if (!(resp instanceof Error)) {
+				setOutfit(resp)
+			}
+		}
+
+		let outfit = router.query.outfit
+
+		if (outfit && outfit.length > 0 && typeof outfit === 'string') {
+			getoutfit(outfit);
+		}
+
+	}, [router])
+
+	return (
+		<>
+			<div className="mb-20 shadow-sm px-4 md:px-8 py-2  top-0 w-screen bg-white fixed z-50 text-xs text-primary" style={{ fontFamily: 'custom-serif' }}>
+				<div className="flex items-center gap-2 justify-between">
+					{
+						useMobileMenu ?
+							<div
+								className="hover:cursor-pointer"
+								onClick={() => setDisplayMobileMenu(!displayMobileMenu)}>
+								<HamburgerMenuIcon />
+							</div> :
+							<div className="mb-1">
+								<Link href="/" passHref={true}>
+									<a className="text-lg">RateYourStyle</a>
+								</Link>
+							</div>
+					}
 					{username ? (
-						<>
-							<Link href={`/user/${username}`} passHref={true}><a>{username}</a></Link>
-						</>
+						<UserAndNotification
+							clientServer={props.clientServer}
+							cookie={props.cookie}
+							hasNotifs={hasNotifs}
+							username={username}
+						/>
 					) : (
 						<div className="flex flex-row gap-2 items-center">
 							<button className="mr-2 w-fit" onClick={() => setShowSignInModal(true)}>
@@ -94,122 +156,31 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 								className="px-1 bg-primary text-white rounded-lg"
 								onClick={() => setShowCreateAccountModal(true)}
 							>
-								Create <br />Account
+								Create Account
 							</button>
 						</div>
 					)}
-
 				</div>
 
-				{displayMobileMenu &&
-					<div className="bg-background w-fit z-50 px-4 pb-8 h-full fixed top-8 left-0 flex flex-col gap-2 shadow text-lg" style={{ fontFamily: 'custom-serif' }}>
-						<div onClick={() => setDisplayMobileMenu(false)} className="self-end mt-4 hover:cursor-pointer">
-							&#10006;
-						</div>
-
-						<Link href="/" passHref={true}>
-							<a className="">Home</a>
-						</Link>
-
+				{!useMobileMenu &&
+					<div className="">
 						<Link href="/discover" passHref={true}>
 							<a className="">Discover</a>
 						</Link>
-
+						<span className="mx-1">|</span>
 						<Link href="/post-outfit" passHref={true}>
 							Post Outfit
 						</Link>
-
+						<span className="mx-1">|</span>
 						<Link href="/request-closet" passHref={true}>
 							Request Closet
 						</Link>
-
+						<span className="mx-1">|</span>
 						<Link href="/for-businesses" passHref={true}>
 							For Businesses
 						</Link>
-
-						{/* {username ? (
-							<>
-								<Link href={`/user/${username}`} passHref={true}><a>{username}</a></Link>
-							</>
-						) : (
-							<>
-								<button className="mr-2 w-fit" onClick={() => setShowSignInModal(true)}>
-									<a>Sign in</a>
-								</button>
-
-								<button
-									className="px-1 bg-primary text-white rounded-lg w-fit"
-									onClick={() => setShowCreateAccountModal(true)}
-								>
-									Create Account
-								</button>
-							</>
-						)} */}
-
 					</div>
 				}
-
-				{showSignInModal && (
-					<SignIn
-						handleClose={() => setShowSignInModal(false)} clientServer={props.clientServer}
-					/>
-				)}
-				{showCreateAccountModal && (
-					<CreateAccount
-						clientServer={props.clientServer}
-						cookie={props.cookie}
-						handleClose={() => setShowCreateAccountModal(false)}
-					/>
-				)}
-
-
-			</>
-		)
-	}
-
-	return (
-		<>
-			<div className="mb-20 shadow-sm px-4 md:px-8 py-2   top-0 w-screen bg-white fixed z-50 text-xs text-primary" style={{ fontFamily: 'custom-serif' }}>
-				<div className="mb-1">
-					<Link href="/" passHref={true}>
-						<a className="text-lg">RateYourStyle</a>
-					</Link>
-					<div className="float-right">
-						{username ? (
-							<>
-								<Link href={`/user/${username}`} passHref={true}><a>{username}</a></Link>
-							</>
-						) : (
-							<>
-								<button className="mr-2" onClick={() => setShowSignInModal(true)}>
-									<a>Sign in</a>
-								</button>
-
-								<button
-									className="px-1 bg-primary text-white rounded-lg"
-									onClick={() => setShowCreateAccountModal(true)}
-								>
-									Create Account
-								</button>
-							</>
-						)}
-					</div>
-				</div>
-				<Link href="/discover" passHref={true}>
-					<a className="">Discover</a>
-				</Link>
-				<span className="mx-1">|</span>
-				<Link href="/post-outfit" passHref={true}>
-					Post Outfit
-				</Link>
-				<span className="mx-1">|</span>
-				<Link href="/request-closet" passHref={true}>
-					Request Closet
-				</Link>
-				<span className="mx-1">|</span>
-				<Link href="/for-businesses" passHref={true}>
-					For Businesses
-				</Link>
 			</div>
 
 			{showSignInModal && (
@@ -224,6 +195,145 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 					handleClose={() => setShowCreateAccountModal(false)}
 				/>
 			)}
+
+			{
+				outfit &&
+				<OutfitModal
+					clientServer={props.clientServer}
+					cookie={props.cookie} handleClose={() => {
+						let url = window.location.origin + window.location.pathname
+						window.location.href = url
+
+					}} data={outfit}
+					asUser={false} userRating={null}
+				/>
+			}
+
+
+			{displayMobileMenu &&
+				<div className="bg-background w-fit z-50 px-4 pb-8 h-full fixed top-8 left-0 flex flex-col gap-2 shadow text-lg" style={{ fontFamily: 'custom-serif' }}>
+					<div onClick={() => setDisplayMobileMenu(false)} className="self-end mt-4 hover:cursor-pointer">
+						&#10006;
+					</div>
+
+					<Link href="/" passHref={true}>
+						<a className="">Home</a>
+					</Link>
+
+					<Link href="/discover" passHref={true}>
+						<a className="">Discover</a>
+					</Link>
+
+					<Link href="/post-outfit" passHref={true}>
+						Post Outfit
+					</Link>
+
+					<Link href="/request-closet" passHref={true}>
+						Request Closet
+					</Link>
+
+					<Link href="/for-businesses" passHref={true}>
+						For Businesses
+					</Link>
+				</div>
+			}
+
+			{showSignInModal && (
+				<SignIn
+					handleClose={() => setShowSignInModal(false)} clientServer={props.clientServer}
+				/>
+			)}
+			{showCreateAccountModal && (
+				<CreateAccount
+					clientServer={props.clientServer}
+					cookie={props.cookie}
+					handleClose={() => setShowCreateAccountModal(false)}
+				/>
+			)}
+
+			{
+				outfit &&
+				<OutfitModal
+					clientServer={props.clientServer}
+					cookie={props.cookie} handleClose={() => {
+						let url = window.location.origin + window.location.pathname
+						window.location.href = url
+
+					}} data={outfit}
+					asUser={false} userRating={null}
+				/>
+			}
 		</>
-	);
+	)
 }
+
+
+function NotificationMenu(props: { clientServer: string; cookie: string; handleClose: any, notifications: Notification[] }) {
+	return (
+		<div className="bg-background w-1/2 md:w-1/3 z-50   h-fit overflow-scroll fixed top-8 right-0 flex flex-col shadow text-lg" style={{ fontFamily: 'custom-serif' }}>
+			<div onClick={props.handleClose} className="self-end mt-4 hover:cursor-pointer pr-2">
+				&#10006;
+			</div>
+			{
+				props.notifications.map((n) => (
+					<button className="p-2 border-b-2 hover:bg-white text-left overflow-clip" onClick={() => {
+						let url = window.location.href;
+						url += `?outfit=${n.for_outfit_id}`
+						window.location.href = url;
+					}}>
+						<div className="text-background-2 text-xs">
+							{n.date}
+						</div>
+						<div className="text-xs">
+							{n.message}
+						</div>
+					</button>
+				))
+			}
+		</div>
+	)
+}
+
+
+function UserAndNotification(props: { clientServer: string; cookie: string; username: string; hasNotifs: boolean }) {
+	const [displayMenu, setDisplayMenu] = useState(false);
+
+	const [notifs, setNotifs] = useState<Notification[]>([]);
+
+	useEffect(()=>{
+		async function getnotifs(){
+			const resp = await GetNotifications(props.clientServer, props.cookie)
+			if (!(resp instanceof Error)) {
+				setNotifs(resp)
+			}
+		}
+
+		if (displayMenu) {
+			getnotifs()
+		}
+
+	},[displayMenu])
+
+	return (
+		<div className="flex flex-row gap-2 items-center">
+			<button className="hover:text-black" onClick={() => { setDisplayMenu(!displayMenu) }}>
+				{props.hasNotifs ? <NotificationFilledIcon /> :
+					<NotificationEmptyIcon />
+				}
+			</button>
+			<Link href={`/user/${props.username}`} passHref={true}>
+				<a>{props.username}</a>
+			</Link>
+			{displayMenu &&
+				<NotificationMenu
+					handleClose={() => { setDisplayMenu(false) }}
+					notifications={notifs}
+					clientServer={props.clientServer}
+					cookie={props.cookie}
+				/>
+			}
+		</div>
+
+	)
+}
+
