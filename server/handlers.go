@@ -159,6 +159,24 @@ func (h Handler) GetCookie() echo.HandlerFunc {
 	}
 }
 
+func (h Handler) GetOutfit() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		outfitId := ctx.Param("outfitid")
+		if outfitId == "" {
+			log.Println("outfit id missing")
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		outfit, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfitId)
+		if err != nil {
+			log.Println("error getting outfit ", err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		return ctx.JSON(http.StatusOK, outfit)
+	}
+}
+
 // only gets public outfits.
 // if count query param is passed and greater than 0,
 // GetOutfits will return up to that number of outfits.
@@ -372,6 +390,78 @@ func (h *Handler) GetRatingsByUser() echo.HandlerFunc {
 		}
 		return ctx.JSON(http.StatusOK, ratings)
 
+	}
+}
+
+func (h *Handler) GetUsernameAndNotifications() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		username, ok := h.UserIndices.CookieUsername[cookie]
+		if !ok {
+			return ctx.NoContent(http.StatusNotFound)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			return ctx.NoContent(http.StatusNotFound)
+		}
+
+		resp := UserNotifResponse{
+			Username:         username,
+			HasNotifications: false,
+		}
+
+		hasNotifications, ok := h.NotificationIndices.UserHasNotifications[userId]
+		if ok && hasNotifications {
+			resp.HasNotifications = true
+		}
+
+		return ctx.JSON(http.StatusOK, resp)
+	}
+}
+
+func (h *Handler) GetNotifications() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			return ctx.NoContent(http.StatusNotFound)
+		}
+
+		notifications, err := getNotifications(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(notificationsDir, userId))
+		if err != nil {
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		// update notifications to be seen
+		for index, notification := range notifications {
+			if !notification.Seen {
+				notifications[index].Seen = true
+				notifications[index].SeenAt = time.Now().Format("2006-01-02")
+			}
+		}
+
+		obj := h.Gcs.Bucket.Object(joinPaths(notificationsDir, userId))
+		writer := obj.NewWriter(ctx.Request().Context())
+		defer writer.Close()
+
+		if err := json.NewEncoder(writer).Encode(notifications); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		// update indices
+		h.NotificationIndices.UserHasNotifications[userId] = false
+
+		return ctx.JSON(http.StatusOK, notifications)
 	}
 }
 
@@ -623,6 +713,11 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 		}
 		data.UserId = userId
 		data.Date = time.Now().Format("2006-01-02")
+		fromUsername, ok := h.UserIndices.IdUsername[userId]
+		if !ok {
+			fromUsername = "anonymous"
+		}
+		data.Username = fromUsername
 
 		userRatedBefore, err := createRating(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, &data)
 		if err != nil {
@@ -630,30 +725,13 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		forUserId, ok := h.OutfitIndices.OutfitUser[data.OutfitId]
-		if !ok {
-			log.Println("outfit id not found in index")
+		n, err := ratingToNotification(&data, ctx.Request().Context(), h.Gcs.Bucket, h.UserIndices.IdUsername)
+		if err != nil {
+			log.Println("error transforming rating to notification " + err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		forUsername, ok := h.UserIndices.IdUsername[forUserId]
-		if !ok {
-			log.Println("userid  id not found in index")
-			return ctx.NoContent(http.StatusInternalServerError)
-		}
-
-		n := Notification{
-			ForOutfitId:  data.OutfitId,
-			ForUserId:    forUserId,
-			ForUsername:  forUsername,
-			FromUserId:   data.UserId,
-			FromUsername: data.Username,
-			Date:         time.Now().Format("2006-01-02"),
-			Message:      fmt.Sprintf("%s rated your outfit", data.Username),
-			Seen:         false,
-			SeenAt:       "",
-		}
-		if err := createNotification(ctx.Request().Context(), h.Gcs.Bucket, &n); err != nil {
+		if err := createNotification(ctx.Request().Context(), h.Gcs.Bucket, n); err != nil {
 			log.Println("error creating notification " + err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
@@ -814,6 +892,55 @@ func (h *Handler) PostBusinessOutfit() echo.HandlerFunc {
 				return ctx.NoContent(http.StatusInternalServerError)
 			}
 		}
+
+		return ctx.NoContent(http.StatusCreated)
+	}
+}
+
+func (h *Handler) PostNotificationsSeen() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		var data []string
+		if err := ctx.Bind(&data); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		n, err := getNotifications(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(notificationsDir, userId))
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		for index, notification := range n {
+			if !notification.Seen {
+				n[index].Seen = true
+				n[index].SeenAt = time.Now().Format("2006-01-02")
+			}
+		}
+
+		obj := h.Gcs.Bucket.Object(joinPaths(notificationsDir, userId))
+		writer := obj.NewWriter(ctx.Request().Context())
+		defer writer.Close()
+
+		if err := json.NewEncoder(writer).Encode(n); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		// update indices
+		h.NotificationIndices.UserHasNotifications[userId] = false
 
 		return ctx.NoContent(http.StatusCreated)
 	}

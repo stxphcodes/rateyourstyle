@@ -64,6 +64,22 @@ type OutfitIndices struct {
 	PublicOutfits map[string]struct{}
 }
 
+// used by ratingToNotification func
+func getOutfitNoResponse(ctx context.Context, bucket *gcs.BucketHandle, id string) (*Outfit, error) {
+	path := "data/outfits/" + id + ".json"
+	bytes, err := readObjectBytes(ctx, bucket, path)
+	if err != nil {
+		return nil, err
+	}
+
+	var o Outfit
+	if err := json.Unmarshal(bytes, &o); err != nil {
+		return nil, err
+	}
+
+	return &o, nil
+}
+
 func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, userIdUsername map[string]string, id string) (*OutfitResponse, error) {
 	path := "data/outfits/" + id + ".json"
 	obj := bucket.Object(path)

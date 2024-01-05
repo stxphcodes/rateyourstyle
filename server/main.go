@@ -113,6 +113,8 @@ func run() error {
 
 	mux.GET("/api/cookie", handler.GetCookie())
 
+	mux.GET("/api/outfit/:outfitid", handler.GetOutfit())
+
 	mux.GET("/api/outfits", handler.GetOutfits())
 
 	mux.GET("/api/business-outfits", handler.GetBusinessOutfits())
@@ -128,6 +130,10 @@ func run() error {
 	mux.GET("/api/user-profile", handler.GetUserProfile())
 
 	mux.GET("/api/username", handler.GetUsername())
+
+	mux.GET("/api/username-notifications", handler.GetUsernameAndNotifications())
+
+	mux.GET("/api/notifications", handler.GetNotifications())
 
 	mux.POST("/api/image", handler.PostImage())
 
@@ -146,6 +152,8 @@ func run() error {
 	mux.POST("/api/business-outfits", handler.PostBusinessOutfit())
 
 	mux.POST("/api/closet-request", handler.PostClosetRequest())
+
+	mux.POST("/api/notifications-seen", handler.PostNotificationsSeen())
 
 	mux.PUT("/api/outfit-item", handler.PutOutfitItem())
 

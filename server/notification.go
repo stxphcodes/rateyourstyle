@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"path/filepath"
 	"strings"
@@ -12,20 +13,63 @@ import (
 
 const notificationsDir = "data/notifications"
 
+type UserNotifResponse struct {
+	Username         string `json:"username"`
+	HasNotifications bool   `json:"has_notifications"`
+}
+
 type NotificationIndices struct {
-	UserHasNotifications map[string]bool
+	UserHasNotifications map[string]bool // userId and whether they have notifications
+}
+
+type NotificationsSeen struct {
+	NotificationIds []string `json:"notification_ids"`
 }
 
 type Notification struct {
-	ForOutfitId  string
-	ForUserId    string
-	ForUsername  string
-	FromUserId   string
-	FromUsername string
-	Date         string
-	Message      string
-	SeenAt       string
-	Seen         bool
+	Id             string `json:"id"`
+	ForOutfitId    string `json:"for_outfit_id"`
+	ForOutfitTitle string `json:"for_outfit_title"`
+	ForUserId      string `json:"for_user_id"`
+	ForUsername    string `json:"for_username"`
+	FromUserId     string `json:"from_user_id"`
+	FromUsername   string `json:"from_username"`
+	Date           string `json:"date"`
+	Message        string `json:"message"`
+	SeenAt         string `json:"seen_at"`
+	Seen           bool   `json:"seen"`
+}
+
+func ratingToNotification(r *Rating, ctx context.Context, bucket *gcs.BucketHandle, userIdUsername map[string]string) (*Notification, error) {
+	if r.Date == "" || r.OutfitId == "" || r.UserId == "" || r.Username == "" {
+		return nil, fmt.Errorf("Rating missing required fields to create notification")
+	}
+
+	outfit, err := getOutfitNoResponse(ctx, bucket, r.OutfitId)
+	if err != nil {
+		return nil, err
+	}
+
+	forUsername, ok := userIdUsername[outfit.UserId]
+	if !ok {
+		forUsername = "anonymous"
+	}
+
+	n := Notification{
+		Id:             uuid(),
+		ForUserId:      outfit.UserId,
+		ForUsername:    forUsername,
+		ForOutfitId:    r.OutfitId,
+		ForOutfitTitle: outfit.Title,
+		FromUserId:     r.UserId,
+		FromUsername:   r.Username,
+		Date:           r.Date,
+		Message:        fmt.Sprintf("%s rated %s", r.Username, outfit.Title),
+		Seen:           false,
+		SeenAt:         "",
+	}
+
+	return &n, nil
 }
 
 func createNotification(ctx context.Context, bucket *gcs.BucketHandle, n *Notification) error {
@@ -59,7 +103,20 @@ func createNotification(ctx context.Context, bucket *gcs.BucketHandle, n *Notifi
 		}
 	}
 
-	data = append(data, n)
+	found := false
+	for index, d := range data {
+		// user just edited review
+		if d.ForOutfitId == n.ForOutfitId && d.FromUserId == n.FromUserId {
+			found = true
+			data[index].Date = n.Date
+			data[index].Seen = false
+			data[index].SeenAt = ""
+		}
+	}
+
+	if !found {
+		data = append(data, n)
+	}
 
 	writer := obj.NewWriter(ctx)
 	if err := json.NewEncoder(writer).Encode(data); err != nil {
