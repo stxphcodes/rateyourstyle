@@ -44,13 +44,6 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 
 	const [hasNotifs, setHasNotifs] = useState<boolean>(props.userNotifs ? props.userNotifs.has_notifications : false)
 
-	// const [notifications, setNotifications] = useState<Notification[]>(() => {
-	// 	if (props.userNotifs && props.userNotifs.notifications) {
-	// 		return props.userNotifs.notifications
-	// 	}
-	// 	return []
-	// });
-
 	const [useMobileMenu, setUseMobileMenu] = useState(false)
 
 	const [displayMobileMenu, setDisplayMobileMenu] = useState(false);
@@ -87,9 +80,6 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 			if (!(resp instanceof Error)) {
 				setUsername(resp.username);
 				setHasNotifs(resp.has_notifications);
-				// if (resp.notifications && resp.notifications.length > 0) {
-				// 	setNotifications(resp.notifications)
-				// }
 				return;
 			}
 		}
@@ -182,34 +172,6 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 					</div>
 				}
 			</div>
-
-			{showSignInModal && (
-				<SignIn
-					handleClose={() => setShowSignInModal(false)} clientServer={props.clientServer}
-				/>
-			)}
-			{showCreateAccountModal && (
-				<CreateAccount
-					clientServer={props.clientServer}
-					cookie={props.cookie}
-					handleClose={() => setShowCreateAccountModal(false)}
-				/>
-			)}
-
-			{
-				outfit &&
-				<OutfitModal
-					clientServer={props.clientServer}
-					cookie={props.cookie} handleClose={() => {
-						let url = window.location.origin + window.location.pathname
-						window.location.href = url
-
-					}} data={outfit}
-					asUser={false} userRating={null}
-				/>
-			}
-
-
 			{displayMobileMenu &&
 				<div className="bg-background w-fit z-50 px-4 pb-8 h-full fixed top-8 left-0 flex flex-col gap-2 shadow text-lg" style={{ fontFamily: 'custom-serif' }}>
 					<div onClick={() => setDisplayMobileMenu(false)} className="self-end mt-4 hover:cursor-pointer">
