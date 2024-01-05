@@ -242,7 +242,9 @@ function NotificationMenu(props: { clientServer: string; cookie: string; handleC
 						let url = window.location.href;
 						url += `?outfit=${n.for_outfit_id}`
 						window.location.href = url;
-					}}>
+					}} 
+					key={n.id}
+					>
 						<div className="text-background-2 text-xs">
 							{n.date}
 						</div>
