@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -460,6 +461,10 @@ func (h *Handler) GetNotifications() echo.HandlerFunc {
 
 		// update indices
 		h.NotificationIndices.UserHasNotifications[userId] = false
+
+		sort.Slice(notifications, func(i, j int) bool {
+			return notifications[i].Date > notifications[j].Date
+		})
 
 		return ctx.JSON(http.StatusOK, notifications)
 	}
