@@ -1,5 +1,46 @@
-export async function GetUsername(server: string, cookie: string): Promise<string | Error> { 
-    let error: Error | null = null 
+export type UserNotifResp = {
+    username: string;
+    has_notifications: boolean;
+}
+
+export async function GetUsernameAndNotifications(server: string, cookie: string): Promise<UserNotifResp | Error> {
+    let error: Error | null = null
+    let resp: UserNotifResp = {
+        username: "",
+        has_notifications: false,
+    }
+
+    await fetch(`${server}/api/username-notifications`, {
+        method: "GET",
+        headers: {
+            'content-type': "application/json",
+            'rys-login': cookie,
+        },
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("response not ok");
+            }
+
+            return response.json()
+        }).then((data: UserNotifResp) => {
+            resp = data
+
+        })
+        .catch((err: Error) => {
+            error = err
+        });
+
+    if (error) {
+        return error
+    }
+
+    return resp
+}
+
+
+export async function GetUsername(server: string, cookie: string): Promise<string | Error> {
+    let error: Error | null = null
     let username: string = ""
 
     await fetch(`${server}/api/username`, {
@@ -36,15 +77,15 @@ export type User = {
 }
 
 export type UserProfile = {
-    department: string; 
+    department: string;
     age_range: string;
     weight_range: string;
     height_range: string;
-  }
+}
 
 
-export async function GetUserProfile(server: string, cookie: string): Promise<User | Error> { 
-    let error: Error | null = null 
+export async function GetUserProfile(server: string, cookie: string): Promise<User | Error> {
+    let error: Error | null = null
     let user: User = {
         username: "",
         email: "",
