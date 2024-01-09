@@ -442,25 +442,29 @@ func (h *Handler) GetNotifications() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		// update notifications to be seen
-		for index, notification := range notifications {
-			if !notification.Seen {
-				notifications[index].Seen = true
-				notifications[index].SeenAt = time.Now().Format("2006-01-02")
+		// only update notification seen if it wasn't seen before
+		needsUpdate, ok := h.NotificationIndices.UserHasNotifications[userId]
+		if ok && needsUpdate {
+			// update notifications to be seen
+			for index, notification := range notifications {
+				if !notification.Seen {
+					notifications[index].Seen = true
+					notifications[index].SeenAt = time.Now().Format("2006-01-02")
+				}
 			}
+
+			obj := h.Gcs.Bucket.Object(joinPaths(notificationsDir, userId))
+			writer := obj.NewWriter(ctx.Request().Context())
+			defer writer.Close()
+
+			if err := json.NewEncoder(writer).Encode(notifications); err != nil {
+				log.Println(err.Error())
+				return ctx.NoContent(http.StatusInternalServerError)
+			}
+
+			// update indices
+			h.NotificationIndices.UserHasNotifications[userId] = false
 		}
-
-		obj := h.Gcs.Bucket.Object(joinPaths(notificationsDir, userId))
-		writer := obj.NewWriter(ctx.Request().Context())
-		defer writer.Close()
-
-		if err := json.NewEncoder(writer).Encode(notifications); err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
-		}
-
-		// update indices
-		h.NotificationIndices.UserHasNotifications[userId] = false
 
 		sort.Slice(notifications, func(i, j int) bool {
 			return notifications[i].Date > notifications[j].Date
