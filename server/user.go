@@ -11,6 +11,11 @@ import (
 	gcs "cloud.google.com/go/storage"
 )
 
+const (
+	usersFile = "data/users/users.json"
+	usersDir  = "data/users"
+)
+
 type User struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
@@ -48,14 +53,7 @@ type UserIndices struct {
 }
 
 func getAllUsers(ctx context.Context, bucket *gcs.BucketHandle) ([]User, error) {
-	obj := bucket.Object("data/users/users.json")
-	reader, err := obj.NewReader(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer reader.Close()
-
-	bytes, err := io.ReadAll(reader)
+	bytes, err := readObjectBytes(ctx, bucket, usersFile)
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"path/filepath"
+	"strings"
+	"time"
 
 	gcs "cloud.google.com/go/storage"
 	"google.golang.org/api/iterator"
@@ -91,6 +94,42 @@ func getRatingsByOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.Buc
 	}
 
 	return r, nil
+}
+
+func createRating(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, r *Rating) (bool, error) {
+	// read original file
+	ratings, err := getRatingsByOutfit(ctx, client, bucket, "data/ratings/"+r.OutfitId+".json")
+	if err != nil {
+		// not object doesn't exist error
+		if !strings.Contains(err.Error(), "exist") {
+			return false, err
+		}
+	}
+
+	found := false
+	for i, rating := range ratings {
+		if rating.UserId == r.UserId {
+			ratings[i].Rating = r.Rating
+			ratings[i].Review = r.Review
+			ratings[i].Date = time.Now().Format("2006-01-02")
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		ratings = append(ratings, r)
+	}
+
+	obj := bucket.Object(filepath.Join("data", "ratings", r.OutfitId+".json"))
+	writer := obj.NewWriter(ctx)
+	defer writer.Close()
+
+	if err := json.NewEncoder(writer).Encode(ratings); err != nil {
+		return false, err
+	}
+
+	return found, nil
 }
 
 func createRatingIndices(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle) (*RatingIndices, error) {

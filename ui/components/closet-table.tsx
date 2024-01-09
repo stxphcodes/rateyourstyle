@@ -435,7 +435,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                 <>
                     <div className="my-4 p-1 bg-primary w-fit rounded text-white">Results: {outfitsToDisplay ? outfitsToDisplay.length : "none"}</div>
 
-                    <div className="flex flex-row flex-wrap gap-4 items-start">
+                    <div className="flex flex-row flex-wrap gap-4 items-start justify-center md:justify-start">
                         {outfitsToDisplay &&
                             outfitsToDisplay.map((item) => (
                                 <OutfitCard

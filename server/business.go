@@ -9,8 +9,9 @@ import (
 	"strings"
 
 	gcs "cloud.google.com/go/storage"
-	"google.golang.org/api/iterator"
 )
+
+const businessesDir = "data/businesses"
 
 type BusinessIndices struct {
 	Businesses map[string]*BusinessProfile
@@ -42,7 +43,7 @@ func createBusinessIndices(ctx context.Context, client *gcs.Client, bucket *gcs.
 		Businesses: make(map[string]*BusinessProfile),
 	}
 
-	businessPaths, err := listBusinesses(ctx, client, bucket)
+	businessPaths, err := getFilepaths(ctx, bucket, businessesDir)
 	if err != nil {
 		return nil, err
 	}
@@ -73,15 +74,7 @@ func createBusinessProfile(ctx context.Context, bucket *gcs.BucketHandle, data *
 }
 
 func getBusinessProfile(ctx context.Context, bucket *gcs.BucketHandle, path string) (*BusinessProfile, error) {
-	obj := bucket.Object(path)
-	reader, err := obj.NewReader(ctx)
-
-	if err != nil {
-		return nil, err
-	}
-	defer reader.Close()
-
-	bytes, err := io.ReadAll(reader)
+	bytes, err := readObjectBytes(ctx, bucket, path)
 	if err != nil {
 		return nil, err
 	}
@@ -92,35 +85,6 @@ func getBusinessProfile(ctx context.Context, bucket *gcs.BucketHandle, path stri
 	}
 
 	return b, nil
-}
-
-func listBusinesses(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle) ([]string, error) {
-	businesses := []string{}
-	objIter := bucket.Objects(ctx, &gcs.Query{
-		Versions: false,
-		Prefix:   "data/businesses",
-	})
-
-	for {
-		attrs, err := objIter.Next()
-		if err == iterator.Done {
-			break
-		}
-
-		// skip directory
-		if attrs.Name == "data/businesses/" {
-			continue
-		}
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		businesses = append(businesses, attrs.Name)
-
-	}
-
-	return businesses, nil
 }
 
 func createBusinessOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, data *BusinessOutfit) error {

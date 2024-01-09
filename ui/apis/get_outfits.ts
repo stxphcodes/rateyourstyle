@@ -36,6 +36,47 @@ export type Outfit = {
   rating_average?: number;
 };
 
+
+export async function GetOutfit(server: string, outfitId: string): Promise<Outfit | Error> {
+  let error: Error | null = null;
+  let outfit: Outfit  = {
+    id: "",
+    date: "",
+    user_id: "",
+    username: "",
+    title: "",
+    picture_url: "",
+    picture_url_resized: "",
+    description: "",
+    style_tags: [],
+    items: [],
+    private: false,
+  };
+
+  let url = `${server}/api/outfit/${outfitId}`
+
+  await fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("response not ok");
+      }
+
+      return response.json();
+    })
+    .then((data: Outfit) => {
+      outfit = data;
+    })
+    .catch((err: Error) => {
+      error = err;
+    });
+
+  if (error) {
+    return error;
+  }
+
+  return outfit;
+}
+
 export async function GetOutfits(server: string, count?: number): Promise<Outfit[] | Error> {
   let error: Error | null = null;
   let outfits: Outfit[] = [];
