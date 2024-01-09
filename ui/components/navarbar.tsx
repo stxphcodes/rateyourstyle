@@ -236,14 +236,17 @@ function NotificationMenu(props: { clientServer: string; cookie: string; handleC
 			<div onClick={props.handleClose} className="self-end mt-4 hover:cursor-pointer pr-2">
 				&#10006;
 			</div>
-			{
+			{props.notifications.length < 1 ?
+				<div className="text-background-2 text-xs p-2">
+					no notifications to show
+				</div> :
 				props.notifications.map((n) => (
 					<button className="p-2 border-b-2 hover:bg-white text-left overflow-clip shrink-0" onClick={() => {
 						let url = window.location.href;
 						url += `?outfit=${n.for_outfit_id}`
 						window.location.href = url;
-					}} 
-					key={n.id}
+					}}
+						key={n.id}
 					>
 						<div className="text-background-2 text-xs">
 							{n.date}
@@ -264,8 +267,8 @@ function UserAndNotification(props: { clientServer: string; cookie: string; user
 
 	const [notifs, setNotifs] = useState<Notification[]>([]);
 
-	useEffect(()=>{
-		async function getnotifs(){
+	useEffect(() => {
+		async function getnotifs() {
 			const resp = await GetNotifications(props.clientServer, props.cookie)
 			if (!(resp instanceof Error)) {
 				setNotifs(resp)
@@ -276,7 +279,7 @@ function UserAndNotification(props: { clientServer: string; cookie: string; user
 			getnotifs()
 		}
 
-	},[displayMenu])
+	}, [displayMenu])
 
 	return (
 		<div className="flex flex-row gap-2 items-center">
