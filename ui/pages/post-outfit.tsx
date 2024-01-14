@@ -4,7 +4,6 @@ import Link from 'next/link';
 
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
 import { GetOutfitsByUser, Outfit, OutfitItem } from '../apis/get_outfits';
-import { GetUsername } from '../apis/get_user';
 import { PostImage } from '../apis/post_image';
 import { PostOutfit } from '../apis/post_outfit';
 import { Footer } from '../components/footer';

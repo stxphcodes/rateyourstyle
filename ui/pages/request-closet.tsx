@@ -1,6 +1,5 @@
 import { GetServerSideProps } from 'next';
 
-import { GetUsername } from '../apis/get_user';
 import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
 import { GetServerURL } from '../apis/get_server';

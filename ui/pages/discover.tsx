@@ -1,18 +1,17 @@
 import { GetServerSideProps } from 'next';
-import { useState, useEffect } from 'react';
-import Link from "next/link";
+import { useEffect, useState } from 'react';
 
+import { GetBusinesses } from '../apis/get_businesses';
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
 import { GetOutfits, Outfit } from '../apis/get_outfits';
 import { GetRatings, Rating } from '../apis/get_ratings';
-import { Footer } from '../components/footer';
-import { Navbar } from '../components/navarbar';
 import { GetServerURL } from "../apis/get_server";
 import { GetUserProfile, User, UserProfile } from '../apis/get_user';
+import { Footer } from '../components/footer';
+import { AccountPromptModal } from '../components/modals/accountPrompt';
+import { Navbar } from '../components/navarbar';
 import { OutfitCard } from '../components/outfitcard';
 import { PageMetadata } from './_app';
-import { GetBusinesses } from '../apis/get_businesses';
-import {  AccountPromptModal } from '../components/modals/accountPrompt';
 
 type Props = {
     campaigns: Campaign[] | null;
@@ -311,8 +310,7 @@ function DiscoverPage({ campaigns, cookie, userRatings, outfits, clientServer, b
                                 userRating = userRatings?.filter(r => r.outfit_id == item.id)[0]
                             }
 
-                            return (
-                          
+                            return ( 
                                 <OutfitCard
                                     cookie={cookie}
                                     data={item}

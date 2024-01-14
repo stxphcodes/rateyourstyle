@@ -1,17 +1,16 @@
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 
 
-import { GetCookie } from '../apis/get_cookie';
-import { GetUsername, GetUsernameAndNotifications, UserNotifResp } from '../apis/get_user';
+import { GetNotifications, Notification } from '../apis/get_notifications';
+import { GetOutfit, Outfit } from '../apis/get_outfits';
+import { GetUsernameAndNotifications, UserNotifResp } from '../apis/get_user';
+import { HamburgerMenuIcon } from './icons/menu-burger';
+import { NotificationEmptyIcon } from './icons/notification-empty';
+import { NotificationFilledIcon } from './icons/notification-filled';
 import { CreateAccount } from './modals/createaccount';
 import { SignIn } from './modals/signin';
-import { HamburgerMenuIcon } from './icons/menu-burger';
-import { GetNotifications, Notification } from '../apis/get_notifications';
-import { NotificationFilledIcon } from './icons/notification-filled';
-import { NotificationEmptyIcon } from './icons/notification-empty';
-import { GetOutfit, GetOutfits, Outfit } from '../apis/get_outfits';
 import { OutfitModal } from './outfit-modal';
 
 // check if browser allows cookies to be set
@@ -35,8 +34,6 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 
 	const [showCreateAccountModal, setShowCreateAccountModal] =
 		useState<boolean>(false);
-
-	const [error, setError] = useState<string | null>(null);
 
 	const [username, setUsername] = useState<string>(
 		props.userNotifs ? props.userNotifs.username : ""
@@ -63,21 +60,6 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 	}
 
 	useEffect(() => {
-		// async function getcookie() {
-		// 	const resp = await GetCookie(props.clientServer);
-		// 	if (resp instanceof Error) {
-		// 		setError(resp.message);
-		// 		return;
-		// 	}
-
-		// 	console.log("this is cookie resp")
-		// 	console.log(resp)
-
-		// 	// set cookie in browser
-		// 	document.cookie = resp;
-		// 	location.reload();
-		// }
-
 		async function getusernotif() {
 			const resp = await GetUsernameAndNotifications(props.clientServer, props.cookie)
 			if (!(resp instanceof Error)) {
@@ -93,14 +75,6 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 		if (props.cookie && !username) {
 			getusernotif();
 		}
-
-		// if (!props.cookie) {
-		// 	if (cookieEnabled()) {
-		// 		getcookie();
-		// 	}
-		// } else {
-		// 	!username && getusernotif();
-		// }
 
 		checkMobileScreenWidth(window);
 		window.addEventListener('resize', () => { checkMobileScreenWidth(window) });

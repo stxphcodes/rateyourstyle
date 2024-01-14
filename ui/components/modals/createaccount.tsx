@@ -33,9 +33,6 @@ export function CreateAccount(props: {clientServer: string; handleClose: any}) {
             return;
         }
 
-        console.log("this is resp")
-        console.log(resp)
-
         document.cookie = resp;
         location.reload();
         return;

@@ -1,16 +1,14 @@
 import { GetServerSideProps } from 'next';
 
-import { GetUsername } from '../apis/get_user';
+import Link from 'next/link';
+import { GetServerURL } from '../apis/get_server';
 import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
-import { GetServerURL } from '../apis/get_server';
 import { PageMetadata } from './_app';
-import Link from 'next/link';
 
 type Props = {
 	cookie: string;
 	error: string | null;
-	//username: string;
 	clientServer: string;
 	metadata: PageMetadata;
 };
