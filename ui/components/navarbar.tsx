@@ -63,17 +63,20 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 	}
 
 	useEffect(() => {
-		async function getcookie() {
-			const resp = await GetCookie(props.clientServer);
-			if (resp instanceof Error) {
-				setError(resp.message);
-				return;
-			}
+		// async function getcookie() {
+		// 	const resp = await GetCookie(props.clientServer);
+		// 	if (resp instanceof Error) {
+		// 		setError(resp.message);
+		// 		return;
+		// 	}
 
-			// set cookie in browser
-			document.cookie = resp;
-			location.reload();
-		}
+		// 	console.log("this is cookie resp")
+		// 	console.log(resp)
+
+		// 	// set cookie in browser
+		// 	document.cookie = resp;
+		// 	location.reload();
+		// }
 
 		async function getusernotif() {
 			const resp = await GetUsernameAndNotifications(props.clientServer, props.cookie)
@@ -81,16 +84,23 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 				setUsername(resp.username);
 				setHasNotifs(resp.has_notifications);
 				return;
+			} else {
+				// delete cookie if there was an error retreiving user info
+				document.cookie = "rys-login=;expires=Thu, 01 Jan 1970 00:00:01 GMT"
 			}
 		}
 
-		if (!props.cookie) {
-			if (cookieEnabled()) {
-				getcookie();
-			}
-		} else {
-			!username && getusernotif();
+		if (props.cookie && !username) {
+			getusernotif();
 		}
+
+		// if (!props.cookie) {
+		// 	if (cookieEnabled()) {
+		// 		getcookie();
+		// 	}
+		// } else {
+		// 	!username && getusernotif();
+		// }
 
 		checkMobileScreenWidth(window);
 		window.addEventListener('resize', () => { checkMobileScreenWidth(window) });
@@ -208,7 +218,6 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 			{showCreateAccountModal && (
 				<CreateAccount
 					clientServer={props.clientServer}
-					cookie={props.cookie}
 					handleClose={() => setShowCreateAccountModal(false)}
 				/>
 			)}

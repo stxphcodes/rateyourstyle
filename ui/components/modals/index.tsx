@@ -1,7 +1,7 @@
 export function Modal(props: {children: JSX.Element; handleClose: any, fullHeight?: boolean, wideScreen?: boolean, noPadding?: boolean}) {
 	return (
 		<>
-			<div className="fixed z-50 top-0 w-screen h-screen bg-black bg-opacity-50"></div>
+			<div className="fixed top-0 z-50 w-screen h-screen bg-black bg-opacity-50"></div>
 			{/* <!-- Main modal --> */}
 
 			<div className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  z-50 w-full ${props.wideScreen ? "md:w-3/4" : "md:w-1/2"} ${props.noPadding ? "" : "p-4"} bg-white shadow-lg rounded overflow-y-scroll ${props.fullHeight && "h-full"}`}>

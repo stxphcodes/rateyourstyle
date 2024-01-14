@@ -12,6 +12,7 @@ import { BusinessProfile, GetBusinessProfile } from '../../apis/get_businessprof
 import { VerifiedCheckIcon } from '../../components/icons/verified-check-icon';
 import { SubmitOutfit } from '../../components/modals/submitoutfit';
 import { GetBusinesses } from '../../apis/get_businesses';
+import { AccountPromptModal } from '../../components/modals/accountPrompt';
 
 type Props = {
     cookie: string;
@@ -20,7 +21,7 @@ type Props = {
     userRatings: Rating[] | null;
     clientServer: string;
     closetName: string;
-    username: string;
+    //username: string;
     businessProfile: BusinessProfile | null;
     businesses: string[];
 };
@@ -33,7 +34,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         outfits: null,
         userRatings: null,
         closetName: "",
-        username: "",
+        //username: "",
         businessProfile: null,
         businesses: [],
     };
@@ -48,10 +49,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props.cookie = cookie ? cookie : "";
 
     if (props.cookie) {
-        const usernameResp = await GetUsername(server, props.cookie);
-        if (!(usernameResp instanceof Error)) {
-            props.username = usernameResp;
-        }
+        // const usernameResp = await GetUsername(server, props.cookie);
+        // if (!(usernameResp instanceof Error)) {
+        //     props.username = usernameResp;
+        // }
 
         const ratingResp = await GetRatings(server, props.cookie);
         if (ratingResp instanceof Error) {
@@ -120,13 +121,13 @@ function Rating(props: { x: number, small?: boolean }) {
     )
 }
 
-export default function UserClosetPage({ clientServer, cookie, outfits, userRatings, closetName, username, businessProfile, businesses, error }: Props) {
+export default function UserClosetPage({ clientServer, cookie, outfits, userRatings, closetName, businessProfile, businesses, error }: Props) {
     const [submitOutfitClicked, setSubmitOutfitClicked] = useState(false);
-  
+
     if (error) {
         return (
             <>
-                <Navbar clientServer={clientServer} cookie={cookie} user={username} />
+                <Navbar clientServer={clientServer} cookie={cookie} />
                 <main className="mt-12 sm:mt-20 p-3 md:p-8">
                     <h1>😕 Oh no</h1>
                     Looks like there&apos;s an error on our end. Please refresh the page in a
@@ -139,7 +140,8 @@ export default function UserClosetPage({ clientServer, cookie, outfits, userRati
 
     return (
         <>
-            <Navbar clientServer={clientServer} cookie={cookie} user={username} />
+            <Navbar clientServer={clientServer} cookie={cookie} />
+            {!cookie && <AccountPromptModal clientServer={clientServer}/>}
             <main className="mt-12 sm:mt-20 px-4 md:px-8">
                 <section className="mb-4">
                     <div className="flex flex-wrap gap-2 items-center mb-1">
@@ -157,22 +159,22 @@ export default function UserClosetPage({ clientServer, cookie, outfits, userRati
                         </div> :
                         <>
                             <div className="mt-4">Select items from the closet below to see outfits that contain them.</div>
-                            <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} userRatings={userRatings} businesses={businesses}/>
+                            <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} userRatings={userRatings} businesses={businesses} />
 
                         </>
                     }
                 </section>
-
-
             </main >
-            {submitOutfitClicked && <SubmitOutfit clientServer={clientServer} cookie={cookie} handleClose={() => {
-                setSubmitOutfitClicked(false)
-                location.reload();
-            }
-
-            } closetName={closetName}
-
-            />
+            {submitOutfitClicked &&
+                <SubmitOutfit
+                    clientServer={clientServer}
+                    cookie={cookie}
+                    handleClose={() => {
+                        setSubmitOutfitClicked(false)
+                        location.reload();
+                    }}
+                    closetName={closetName}
+                />
 
             }
 

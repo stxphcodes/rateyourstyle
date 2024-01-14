@@ -94,7 +94,7 @@ export function OutfitModal(props: { clientServer: string; cookie: string; handl
                                 }
                             </div>
                         </div>
-                        {!props.asUser && (
+                        {!props.asUser && props.cookie &&  (
                             <>
                                 {!submitRating ? (
                                     <>

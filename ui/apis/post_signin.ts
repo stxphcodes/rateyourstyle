@@ -1,3 +1,5 @@
+import { SetCookieExpiration } from "./post_user";
+
 export async function PostSignIn(
   server: string,
   username: string,
@@ -32,5 +34,5 @@ export async function PostSignIn(
     return error;
   }
 
-  return cookie;
+  return SetCookieExpiration(cookie, 365);
 }
