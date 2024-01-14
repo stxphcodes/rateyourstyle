@@ -21,7 +21,6 @@ type Props = {
     error: string | null;
     outfits: Outfit[] | null;
     userRatings: Rating[] | null;
-    //user: User | null;
     metadata: PageMetadata;
     businesses: string[];
 };
@@ -70,7 +69,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
         campaigns: null,
         cookie: "",
-        //user: null,
         userRatings: null,
         error: null,
         outfits: null,
@@ -94,13 +92,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 
     if (props.cookie) {
-        // const userResp = await GetUserProfile(server, props.cookie);
-        // if (userResp instanceof Error) {
-        //     props.error = userResp.message;
-        //     return { props };
-        // }
-        // props.user = userResp;
-
         const ratingResp = await GetRatings(server, props.cookie);
         if (ratingResp instanceof Error) {
             props.error = ratingResp.message;

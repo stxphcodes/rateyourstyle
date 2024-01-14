@@ -44,7 +44,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		campaigns: null,
 		cookie: "",
 		error: null,
-		//username: "",
 		clientServer: "",
 		previousOutfitItems: [],
 		metadata: {
@@ -63,12 +62,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	props.cookie = cookie ? cookie : "";
 
 	if (props.cookie) {
-		// const usernameResp = await GetUsername(server, props.cookie);
-		// if (!(usernameResp instanceof Error)) {
-		// 	props.username = usernameResp;
-		// }
-
-
 		const outfits = await GetOutfitsByUser(server, props.cookie)
 		if (!(outfits instanceof Error)) {
 			outfits.map(outfit => {

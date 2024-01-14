@@ -12,7 +12,6 @@ import { ClosetRequest } from '../apis/post_closetrequest';
 type Props = {
     cookie: string;
     error: string | null;
-    //username: string;
     clientServer: string;
     metadata: PageMetadata;
 };
@@ -21,7 +20,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
         cookie: "",
         error: null,
-        //username: "",
         clientServer: "",
         metadata: {
             title: "RateYourStyle Business",
@@ -37,13 +35,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     let cookie = context.req.cookies["rys-login"];
     props.cookie = cookie ? cookie : "";
-
-    // if (props.cookie) {
-    //     const usernameResp = await GetUsername(server, props.cookie);
-    //     if (!(usernameResp instanceof Error)) {
-    //         props.username = usernameResp;
-    //     }
-    // }
 
     let clientServer = GetServerURL(true)
     if (clientServer instanceof Error) {
@@ -209,12 +200,7 @@ export default function RequestClosetPage({ cookie, clientServer }: Props) {
                             </>
                         }
                     </form>
-
-
-
-
                 </section>
-
             </main>
             <Footer />
         </>

@@ -21,7 +21,6 @@ type Props = {
     userRatings: Rating[] | null;
     clientServer: string;
     closetName: string;
-    //username: string;
     businessProfile: BusinessProfile | null;
     businesses: string[];
 };
@@ -34,7 +33,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         outfits: null,
         userRatings: null,
         closetName: "",
-        //username: "",
         businessProfile: null,
         businesses: [],
     };
@@ -49,11 +47,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props.cookie = cookie ? cookie : "";
 
     if (props.cookie) {
-        // const usernameResp = await GetUsername(server, props.cookie);
-        // if (!(usernameResp instanceof Error)) {
-        //     props.username = usernameResp;
-        // }
-
         const ratingResp = await GetRatings(server, props.cookie);
         if (ratingResp instanceof Error) {
             props.error = ratingResp.message;
@@ -141,7 +134,7 @@ export default function UserClosetPage({ clientServer, cookie, outfits, userRati
     return (
         <>
             <Navbar clientServer={clientServer} cookie={cookie} />
-            {!cookie && <AccountPromptModal clientServer={clientServer}/>}
+            {!cookie && <AccountPromptModal clientServer={clientServer} />}
             <main className="mt-12 sm:mt-20 px-4 md:px-8">
                 <section className="mb-4">
                     <div className="flex flex-wrap gap-2 items-center mb-1">
@@ -160,7 +153,6 @@ export default function UserClosetPage({ clientServer, cookie, outfits, userRati
                         <>
                             <div className="mt-4">Select items from the closet below to see outfits that contain them.</div>
                             <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} userRatings={userRatings} businesses={businesses} />
-
                         </>
                     }
                 </section>
@@ -175,9 +167,7 @@ export default function UserClosetPage({ clientServer, cookie, outfits, userRati
                     }}
                     closetName={closetName}
                 />
-
             }
-
             <Footer />
         </>
     );
