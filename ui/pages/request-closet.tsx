@@ -1,6 +1,5 @@
 import { GetServerSideProps } from 'next';
 
-import { GetUsername } from '../apis/get_user';
 import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
 import { GetServerURL } from '../apis/get_server';
@@ -12,7 +11,6 @@ import { ClosetRequest } from '../apis/post_closetrequest';
 type Props = {
     cookie: string;
     error: string | null;
-    username: string;
     clientServer: string;
     metadata: PageMetadata;
 };
@@ -21,7 +19,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
         cookie: "",
         error: null,
-        username: "",
         clientServer: "",
         metadata: {
             title: "RateYourStyle Business",
@@ -38,13 +35,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let cookie = context.req.cookies["rys-login"];
     props.cookie = cookie ? cookie : "";
 
-    if (props.cookie) {
-        const usernameResp = await GetUsername(server, props.cookie);
-        if (!(usernameResp instanceof Error)) {
-            props.username = usernameResp;
-        }
-    }
-
     let clientServer = GetServerURL(true)
     if (clientServer instanceof Error) {
         props.error = clientServer.message;
@@ -57,7 +47,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 
-export default function RequestClosetPage({ cookie, username, clientServer }: Props) {
+export default function RequestClosetPage({ cookie, clientServer }: Props) {
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
     const [reason, setReason] = useState("")
@@ -117,7 +107,7 @@ export default function RequestClosetPage({ cookie, username, clientServer }: Pr
 
     return (
         <>
-            <Navbar clientServer={clientServer} cookie={cookie} user={username} />
+            <Navbar clientServer={clientServer} cookie={cookie} />
 
             <main className="mt-12 sm:mt-20 px-4 md:px-8 w-full md:w-3/4">
                 <section className="mb-4">
@@ -209,12 +199,7 @@ export default function RequestClosetPage({ cookie, username, clientServer }: Pr
                             </>
                         }
                     </form>
-
-
-
-
                 </section>
-
             </main>
             <Footer />
         </>

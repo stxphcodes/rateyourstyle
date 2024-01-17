@@ -4,7 +4,6 @@ import Link from 'next/link';
 
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
 import { GetOutfitsByUser, Outfit, OutfitItem } from '../apis/get_outfits';
-import { GetUsername } from '../apis/get_user';
 import { PostImage } from '../apis/post_image';
 import { PostOutfit } from '../apis/post_outfit';
 import { Footer } from '../components/footer';
@@ -12,12 +11,13 @@ import { Modal, XButton } from '../components/modals';
 import { Navbar } from '../components/navarbar';
 import { GetServerURL } from '../apis/get_server';
 import { PageMetadata } from './_app';
+import { AccountPromptModal } from '../components/modals/accountPrompt';
 
 type Props = {
 	campaigns: Campaign[] | null;
 	cookie: string;
 	error: string | null;
-	username: string;
+	//username: string;
 	clientServer: string;
 	previousOutfitItems: OutfitItem[];
 	metadata: PageMetadata;
@@ -43,7 +43,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		campaigns: null,
 		cookie: "",
 		error: null,
-		username: "",
 		clientServer: "",
 		previousOutfitItems: [],
 		metadata: {
@@ -62,12 +61,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	props.cookie = cookie ? cookie : "";
 
 	if (props.cookie) {
-		const usernameResp = await GetUsername(server, props.cookie);
-		if (!(usernameResp instanceof Error)) {
-			props.username = usernameResp;
-		}
-
-
 		const outfits = await GetOutfitsByUser(server, props.cookie)
 		if (!(outfits instanceof Error)) {
 			outfits.map(outfit => {
@@ -138,7 +131,7 @@ function validateForm(
 	}
 }
 
-function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOutfitItems, error }: Props) {
+function PostOutfitPage({ campaigns, cookie, clientServer, previousOutfitItems, error }: Props) {
 	const [file, setFile] = useState<File | null>(null);
 	const [imageURL, setImageURL] = useState<string | null>("");
 	const [fileError, setFileError] = useState<string | null>("");
@@ -339,18 +332,12 @@ function PostOutfitPage({ campaigns, cookie, username, clientServer, previousOut
 
 	return (
 		<>
-			<Navbar clientServer={clientServer} cookie={cookie} user={username} />
+			<Navbar clientServer={clientServer} cookie={cookie} />
+			{!cookie && <AccountPromptModal clientServer={clientServer} />}
 
 			<main className="mt-12 sm:mt-20 px-4 md:px-8 w-full md:w-3/4">
 				<section className="mb-4">
 					<h1>Outfit Post</h1>
-					{!username && (
-						<div className="bg-red-700 p-2 rounded text-white mb-2">
-							You are not currently signed into an account. You can still create
-							a post but your post will be inelible for campaign giveaways since we don&apos;t have an email to contact you with if you were to win. If you are applying to a campaign, please sign in or create an account if
-							you don&apos;t have one!
-						</div>
-					)}
 					<div className="bg-background p-2 rounded">
 						<h3>FAQs</h3>
 						<div className="font-semibold mt-2">Who can see my outfit posts?</div>

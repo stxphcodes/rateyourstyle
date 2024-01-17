@@ -1,16 +1,14 @@
 import { GetServerSideProps } from 'next';
 
-import { GetUsername } from '../apis/get_user';
+import Link from 'next/link';
+import { GetServerURL } from '../apis/get_server';
 import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
-import { GetServerURL } from '../apis/get_server';
 import { PageMetadata } from './_app';
-import Link from 'next/link';
 
 type Props = {
 	cookie: string;
 	error: string | null;
-	username: string;
 	clientServer: string;
 	metadata: PageMetadata;
 };
@@ -19,7 +17,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	let props: Props = {
 		cookie: "",
 		error: null,
-		username: "",
 		clientServer: "",
 		metadata: {
 			title: "RateYourStyle Business",
@@ -36,13 +33,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	let cookie = context.req.cookies["rys-login"];
 	props.cookie = cookie ? cookie : "";
 
-	if (props.cookie) {
-		const usernameResp = await GetUsername(server, props.cookie);
-		if (!(usernameResp instanceof Error)) {
-			props.username = usernameResp;
-		}
-	}
-
 	let clientServer = GetServerURL(true)
 	if (clientServer instanceof Error) {
 		props.error = clientServer.message;
@@ -55,10 +45,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 
-export default function ForBusinessesPage({ cookie, username, clientServer }: Props) {
+export default function ForBusinessesPage({ cookie,  clientServer }: Props) {
 	return (
 		<>
-			<Navbar clientServer={clientServer} cookie={cookie} user={username} />
+			<Navbar clientServer={clientServer} cookie={cookie} />
 			<main className="mt-10 ">
 				<section className="bg-primary text-white ">
 					<div className="grid grid-cols-1 md:grid-cols-7 items-center gap-x-0 md:gap-x-8">
@@ -97,7 +87,7 @@ export default function ForBusinessesPage({ cookie, username, clientServer }: Pr
 
 							<div className="bg-background rounded p-4">The quickest way to get started is to submit a<Link href="/request-closet" passHref={true}>
                                 <a className="mx-2">Closet Request</a>
-                            </Link>form and make sure to check the owner checkbox!  If you have any questions, please email sitesbystephanie@gmail.com </div>
+                            </Link>form and make sure to check the owner checkbox!  If you have any questions, please email sitesbystephanie@gmail.com . </div>
 							
 						</div>
 					</div>

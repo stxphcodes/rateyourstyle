@@ -9,7 +9,6 @@ import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
 import { OutfitCard } from '../components/outfitcard';
 import { GetServerURL } from "../apis/get_server";
-import { GetUserProfile, User } from '../apis/get_user';
 import { ClosetTable } from '../components/closet-table';
 import { PageMetadata } from './_app';
 import { GetBusinesses } from '../apis/get_businesses';
@@ -21,7 +20,6 @@ type Props = {
     error: string | null;
     outfits: Outfit[] | null;
     userRatings: Rating[] | null;
-    user: User | null;
     metadata: PageMetadata;
     businesses: string[] | null;
 };
@@ -30,7 +28,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
         campaigns: null,
         cookie: "",
-        user: null,
         userRatings: null,
         error: null,
         outfits: null,
@@ -53,14 +50,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 
     if (props.cookie) {
-        const userResp = await GetUserProfile(server, props.cookie);
-        if (userResp instanceof Error) {
-            props.error = userResp.message;
-            return { props };
-        }
-
-        props.user = userResp;
-
         const ratingResp = await GetRatings(server, props.cookie);
         if (ratingResp instanceof Error) {
             props.error = ratingResp.message;
@@ -101,7 +90,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props };
 };
 
-function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, businesses, error }: Props) {
+function Home({ campaigns, cookie, outfits, userRatings, clientServer, businesses, error }: Props) {
     const [heroSectionImage, setHeroSectionImage] = useState(outfits ? outfits[0].picture_url : "/clothing-photo.jpg")
 
     let outfitItems: OutfitItem[] = [];
@@ -144,7 +133,7 @@ function Home({ campaigns, cookie, user, outfits, userRatings, clientServer, bus
 
     return (
         <>
-            <Navbar clientServer={clientServer} cookie={cookie} user={user?.username} />
+            <Navbar clientServer={clientServer} cookie={cookie} />
             <main className="mt-12 sm:mt-20">
                 <section className="px-3 md:px-8 mb-8">
                     <h1>Read outfit reviews from real people</h1>

@@ -1,13 +1,21 @@
 import { UserProfile } from "./get_user";
 
+export async function SetCookieExpiration(cookie: string, expDays: number)  {
+  let date = new Date();
+  date.setTime(date.getTime() + (expDays * 24 * 60 * 60 * 1000));
+  let dateStr =  date.toUTCString();
+  let newCookie = cookie +";expires=" + dateStr +";path=/"
+  return newCookie;
+}
+
 export async function PostUser(
   server: string,
-  cookie: string,
   username: string,
   email: string,
   password: string
 ): Promise<string | Error> {
   let error: Error | null = null;
+  let cookie: string = ""
 
   try {
     const resp = await fetch(`${server}/api/user`, {
@@ -16,13 +24,11 @@ export async function PostUser(
         username: username,
         email: email,
         password: password,
-        cookie: cookie,
       }),
       headers: {"content-type": "application/json"},
     });
 
     const data = await resp.text();
-
     if (resp.ok) {
       cookie = data;
     } else {
@@ -38,7 +44,7 @@ export async function PostUser(
     return error;
   }
 
-  return cookie;
+  return SetCookieExpiration(cookie, 365)
 }
 
 

@@ -4,7 +4,7 @@ import { PostUser } from '../../apis/post_user';
 import { Modal } from './';
 import { GetServerURL } from '../../apis/get_server';
 
-export function CreateAccount(props: {clientServer: string; cookie: string; handleClose: any}) {
+export function CreateAccount(props: {clientServer: string; handleClose: any}) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
@@ -27,7 +27,7 @@ export function CreateAccount(props: {clientServer: string; cookie: string; hand
     async function handleSubmit(event: React.FormEvent<HTMLButtonElement>) {
         event.preventDefault();
 
-        const resp = await PostUser(props.clientServer, props.cookie, username, email, password);
+        const resp = await PostUser(props.clientServer, username, email, password);
         if (resp instanceof Error) {
             setError(resp.message);
             return;

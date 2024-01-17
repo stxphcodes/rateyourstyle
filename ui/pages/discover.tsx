@@ -1,18 +1,17 @@
 import { GetServerSideProps } from 'next';
-import { useState, useEffect } from 'react';
-import Link from "next/link";
+import { useEffect, useState } from 'react';
 
+import { GetBusinesses } from '../apis/get_businesses';
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
 import { GetOutfits, Outfit } from '../apis/get_outfits';
 import { GetRatings, Rating } from '../apis/get_ratings';
-import { Footer } from '../components/footer';
-import { Navbar } from '../components/navarbar';
 import { GetServerURL } from "../apis/get_server";
 import { GetUserProfile, User, UserProfile } from '../apis/get_user';
+import { Footer } from '../components/footer';
+import { AccountPromptModal } from '../components/modals/accountPrompt';
+import { Navbar } from '../components/navarbar';
 import { OutfitCard } from '../components/outfitcard';
 import { PageMetadata } from './_app';
-import { GetBusinesses } from '../apis/get_businesses';
-
 
 type Props = {
     campaigns: Campaign[] | null;
@@ -21,7 +20,6 @@ type Props = {
     error: string | null;
     outfits: Outfit[] | null;
     userRatings: Rating[] | null;
-    user: User | null;
     metadata: PageMetadata;
     businesses: string[];
 };
@@ -70,7 +68,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let props: Props = {
         campaigns: null,
         cookie: "",
-        user: null,
         userRatings: null,
         error: null,
         outfits: null,
@@ -94,14 +91,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 
     if (props.cookie) {
-        const userResp = await GetUserProfile(server, props.cookie);
-        if (userResp instanceof Error) {
-            props.error = userResp.message;
-            return { props };
-        }
-
-        props.user = userResp;
-
         const ratingResp = await GetRatings(server, props.cookie);
         if (ratingResp instanceof Error) {
             props.error = ratingResp.message;
@@ -144,7 +133,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props };
 };
 
-function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientServer, businesses, error }: Props) {
+function DiscoverPage({ campaigns, cookie, userRatings, outfits, clientServer, businesses, error }: Props) {
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
     const [readMore, setReadMore] = useState(() => {
         let intialState =
@@ -157,15 +146,28 @@ function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientSer
         return intialState;
     });
 
+    const [userProfile, setUserProfile] = useState<User | null>(null);
     const [similarToMe, setSimilarToMe] = useState<boolean>(false);
     const [similarToMeError, setSimilarToMeError] = useState<string | null>(null);
 
     const [outfitsFiltered, setOutfitsFiltered] = useState<Outfit[] | null>(outfits);
 
     useEffect(() => {
+        async function getuserprofile() {
+            const userResp = await GetUserProfile(clientServer, cookie);
+            if (!(userResp instanceof Error)) {
+                setUserProfile(userResp)
+            }
+        }
+
+
         if (searchTerms.length == 0 && !similarToMe) {
             setOutfitsFiltered(outfits)
             return
+        }
+
+        if (similarToMe) {
+            getuserprofile();
         }
 
         let filtered: Outfit[] = []
@@ -183,9 +185,9 @@ function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientSer
                 return;
             }
 
-            if (similarToMe) {
-                if (outfit?.user_profile && user?.user_profile) {
-                    if (findSimilarToMe(outfit.user_profile, user.user_profile)) {
+            if (similarToMe && userProfile && userProfile.user_profile) {
+                if (outfit?.user_profile) {
+                    if (findSimilarToMe(outfit.user_profile, userProfile.user_profile)) {
                         filtered.push(outfit);
                     }
                 }
@@ -199,10 +201,15 @@ function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientSer
         return <div>error {error} </div>;
     }
 
+
     return (
         <>
-            <Navbar clientServer={clientServer} cookie={cookie} user={user?.username} />
-            <main className="mt-12 sm:mt-20 px-4 md:px-8">
+            <Navbar clientServer={clientServer} cookie={cookie} />
+            {
+                !cookie && 
+                <AccountPromptModal clientServer={clientServer}/>
+            }
+            <main className="mt-12 sm:mt-20 px-4 md:px-8 overflow-y-hidden">
                 <section className="mb-4">
                     <h1>Discover</h1>
                     <div>Select a username to see the user&apos;s closet. Submit a rating for an outfit by clicking &apos;submit your rating&apos;.</div>
@@ -213,12 +220,12 @@ function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientSer
                                 Similar to me
                                 <input type="checkbox"
                                     onChange={() => {
-                                        if (!user || !user.username) {
+                                        if (!userProfile || !userProfile.username) {
                                             setSimilarToMeError("unknownUser")
                                             return;
                                         }
 
-                                        if (checkEmptyUserProfile(user.user_profile)) {
+                                        if (checkEmptyUserProfile(userProfile.user_profile)) {
                                             setSimilarToMeError("missingProfile")
                                             return;
                                         }
@@ -290,7 +297,7 @@ function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientSer
                     </div>
                 </section>
 
-                <section className="flex flex-row flex-wrap items-start justify-center md:justify-start gap-4">
+                <section className="flex flex-row flex-wrap items-start justify-center md:justify-start gap-2">
                     {
                         (!outfitsFiltered || outfitsFiltered.length == 0) &&
                         <div className="h-screen">No results at this time </div>
@@ -303,7 +310,7 @@ function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientSer
                                 userRating = userRatings?.filter(r => r.outfit_id == item.id)[0]
                             }
 
-                            return (
+                            return ( 
                                 <OutfitCard
                                     cookie={cookie}
                                     data={item}
@@ -312,6 +319,7 @@ function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientSer
                                     clientServer={clientServer}
                                     verifiedBusiness={businesses && businesses.filter(id => item.username == id).length > 0 ? true : false}
                                 />
+                          
                             )
                         })}
                 </section>

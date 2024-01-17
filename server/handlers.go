@@ -375,12 +375,13 @@ func (h *Handler) GetRatingsByUser() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 
+		ratings := []interface{}{}
 		userId, ok := h.UserIndices.CookieId[cookie]
 		if !ok {
-			return ctx.NoContent(http.StatusForbidden)
+			log.Println("in GetRatingsByUser, user id not found with cookie ", cookie)
+			return ctx.JSON(http.StatusOK, ratings)
 		}
 
-		ratings := []interface{}{}
 		outfitRatings, ok := h.RatingIndices.UserOutfitRating[userId]
 		if !ok {
 			return ctx.NoContent(http.StatusNoContent)
@@ -525,16 +526,19 @@ func (h *Handler) GetUserProfile() echo.HandlerFunc {
 
 func (h Handler) PostClosetRequest() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
+		var userId string
+		var ok bool
+
 		cookie, err := getCookie(ctx.Request())
 		if err != nil {
-			log.Println("error retrieving cookie")
-			return ctx.NoContent(http.StatusForbidden)
-		}
-
-		userId, ok := h.UserIndices.CookieId[cookie]
-		if !ok {
-			log.Println("user id not found based on cookie " + cookie)
-			return ctx.NoContent(http.StatusForbidden)
+			userId = "anonymous"
+		} else {
+			// cookie was sent
+			userId, ok = h.UserIndices.CookieId[cookie]
+			if !ok {
+				log.Println("user id not found based on cookie " + cookie)
+				return ctx.NoContent(http.StatusForbidden)
+			}
 		}
 
 		var data map[string]interface{}
@@ -770,15 +774,14 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 		}
 
 		// uniqueness checks
-		_, ok := h.UserIndices.Emails[data.Email]
-		if ok {
-			return ctx.String(http.StatusBadRequest, "email taken")
-		}
-
-		_, ok = h.UserIndices.Usernames[data.Username]
+		_, ok := h.UserIndices.Usernames[data.Username]
 		if ok {
 			return ctx.String(http.StatusBadRequest, "username taken")
 		}
+
+		// assign cookie and id to user
+		data.Cookie = uuid()
+		data.Id = uuid()
 
 		// read original file
 		users, err := getAllUsers(ctx.Request().Context(), h.Gcs.Bucket)
@@ -787,33 +790,12 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
+		users = append(users, data)
+
 		// update user in  original file
 		obj := h.Gcs.Bucket.Object("data/users/users.json")
 		writer := obj.NewWriter(ctx.Request().Context())
 		defer writer.Close()
-
-		found := false
-		for i, u := range users {
-			if u.Cookie == data.Cookie {
-				// update fields for user
-				users[i].Email = data.Email
-				users[i].Password = data.Password
-				users[i].Username = data.Username
-
-				// get user id from files
-				data.Id = u.Id
-				found = true
-			}
-		}
-
-		if !found {
-			// cookie wasn't found in users file for some reason.
-			// create a new id to associate with the cookie.
-			// this scenario shouldn't be the case.
-			log.Println("in post user, cookie not found in users file")
-			data.Id = uuid()
-			users = append(users, data)
-		}
 
 		if err := json.NewEncoder(writer).Encode(users); err != nil {
 			log.Println(err.Error())

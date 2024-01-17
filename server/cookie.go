@@ -5,10 +5,10 @@ import (
 	"math/rand"
 	"net/http"
 	"strings"
-	"time"
 )
 
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+const cookieName = "rys-login"
 
 func uuid() string {
 	b := make([]byte, 16)
@@ -22,7 +22,7 @@ func uuid() string {
 func getCookie(request *http.Request) (string, error) {
 	cookie := ""
 	for key, value := range request.Header {
-		if strings.ToLower(key) == "rys-login" {
+		if strings.ToLower(key) == cookieName {
 			cookie = value[0]
 		}
 	}
@@ -36,8 +36,8 @@ func getCookie(request *http.Request) (string, error) {
 
 func createCookieStr(cookie string) string {
 	return fmt.Sprintf(
-		"rys-login=%s;expires=%s",
+		"%s=%s",
+		cookieName,
 		cookie,
-		time.Now().Add(time.Minute*525600).String(),
 	)
 }
