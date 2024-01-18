@@ -135,8 +135,22 @@ function Home({ campaigns, cookie, outfits, userRatings, clientServer, businesse
         <>
             <Navbar clientServer={clientServer} cookie={cookie} />
             <main className="mt-12 sm:mt-20">
+           
+
+                <section className="bg-background-2 px-3 md:px-8 py-8">
+                    <h1 className="text-white">Virtual Closets and Data Viz for the Fashion Nerd</h1>
+                    <h2 className="my-4 text-white text-base">
+                        RateYourStyle will aggregate all of the clothing items in your outfits to create an inventory of your closet. You can sort, filter and search your clothes easily with our spreadsheet-like table. Features to come include: more data science tools to enable meaningful analysis of your closet, an AI style assistant and more. Start your virtual closet by simply posting an outfit.
+                    </h2>
+                    <div className="bg-white p-2 rounded-lg">
+                            <h6>Sample Closet</h6>
+                            <ClosetTable outfits={outfits ? outfits : []} cookie={cookie} clientServer={clientServer} userRatings={null} onlyTable={true} />
+                    </div>
+                </section>
+
+
                 <section className="px-3 md:px-8 mb-8">
-                    <h1>Read outfit reviews from real people</h1>
+                    <h1>Discourse for the Fashion Concious</h1>
                     <Link href="discover">Discover more here</Link>
                     <div className="flex flex-nowrap flex-row gap-2 overflow-scroll my-2">
                         {outfits &&
@@ -158,16 +172,6 @@ function Home({ campaigns, cookie, outfits, userRatings, clientServer, businesse
                                     </div>
                                 )
                             })}
-                    </div>
-                </section>
-
-                <section className="bg-background-2 px-3 md:px-8 py-8">
-                    <h1 className="text-white">Build Your Virtual Closet</h1>
-                    <h2 className="my-4 text-white text-base">
-                        RateYourStyle will aggregate all of the clothing items in your outfits to create an inventory of your closet. You can sort, filter and search your clothes easily with our spreadsheet-like table. Features to come include: more data science tools to enable meaningful analysis of your closet, an AI style assistant and more. Start your virtual closet by simply posting an outfit.
-                    </h2>
-                    <div>
-                        <ClosetTable outfits={outfits ? outfits : []} cookie={cookie} clientServer={clientServer} userRatings={null} onlyTable={true} />
                     </div>
                 </section>
 

@@ -1,18 +1,20 @@
 import { GetServerSideProps } from 'next';
 import { useState, useEffect } from 'react';
 
-import { GetPublicOutfitsByUser, Outfit, GetBusinessOutfits } from '../../apis/get_outfits';
-import { GetRatings, Rating } from '../../apis/get_ratings';
-import { Navbar } from '../../components/navarbar';
-import { GetServerURL } from "../../apis/get_server";
-import { ClosetTable } from '../../components/closet-table';
-import { GetUsername } from '../../apis/get_user';
-import { Footer } from '../../components/footer';
-import { BusinessProfile, GetBusinessProfile } from '../../apis/get_businessprofile';
-import { VerifiedCheckIcon } from '../../components/icons/verified-check-icon';
-import { SubmitOutfit } from '../../components/modals/submitoutfit';
-import { GetBusinesses } from '../../apis/get_businesses';
-import { AccountPromptModal } from '../../components/modals/accountPrompt';
+import { GetPublicOutfitsByUser, Outfit, GetBusinessOutfits } from '../apis/get_outfits';
+import { GetRatings, Rating } from '../apis/get_ratings';
+import { Navbar } from '../components/navarbar';
+import { GetServerURL } from "../apis/get_server";
+import { ClosetTable } from '../components/closet-table';
+import { GetUsername } from '../apis/get_user';
+import { Footer } from '../components/footer';
+import { BusinessProfile, GetBusinessProfile } from '../apis/get_businessprofile';
+import { VerifiedCheckIcon } from '../components/icons/verified-check-icon';
+import { SubmitOutfit } from '../components/modals/submitoutfit';
+import { GetBusinesses } from '../apis/get_businesses';
+import { AccountPromptModal } from '../components/modals/accountPrompt';
+import { Budget } from '../components/budget-donut';
+import { OutfitItem } from '../apis/get_outfits';
 
 type Props = {
     cookie: string;
@@ -55,11 +57,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         props.userRatings = ratingResp;
     }
 
-    let closetName = context.query["user_id"];
-    if (typeof closetName !== "string") {
-        props.error = "missing username for closet"
-        return { props };
-    }
+    let closetName = "test1234"
     props.closetName = closetName;
 
     const resp = await GetPublicOutfitsByUser(server, props.cookie, closetName);
@@ -131,6 +129,21 @@ export default function UserClosetPage({ clientServer, cookie, outfits, userRati
         );
     }
 
+    let outfitItemToIds: Map<string, string[]> = new Map<string, string[]>();
+
+    let items: OutfitItem[] = []
+    outfits && outfits.map(outfit => {
+        outfit.items.map(item => {
+            if (!outfitItemToIds.has(item.id)) {
+                outfitItemToIds.set(item.id, [outfit.id]);
+                items.push(item);
+            } else {
+                let outfitIds = outfitItemToIds.get(item.id) || [];
+                outfitItemToIds.set(item.id, outfitIds);
+            }
+        })
+    })
+
     return (
         <>
             <Navbar clientServer={clientServer} cookie={cookie} />
@@ -145,16 +158,18 @@ export default function UserClosetPage({ clientServer, cookie, outfits, userRati
                     </div>
                     {businessProfile && <div className="">{businessProfile.description}</div>}
 
+           
+
                     {!outfits || outfits.length == 0 ?
                         <div className="h-screen">
                             <h3>😕 Empty</h3>
                             Looks like the user hasn&apos;t posted any public outfits yet.
                         </div> :
-                     <>
-                         <div></div>
+                        <>
+                           
                             <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} userRatings={userRatings} businesses={businesses} />
-                            </>
-                      
+                     
+                        </>
                     }
                 </section>
             </main >
