@@ -1,4 +1,4 @@
-import {  useState } from 'react';
+import { useState } from 'react';
 
 import { Outfit, OutfitItem } from '../apis/get_outfits';
 import { GetRatings, GetRatingsByOutfit, Rating } from '../apis/get_ratings';
@@ -10,7 +10,10 @@ import { OutfitModal } from './outfit-modal';
 
 export function RatingDiv(props: { x: number, small?: boolean }) {
 	return (
-		<div style={{ fontSize: props.small ? "18px" : "30px" }} className="text-primary">{props.x == 0 ? "?" : props.x}</div>
+		<div
+			style={{ fontSize: props.small ? "18px" : "30px" }} className="text-primary">
+			{props.x == 0 ? "" : props.x}
+		</div>
 	)
 }
 
@@ -34,55 +37,64 @@ export function OutfitCard(props: {
 	const [readMore, setReadMore] = useState(false)
 	return (
 		<>
-			<div className="w-72 shadow-md break-words">
-				<div className="px-2 py-1 bg-background text-sm " style={{ fontFamily: 'custom-serif' }}>
-					{props.data.username ? <Link href={`/closet/${props.data.username}`} passHref={true}>
-						<a className="flex flex-wrap items-center gap-1">{props.data.username}&apos;s closet {props.verifiedBusiness && <VerifiedCheckIcon small={true} />}</a>
-					</Link> : <div>anonymous</div>}
-					<div className="">{props.data.date}</div>
-				</div>
-				<div className="overflow-hidden h-96 hover:cursor-pointer">
+			<div className="w-40 sm:w-72 shadow-sm break-words">
+
+				<div className="overflow-hidden h-72 sm:h-96 hover:cursor-pointer">
 					<img
 						onClick={() => setExpandImage(true)}
 						className="object-cover w-full h-full"
 						src={props.data.picture_url_resized}
 					/>
 				</div>
+
 				<div className="p-2">
-					<div style={{ fontFamily: 'custom-serif' }} className="whitespace-nowrap text-ellipsis overflow-hidden">{props.data.title}</div>
-					<div className="flex items-center mt-1">
-						<div className="hover:cursor-pointer mr-2" onClick={() => setExpandImage(true)}>
-							<RatingDiv x={props.data.rating_average ? props.data.rating_average : 0} small={true} />
+					<div
+						style={{ fontFamily: 'custom-serif' }} className="whitespace-nowrap text-ellipsis overflow-hidden">
+						<div className="text-sm">
+							{props.data.username ?
+								<Link
+									href={`/closet/${props.data.username}`}
+									passHref={true}>
+									<a
+										className="flex flex-wrap items-center gap-1">
+										{props.data.username}&apos;s closet
+										{props.verifiedBusiness &&
+											<VerifiedCheckIcon small={true} />}
+									</a>
+								</Link> : "anonymous"}
 						</div>
-						<a className="" onClick={() => setExpandImage(true)}>
+						<div>{props.data.title}</div>
+					</div>
+					<div className="flex items-center mt-1">
+						{
+							props.data.rating_average &&
+							<div
+								className="hover:cursor-pointer mr-2"
+								onClick={() => setExpandImage(true)}>
+								<RatingDiv x={props.data.rating_average} small={true} />
+							</div>
+						}
+						<a className="text-background-2" onClick={() => setExpandImage(true)}>
 							{
 								!props.data.rating_count ? "no reviews submitted yet" : `from ${props.data.rating_count} ${props.data.rating_count > 1 ? "reviews" : "review"} `
 							}
 						</a>
 					</div>
 				</div>
+				{
+					readMore &&
 
-				{!readMore ?
-					<div className="flex bg-background p-1 justify-center">
-						<a className="" onClick={(e) => {
-							e.preventDefault()
-							setReadMore(!readMore)
-						}}>View {props.data.items.length} {props.data.items.length > 1 ? "items" : "item"}</a>
-					</div> : <hr className="my-2" />
+					<OutfitItemList outfitItems={props.data.items} />
+
+
 				}
 
-				{readMore &&
-					<>
-						<OutfitItemList outfitItems={props.data.items} />
-						<div className="flex bg-background p-1 justify-center">
-							<a className="" onClick={(e) => {
-								e.preventDefault()
-								setReadMore(!readMore)
-							}}>View less</a>
-						</div>
-					</>
-				}
-
+				<div className="flex justify-center px-2 pb-1">
+					<a className="text-background-2" onClick={(e) => {
+						e.preventDefault()
+						setReadMore(!readMore)
+					}}>View {!readMore && props.data.items.length} {!readMore && props.data.items.length > 1 ? "items" : !readMore && "item"} {readMore && "less"}</a>
+				</div>
 			</div>
 
 			{expandImage && (

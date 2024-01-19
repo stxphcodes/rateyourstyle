@@ -297,7 +297,8 @@ function DiscoverPage({ campaigns, cookie, userRatings, outfits, clientServer, b
                     </div>
                 </section>
 
-                <section className="flex flex-row flex-wrap items-start justify-center md:justify-start gap-2">
+                <section 
+                className="flex flex-row flex-wrap justify-center gap-2 sm:gap-4">
                     {
                         (!outfitsFiltered || outfitsFiltered.length == 0) &&
                         <div className="h-screen">No results at this time </div>

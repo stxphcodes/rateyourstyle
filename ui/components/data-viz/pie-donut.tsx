@@ -23,7 +23,7 @@ export function ClosetCostChart(props: { items: OutfitItem[] }) {
     })
 
     var total = prices.reduce((partialSum, a) => partialSum + a, 0);
-    var average = total / prices.length
+    var average = Math.round((total / prices.length)*100)/100;
     var data: any[] = [] 
 
     if (total == average) {

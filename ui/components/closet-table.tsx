@@ -262,7 +262,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                     </div>
 
                     :
-                    (itemsSelected && itemsSelected.length > 1) ?
+                    (!props.onlyTable && itemsSelected && itemsSelected.length > 1) ?
                         <div className="grid grid-cols-1 sm:grid-cols-2 items-center">
                             <ClosetCostChart items={items.filter(item => {
                                 let idx = itemsSelected.findIndex(i => i === item.id)
@@ -273,7 +273,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                                 return idx >= 0
                             })} />
                         </div> :
-                        itemsSelected && itemsSelected.length > 0 &&
+                       !props.onlyTable && itemsSelected && itemsSelected.length > 0 &&
                         <ItemCostPerWear item={
                             items.filter(item => {
                                 let idx = itemsSelected.findIndex(i => i === item.id)
