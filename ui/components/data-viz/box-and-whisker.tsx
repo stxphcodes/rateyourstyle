@@ -4,8 +4,7 @@ import { OutfitItem } from "../../apis/get_outfits";
 import { ExtractPrice } from "./pie-donut";
 
 
-export function ItemPricesChart(props: { items: OutfitItem[] }) {
-
+export function ItemPricesChart(props: { items: OutfitItem[] }) { 
     var prices: number[] = []
     props.items.forEach((item) => {
         if (item.price) {

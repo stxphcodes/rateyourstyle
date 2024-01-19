@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 import { Campaign, GetCampaigns } from '../apis/get_campaigns';
-import { GetOutfits, Outfit, OutfitItem } from '../apis/get_outfits';
+import { GetOutfits, GetPublicOutfitsByUser, Outfit, OutfitItem } from '../apis/get_outfits';
 import { GetRatings, Rating } from '../apis/get_ratings';
 import { Footer } from '../components/footer';
 import { Navbar } from '../components/navarbar';
@@ -19,6 +19,7 @@ type Props = {
     clientServer: string;
     error: string | null;
     outfits: Outfit[] | null;
+    outfitsForTable: Outfit[] | null;
     userRatings: Rating[] | null;
     metadata: PageMetadata;
     businesses: string[] | null;
@@ -31,11 +32,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         userRatings: null,
         error: null,
         outfits: null,
+        outfitsForTable: null,
         clientServer: "",
         businesses: [],
         metadata: {
             title: "",
-            description: "Rate Your Style is a fashion community where you can build your own virtual closet, receive feedback about your outfits, and get rewarded for your style. RateYourStyle is for the everyday fashion enthusiast who likes to stay chic, organized and mindful of what's in their closet."
+            description: "RateYourStyle is for the fashion conscious who are intentional with the clothes they purchase and wear. Engage in meaningful fashion discourse with other users through outfit reviews. For the fashion nerd, our virtual closet is a database-like table that takes inventory of your clothes and uses data science tools to create meaningful graphs."
         }
     };
 
@@ -79,6 +81,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
     props.outfits = outfitResp;
 
+    const userOutfits = await GetPublicOutfitsByUser(server, props.cookie, "test1234");
+    if (userOutfits instanceof Error) {
+        props.error = userOutfits.message;
+        return { props };
+    }
+    props.outfitsForTable = userOutfits;
+
 
     const clientServer = GetServerURL(true);
     if (clientServer instanceof Error) {
@@ -90,7 +99,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props };
 };
 
-function Home({ campaigns, cookie, outfits, userRatings, clientServer, businesses, error }: Props) {
+function Home({ campaigns, cookie, outfits, outfitsForTable, userRatings, clientServer, businesses, error }: Props) {
     const [heroSectionImage, setHeroSectionImage] = useState(outfits ? outfits[0].picture_url : "/clothing-photo.jpg")
 
     let outfitItems: OutfitItem[] = [];
@@ -139,7 +148,7 @@ function Home({ campaigns, cookie, outfits, userRatings, clientServer, businesse
                 <section className="px-3 md:px-8 mb-8">
                     <h1>For the Fashion Conscious</h1>
                     <h6 className="py-2 text-sm md:text-base text-balance">
-                        RateYourStyle is a community of fashion lovers who are intentional with the clothes they purchase and wear. Through ratings and reviews, users share their thoughts about each clothing item they own, as well as give feedback about each other&apos;s outfits.{" "}
+                        RateYourStyle is for the fashion conscious who are intentional with the clothes they purchase and wear.  Engage in fashion discourse with other users through outfit reviews, and practice closet mindfulness by reviewing your own clothing items.{" "}
                         <Link href="discover">Discover more here</Link>
                     </h6>
                     <div className="flex flex-nowrap flex-row gap-2 overflow-scroll my-2">
@@ -164,78 +173,31 @@ function Home({ campaigns, cookie, outfits, userRatings, clientServer, businesse
                             })}
                     </div>
                 </section>
-
-
                 <section className="bg-background-2 px-3 md:px-8 py-8">
                     <h1 className="text-white">For the Fashion Nerd</h1>
                     <h6 className="my-4 text-white text-base">
-                        RateYourStyle will aggregate all of the clothing items in your outfits to create an inventory of your closet. You can sort, filter and search your clothes easily with our spreadsheet-like table. Features to come include: more data science tools to enable meaningful analysis of your closet, an AI style assistant and more. Start your virtual closet by simply posting an outfit.
+                        Is loud budgeting one of your &quot;ins&quot; this year? <br />
+                        The virtual closet feature of RateYourStyle aggreates your clothes into a database-like table and uses data science to visualize your closet data into meaningful graphs.
                     </h6>
                     <div className="bg-white p-2 rounded-lg">
+
+
                         <h6>Sample Closet</h6>
-                        <ClosetTable outfits={outfits ? outfits : []} cookie={cookie} clientServer={clientServer} userRatings={null} onlyTable={true} />
+                        <ClosetTable outfits={outfitsForTable ? outfitsForTable : []} cookie={cookie} clientServer={clientServer} userRatings={null} onlyTable={true} />
                     </div>
                 </section>
-
-
-
-
-                <section className="bg-white px-3 md:px-8 mt-4">
-                    <h1>Get Rewarded for Your Style</h1>
+                <section className="bg-white px-3 md:px-8 my-4">
+                    <h1>Get Started</h1>
                     <div className="my-4">
-                        RateYourStyle hosts campaigns that celebrate, reward and showcase our users&apos; style and fashion. Typically, at the end of the campaign, a few posts will be selected to win $100 gift cards. To apply to an active campaign, <Link href="/post-outfit">Post an Outfit</Link> according to the requirements listed in the campaign, and tag the outfit with the campaign #tag. Winners of campaigns will be notified by email, so be sure to create an account before posting.
+                        RateYourStyle is completely free to use. As a programmer who is interested in fashion, I work on this as a side project because it helps me practice coding, and (this is the real reason) it gives me an excuse to buy clothes and dress up 💃🏻. If you're interested in joining our little community, please hit the{" "}<span className="text-primary">Create an Account</span>{" "}button on the navbar.
                     </div>
-                    <h6>Active Campaigns:</h6>
-                    <div className="flex flex-wrap justify-start items-start gap-2 mt-4">
-                        {campaigns?.map((item) => (
-                            <div
-                                className={`text-white p-2 rounded-lg h-fit w-48`}
-                                style={{ backgroundColor: `${item.background_img}` }}
-                                key={item.tag}
-                            >
-                                <div>
-                                    {item.tag}
-                                </div>
-                                <div className="text-xs">Ends: {item.date_ending}</div>
-                                {readMore?.filter((i) => i.tag == item.tag)[0].readMore && (
-                                    <p className="mb-4 text-xs">{item.description}</p>
-                                )}
-                                <a
-                                    className="text-white text-xs"
-                                    onClick={() => {
-                                        readMore?.forEach((i, index) => {
-                                            if (i.tag == item.tag) {
-                                                let copy = [...readMore];
-                                                copy[index].readMore = !copy[index].readMore;
-                                                setReadMore(copy);
-                                                return;
-                                            }
-                                        });
-                                    }}
-                                >
-                                    Read{" "}
-                                    {readMore?.filter((i) => i.tag == item.tag)[0].readMore
-                                        ? "less"
-                                        : "more"}
-                                </a>
-                            </div>
-                        ))}
-                    </div>
+
                     <div className="mt-8">
-                        <h1>For Businesses</h1>
-                        <div>See our
-                            <Link href="/for-businesses" passHref={true}>
-                                <a className="mx-2">business page</a>
-                            </Link>to learn how RateYourStyle can help you leverage user generated content to grow your business.
+                        <h1>Privacy</h1>
+                        <div>We value your privacy. That&apos;s why each outfit post has its own visibility setting and your closet will only display clothing items from public outfit posts. Private outfits and its clothing items can only be viewed by you and the sponsor of a campaign if it uses a campaign #tag. <br /><br />
+
+                            RateYourStyle also uses cookies to maintain your login session. The cookie is only used for the purpose of saving your login details.
                         </div>
-                    </div>
-                </section>
-
-                <section className="mt-4 bg-background-2 text-white px-3 md:px-8 py-4">
-                    <h1>Privacy</h1>
-                    <div>We value your privacy. That&apos;s why each outfit post has its own visibility setting and your closet will only display clothing items from public outfit posts. Private outfits and its clothing items can only be viewed by you and the sponsor of a campaign if it uses a campaign #tag. <br /><br />
-
-                        RateYourStyle also uses cookies to maintain your login session. The cookie is only used for the purpose of saving your login details.
                     </div>
                 </section>
             </main>

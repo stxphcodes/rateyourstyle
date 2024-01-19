@@ -253,8 +253,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
     return (
         <>
             {
-                !props.onlyTable &&
-                    itemsSelected &&
+                itemsSelected &&
                     itemsSelected.length == outfitItems.length ?
                     <div className="grid grid-cols-1 sm:grid-cols-2 items-center">
                         <ClosetCostChart items={items} />
@@ -262,7 +261,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                     </div>
 
                     :
-                    (!props.onlyTable && itemsSelected && itemsSelected.length > 1) ?
+                    (itemsSelected && itemsSelected.length > 1) ?
                         <div className="grid grid-cols-1 sm:grid-cols-2 items-center">
                             <ClosetCostChart items={items.filter(item => {
                                 let idx = itemsSelected.findIndex(i => i === item.id)
@@ -273,7 +272,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                                 return idx >= 0
                             })} />
                         </div> :
-                       !props.onlyTable && itemsSelected && itemsSelected.length > 0 &&
+                        itemsSelected && itemsSelected.length > 0 &&
                         <ItemCostPerWear item={
                             items.filter(item => {
                                 let idx = itemsSelected.findIndex(i => i === item.id)
@@ -285,9 +284,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                                 outfitItemToIds.get(itemsSelected[0]) ? outfitItemToIds.get(itemsSelected[0])?.length : 1}
                         />
             }
-
             {
-                !props.onlyTable &&
                 <h6 className="mb-2">Select items from the closet below to update graphs and see outfits that contain them.
                 </h6>
             }
@@ -478,7 +475,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                 <>
                     <div className="my-4 p-1 bg-primary w-fit rounded text-white">Results: {outfitsToDisplay ? outfitsToDisplay.length : "none"}</div>
 
-                    <div className="flex flex-row flex-wrap gap-4 items-start justify-center md:justify-start">
+                    <div className="flex flex-row flex-wrap gap-2 sm:gap-4 justify-center">
                         {outfitsToDisplay &&
                             outfitsToDisplay.map((item) => (
                                 <OutfitCard
