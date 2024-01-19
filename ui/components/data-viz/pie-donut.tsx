@@ -36,7 +36,6 @@ export function ClosetCostChart(props: { items: OutfitItem[] }) {
                 name: `Total=Average\n(${average})`
             },
         ]
-
     } else {
         data = 
         [
@@ -65,6 +64,7 @@ export function ClosetCostChart(props: { items: OutfitItem[] }) {
             left: 'center',
             textStyle: {
                 fontFamily: "custom-serif",
+                fontSize: 14,
             },
         },
         series: [

@@ -28,6 +28,7 @@ export function ItemPricesChart(props: { items: OutfitItem[] }) {
                 left: 'center',
                 textStyle: {
                     fontFamily: "custom-serif",
+                    fontSize: 14,
                 },
                 subtext: '(click or hover over the plot to read description)'
             },
