@@ -81,7 +81,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
     props.outfits = outfitResp;
 
-    const userOutfits = await GetPublicOutfitsByUser(server, props.cookie, "test1234");
+    const userOutfits = await GetPublicOutfitsByUser(server, props.cookie, "stxphcodes");
     if (userOutfits instanceof Error) {
         props.error = userOutfits.message;
         return { props };
@@ -189,7 +189,7 @@ function Home({ campaigns, cookie, outfits, outfitsForTable, userRatings, client
                 <section className="bg-white px-3 md:px-8 my-4">
                     <h1>Get Started</h1>
                     <div className="my-4">
-                        RateYourStyle is completely free to use. As a programmer who is interested in fashion, I work on this as a side project because it helps me practice coding, and (this is the real reason) it gives me an excuse to buy clothes and dress up 💃🏻. If you're interested in joining our little community, please hit the{" "}<span className="text-primary">Create an Account</span>{" "}button on the navbar.
+                        RateYourStyle is completely free to use. As a programmer who is interested in fashion, I work on this as a side project because it helps me practice coding, and (this is the real reason) it gives me an excuse to buy clothes and dress up 💃🏻. If you&apos;re interested in joining our little community, please hit the{" "}<span className="text-primary">Create an Account</span>{" "}button on the navbar.
                     </div>
 
                     <div className="mt-8">
