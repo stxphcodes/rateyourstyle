@@ -5,7 +5,6 @@ import { Rating } from "../apis/get_ratings";
 import { OutfitCard } from "./outfitcard";
 import { PutOutfitItem } from "../apis/put_outfititem";
 import { Modal } from "./modals";
-import { Budget } from "./budget-donut";
 import { ClosetCostChart } from "./data-viz/pie-donut";
 import { ItemPricesChart } from "./data-viz/box-and-whisker";
 import { ItemCostPerWear } from "./data-viz/pie";
@@ -259,8 +258,8 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                         <ClosetCostChart items={items} />
                         <ItemPricesChart items={items} />
                     </div>
-
                     :
+                    // TODO: Make outfit items selected the actual object and store as state.
                     (itemsSelected && itemsSelected.length > 1) ?
                         <div className="grid grid-cols-1 sm:grid-cols-2 items-center">
                             <ClosetCostChart items={items.filter(item => {
