@@ -142,24 +142,22 @@ export default function UserClosetPage({ clientServer, cookie, outfits, userRati
                         {businessProfile &&
                             <button className="border-2 rounded border-primary px-2 text-primary  hover:bg-primary hover:text-white" onClick={(e) => { e.preventDefault(); console.log("button clicked"); setSubmitOutfitClicked(true) }}><span className="text-lg bold" >&#43;</span> Submit An Outfit</button>}
                     </div>
+
+
                     {businessProfile &&
                         <div className="">
                             {businessProfile.description}
-                        </div>}
+                        </div>
+                    }
 
+                </section>
+                <section>
                     {!outfits || outfits.length == 0 ?
                         <div className="h-screen">
                             <h3>😕 Empty</h3>
                             Looks like the user hasn&apos;t posted any public outfits yet.
                         </div> :
-                        <>
-                        <div></div>
-                        <div >
-                           
-                            <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} userRatings={userRatings} businesses={businesses} />
-                        </div>
-                        </>
-
+                        <ClosetTable outfits={outfits} cookie={cookie} clientServer={clientServer} userRatings={userRatings} businesses={businesses} />
                     }
                 </section>
             </main >
