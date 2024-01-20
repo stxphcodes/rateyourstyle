@@ -3,40 +3,37 @@ import ReactEcharts from "echarts-for-react";
 import { OutfitItem } from "../../apis/get_outfits";
 import { ExtractPrice } from "./pie-donut";
 
+  // Function to calculate quartiles
+  function getQuartile(sortedNumbers: number[], percentile:number) {
+    const index = Math.floor((sortedNumbers.length - 1) * percentile);
+    const lowerValue = sortedNumbers[Math.floor(index)];
+    const upperValue = sortedNumbers[Math.ceil(index)];
+    return lowerValue + (upperValue - lowerValue) * (index % 1);
+}
+
 function getBoxWhiskerDataPoints(sortedNumbers: number[]) {
-    // Calculate median (Q2)
-    const medianIndex = Math.floor(sortedNumbers.length / 2);
-    const median = sortedNumbers.length % 2 === 0
-        ? (sortedNumbers[medianIndex - 1] + sortedNumbers[medianIndex]) / 2
-        : sortedNumbers[medianIndex];
-
-    // Calculate first quartile (Q1)
-    const q1Index = Math.floor(sortedNumbers.length / 4);
-    const q1 = sortedNumbers.length % 4 === 0
-        ? (sortedNumbers[q1Index - 1] + sortedNumbers[q1Index]) / 2
-        : sortedNumbers[q1Index];
-
-    // Calculate third quartile (Q3)
-    const q3Index = Math.floor((3 * sortedNumbers.length) / 4);
-    const q3 = (sortedNumbers.length % 4 === 0 && q3Index < sortedNumbers.length)
-        ? (sortedNumbers[q3Index] + sortedNumbers[q3Index - 1]) / 2
-        : sortedNumbers[q3Index];
-
-     // Calculate interquartile range (IQR)
-     const iqr = q3 - q1;
-
-     // Calculate minimum and maximum within 1.5 * IQR from Q1 and Q3
-     const min = q1 - 1.5 * iqr;
-     const max = q3 + 1.5 * iqr;
-
-    // Return the box and whisker data points
-    return [
-        min,
-        q1,
-        median,
-        q3,
-        max
-    ]
+   
+    
+        // Calculate quartiles
+        const q1 = getQuartile(sortedNumbers, 0.25);
+        const median = getQuartile(sortedNumbers, 0.5);
+        const q3 = getQuartile(sortedNumbers, 0.75);
+    
+        // Calculate interquartile range (IQR)
+        const iqr = q3 - q1;
+    
+        // Calculate minimum and maximum within 1.5 * IQR from Q1 and Q3
+        const min = q1 - 1.5 * iqr;
+        const max = q3 + 1.5 * iqr;
+    
+        // Return the box and whisker data points
+        return [
+            min,
+            q1,
+            median,
+            q3,
+            max
+        ]
 }
 
 export function ItemPricesChart(props: { items: OutfitItem[] }) { 
@@ -69,7 +66,7 @@ export function ItemPricesChart(props: { items: OutfitItem[] }) {
     }
 
     if (greaterThanMaxIndex > 0) {
-        max = prices[greaterThanMaxIndex ]
+        max = prices[greaterThanMaxIndex]
     }
 
     const option = {
@@ -156,7 +153,7 @@ export function ItemPricesChart(props: { items: OutfitItem[] }) {
                     textStyle: { fontSize: 14 },
                     formatter: function (params: any) {
                         return `50% of the clothes cost between ${params.data[2]} and ${params.data[4]}. <br />` +
-                            `Median price: ${params.data[3]}.`
+                            `Median price: ${params.data[3]}.<br/>${params.data}`
                     }
                 }
             }
@@ -164,6 +161,6 @@ export function ItemPricesChart(props: { items: OutfitItem[] }) {
     };
 
     return (
-        <ReactEcharts option={option} />
+        <ReactEcharts option={option} opts={{renderer: 'svg'}}/>
     )
 }
