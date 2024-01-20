@@ -81,7 +81,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
     props.outfits = outfitResp;
 
-    const userOutfits = await GetPublicOutfitsByUser(server, props.cookie, "stxphcodes");
+    let sampleCloset="stxphcodes"
+    if (process.env.NODE_ENV == "development") {
+        sampleCloset = "test1234"
+    }
+
+    const userOutfits = await GetPublicOutfitsByUser(server, props.cookie, sampleCloset);
     if (userOutfits instanceof Error) {
         props.error = userOutfits.message;
         return { props };
