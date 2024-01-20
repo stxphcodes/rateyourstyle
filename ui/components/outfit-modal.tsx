@@ -90,7 +90,7 @@ export function OutfitModal(props: { clientServer: string; cookie: string; handl
                             <RatingDiv x={props.data.rating_average ? props.data.rating_average : 0} />
                             <div className="mx-2">
                                 {
-                                    !props.data.rating_count ? "no reviews submitted yet" : `from ${props.data.rating_count} ${props.data.rating_count > 1 ? "reviews" : "review"} `
+                                    !props.data.rating_count ? "no reviews yet" : `from ${props.data.rating_count} ${props.data.rating_count > 1 ? "reviews" : "review"} `
                                 }
                             </div>
                         </div>

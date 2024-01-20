@@ -76,7 +76,7 @@ export function OutfitCard(props: {
 						}
 						<a className="text-background-2" onClick={() => setExpandImage(true)}>
 							{
-								!props.data.rating_count ? "no reviews submitted yet" : `from ${props.data.rating_count} ${props.data.rating_count > 1 ? "reviews" : "review"} `
+								!props.data.rating_count ? "no reviews yet" : `from ${props.data.rating_count} ${props.data.rating_count > 1 ? "reviews" : "review"} `
 							}
 						</a>
 					</div>
