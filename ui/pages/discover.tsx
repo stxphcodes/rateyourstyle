@@ -298,12 +298,11 @@ function DiscoverPage({ campaigns, cookie, userRatings, outfits, clientServer, b
                 </section>
 
                 <section 
-                className="flex flex-row flex-wrap justify-center gap-2 sm:gap-4">
+                className="flex flex-row flex-wrap justify-center gap-4">
                     {
                         (!outfitsFiltered || outfitsFiltered.length == 0) &&
                         <div className="h-screen">No results at this time </div>
                     }
-
                     {outfitsFiltered &&
                         outfitsFiltered.map((item) => {
                             let userRating: Rating | null = null
