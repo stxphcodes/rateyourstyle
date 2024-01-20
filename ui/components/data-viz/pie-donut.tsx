@@ -56,8 +56,6 @@ export function ClosetCostChart(props: { items: OutfitItem[] }) {
         ]
     }
   
-
-
     const option = {
         title: {
             text: 'Items Total',
