@@ -8,6 +8,7 @@ import { Modal } from "./modals";
 import { ClosetCostChart } from "./data-viz/pie-donut";
 import { ItemPricesChart } from "./data-viz/box-and-whisker";
 import { ItemCostPerWear } from "./data-viz/pie";
+import { BarGraph } from "./data-viz/bar";
 
 export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientServer: string, userRatings: Rating[] | null, onlyTable?: boolean, includeEdit?: boolean, businesses?: string[] }) {
     let outfitItemToIds: Map<string, string[]> = new Map<string, string[]>();
@@ -254,9 +255,10 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
             {
                 itemsSelected &&
                     itemsSelected.length == outfitItems.length ?
-                    <div className="grid grid-cols-1 sm:grid-cols-2 items-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 items-center">
                         <ClosetCostChart items={items} />
                         <ItemPricesChart items={items} />
+                        <BarGraph items={items} itemsToOutfits={outfitItemToIds} />
                     </div>
                     :
                     // TODO: Make outfit items selected the actual object and store as state.
@@ -474,7 +476,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                 <>
                     <div className="my-4 p-1 bg-primary w-fit rounded text-white">Results: {outfitsToDisplay ? outfitsToDisplay.length : "none"}</div>
 
-                    <div className="flex flex-row flex-wrap gap-2 sm:gap-4 justify-center">
+                    <div className="flex flex-row flex-wrap gap-4 justify-center">
                         {outfitsToDisplay &&
                             outfitsToDisplay.map((item) => (
                                 <OutfitCard
