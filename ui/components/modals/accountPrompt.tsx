@@ -8,7 +8,7 @@ export function AccountPromptModal(props: { clientServer: string }) {
     const [createAccountClicked, setCreateAccountClicked] = useState<boolean>(false)
     return (
         <Modal handleClose={null} wideScreen={true} noPadding={true}>
-            <div className="px-2 py-64 md:py-80  items-center  justify-center flex flex-wrap flex-row gap-4">
+            <div className="py-64 md:py-80 px-4">
                 {
                     signInClicked &&
                     <SignIn
@@ -30,7 +30,7 @@ export function AccountPromptModal(props: { clientServer: string }) {
                     <a onClick={() => setCreateAccountClicked(!createAccountClicked)}>create an account</a>.
                 </h3>
 
-                <h6 className="basis-full text-center">Go back to <Link href="/" passHref={true}><a>Home</a></Link></h6>
+                <h4 className="basis-full text-center pt-4">Go back to <Link href="/" passHref={true}><a>Home</a></Link></h4>
             </div>
         </Modal>
 
