@@ -75,7 +75,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         businesses: [],
         metadata: {
             title: "Discover",
-            description: "Engage in meaningful fashion discourse with users through outfit reviews. Find fashion inspo, get clothing links and receive outfit feedback."
+            description: "Discover fashion inspo, like new clothing brands and outfit ideas on RateYourStyle."
         },
 
     };
