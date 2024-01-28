@@ -37,7 +37,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         businesses: [],
         metadata: {
             title: "",
-            description: "Get style feedback on RateYourStyle through outfit reviews and keep track of the clothes you wear through our virtual closet, a database-like table that takes inventory of your clothes and uses data science to create graphs about your closet."
+            description: "Get style feedback on Rate Your Style through outfit reviews and keep track of the clothes you wear through our virtual closet, a database-like table that takes inventory of your clothes and uses data science to create graphs about your closet."
         }
     };
 
