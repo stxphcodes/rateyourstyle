@@ -153,7 +153,7 @@ export function ItemPricesChart(props: { items: OutfitItem[] }) {
                     textStyle: { fontSize: 14 },
                     formatter: function (params: any) {
                         return `50% of the clothes cost between ${params.data[2]} and ${params.data[4]}. <br />` +
-                            `Median price: ${params.data[3]}.<br/>${params.data}`
+                            `Median price: ${params.data[3]}`
                     }
                 }
             }
