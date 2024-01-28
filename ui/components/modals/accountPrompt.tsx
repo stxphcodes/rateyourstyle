@@ -8,7 +8,7 @@ export function AccountPromptModal(props: { clientServer: string }) {
     const [createAccountClicked, setCreateAccountClicked] = useState<boolean>(false)
     return (
         <Modal handleClose={null} wideScreen={true} noPadding={true}>
-            <div className="py-64 md:py-80 px-4">
+            <div className="py-64 md:py-80">
                 {
                     signInClicked &&
                     <SignIn
@@ -23,7 +23,7 @@ export function AccountPromptModal(props: { clientServer: string }) {
                 }
 
 
-                <h3 className="text-center">
+                <h3 className="text-center px-4">
                     To view this page, please{' '}
                     <a onClick={() => setSignInClicked(!signInClicked)}>sign in</a>
                     {' '}or {' '}
