@@ -2,6 +2,7 @@ import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import Head from "next/head";
 import { useRouter } from 'next/router'
+import Script from 'next/script';
 
 export type PageMetadata = {
   title: string;
@@ -18,18 +19,39 @@ function MyApp({ Component, pageProps }: AppProps<any>) {
   return (
     <>
       <Head>
-        <title>{metadata && metadata.title ?  metadata.title + " - Rate Your Style" : "RateYourStyle"}</title>
+        <title>{metadata && metadata.title ? metadata.title + " - Rate Your Style" : "RateYourStyle"}</title>
         <link rel="icon" type="image/x-icon" href="/favicon.ico"></link>
         <meta
           name="description"
           content={
-           metadata && metadata.description
+            metadata && metadata.description
               ? metadata.description
-              : "Rate Your Style is an online fashion community for all of your style inspo needs. Post outfit pics to get fashion feedback, and give style advice to other users. Find new clothing brands and read reviews about each clothing item. Keep an e-inventory of all of your clothes through our closet table feature."
+              : "Get style feedback on Rate Your Style through outfit reviews and keep track of the clothes you wear through our virtual closet, a database-like table that takes inventory of your clothes and uses data science to create graphs about your closet."
           }
         />
       </Head>
-      <Component {...pageProps} key={router.asPath}/>
+      {/* https://nextjs.org/docs/messages/next-script-for-ga */}
+      {process.env.NODE_ENV !== "development" && (
+        <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=G-TKWD2G1RP9`}
+            strategy="afterInteractive"
+          ></Script>
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){window.dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-TKWD2G1RP9', {
+            page_path: window.location.pathname,
+          });
+        `}
+          </Script>
+        </>
+      )
+      }
+      <Component {...pageProps} key={router.asPath} />
     </>
   )
 }

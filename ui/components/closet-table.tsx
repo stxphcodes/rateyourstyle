@@ -5,6 +5,10 @@ import { Rating } from "../apis/get_ratings";
 import { OutfitCard } from "./outfitcard";
 import { PutOutfitItem } from "../apis/put_outfititem";
 import { Modal } from "./modals";
+import { ClosetCostChart } from "./data-viz/pie-donut";
+import { ItemPricesChart } from "./data-viz/box-and-whisker";
+import { ItemCostPerWear } from "./data-viz/pie";
+import { BarGraph } from "./data-viz/bar";
 
 export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientServer: string, userRatings: Rating[] | null, onlyTable?: boolean, includeEdit?: boolean, businesses?: string[] }) {
     let outfitItemToIds: Map<string, string[]> = new Map<string, string[]>();
@@ -134,7 +138,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
         if (resp instanceof Error) {
             setItemEditError("Server error. We apologize for the inconvenience, please try again at a later time or email sitesbystephanie@gmail.com if the issue persists.")
             return;
-        } else  {
+        } else {
             location.reload()
         }
     }
@@ -248,6 +252,43 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
 
     return (
         <>
+            {
+                itemsSelected &&
+                    itemsSelected.length == outfitItems.length ?
+                    <div className="grid grid-cols-1 sm:grid-cols-3 items-center">
+                        <ClosetCostChart items={items} />
+                        <ItemPricesChart items={items} />
+                        <BarGraph items={items} itemsToOutfits={outfitItemToIds} />
+                    </div>
+                    :
+                    // TODO: Make outfit items selected the actual object and store as state.
+                    (itemsSelected && itemsSelected.length > 1) ?
+                        <div className="grid grid-cols-1 sm:grid-cols-2 items-center">
+                            <ClosetCostChart items={items.filter(item => {
+                                let idx = itemsSelected.findIndex(i => i === item.id)
+                                return idx >= 0
+                            })} />
+                            <ItemPricesChart items={items.filter(item => {
+                                let idx = itemsSelected.findIndex(i => i === item.id)
+                                return idx >= 0
+                            })} />
+                        </div> :
+                        itemsSelected && itemsSelected.length > 0 &&
+                        <ItemCostPerWear item={
+                            items.filter(item => {
+                                let idx = itemsSelected.findIndex(i => i === item.id)
+                                return idx >= 0
+                            })[0]
+                        }
+                            count={
+
+                                outfitItemToIds.get(itemsSelected[0]) ? outfitItemToIds.get(itemsSelected[0])?.length : 1}
+                        />
+            }
+            {
+                <h6 className="mb-2">Select items from the closet below to update graphs and see outfits that contain them.
+                </h6>
+            }
             <div className="overflow-x-auto shadow-md rounded-lg max-h-table">
                 <table className="w-full text-xs md:text-sm text-left overflow-x-scroll">
                     <thead className="text-xs uppercase bg-background sticky top-0">
@@ -291,7 +332,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                                     Link
                                 </th>
                             }
-                        
+
                             <th scope="col" className="p-2 ">
                                 <div className="flex items-center">
                                     Brand
@@ -384,7 +425,7 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                                         <input id="link" value={itemEdit.link} onChange={e => handleItemEdit(e)} />
                                     </td>
                                 }
-                            
+
                                 <td className="p-2 ">
                                     {itemEdit && itemEdit.id == item.id ? <input id="brand" value={itemEdit.brand} onChange={e => handleItemEdit(e)} /> :
                                         <> {item.brand}</>
@@ -424,18 +465,18 @@ export function ClosetTable(props: { outfits: Outfit[], cookie: string, clientSe
                         }
                     </tbody>
                 </table>
-                {itemEditError && 
-                <Modal handleClose={() => setItemEditError("")}>
-					<div>{itemEditError}</div>
-				</Modal>
-}
+                {itemEditError &&
+                    <Modal handleClose={() => setItemEditError("")}>
+                        <div>{itemEditError}</div>
+                    </Modal>
+                }
             </div>
 
             {!props.onlyTable &&
                 <>
                     <div className="my-4 p-1 bg-primary w-fit rounded text-white">Results: {outfitsToDisplay ? outfitsToDisplay.length : "none"}</div>
 
-                    <div className="flex flex-row flex-wrap gap-4 items-start justify-center md:justify-start">
+                    <div className="flex flex-row flex-wrap gap-4 justify-center">
                         {outfitsToDisplay &&
                             outfitsToDisplay.map((item) => (
                                 <OutfitCard

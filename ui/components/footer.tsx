@@ -7,7 +7,7 @@ export function Footer() {
 		</div>
 		<div className="col-span-2">
 			<h6 >About RateYourStyle</h6>
-			<div className="text-xs">A fashion community where you can build your own virtual closet, rate & review your clothes,  and get rewarded for your style. <br /> For businesses, RateYourStyle is a one-stop platform to gather user generated content, derive meaningful market insights, and engage with consumers through rewards and feedback.
+			<div className="text-xs">Get style feedback on RateYourStyle through outfit reviews and keep track of the clothes you wear through our virtual closet, a database-like table that takes inventory of your clothes and uses data science to create graphs about your closet.
 			</div>
 		</div>
 

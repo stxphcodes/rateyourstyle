@@ -75,7 +75,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         businesses: [],
         metadata: {
             title: "Discover",
-            description: "Find fashion inspo, get clothings links and read outfit reviews. Rate Your Style is a  fashion community where you can share outfits and build your own virtual closet."
+            description: "Discover fashion inspo, like new clothing brands and outfit ideas on RateYourStyle."
         },
 
     };
@@ -297,12 +297,12 @@ function DiscoverPage({ campaigns, cookie, userRatings, outfits, clientServer, b
                     </div>
                 </section>
 
-                <section className="flex flex-row flex-wrap items-start justify-center md:justify-start gap-2">
+                <section 
+                className="flex flex-row flex-wrap justify-center gap-4">
                     {
                         (!outfitsFiltered || outfitsFiltered.length == 0) &&
                         <div className="h-screen">No results at this time </div>
                     }
-
                     {outfitsFiltered &&
                         outfitsFiltered.map((item) => {
                             let userRating: Rating | null = null
