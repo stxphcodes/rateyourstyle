@@ -156,7 +156,7 @@ function Home({ campaigns, cookie, outfits, outfitsForTable, userRatings, client
                         RateYourStyle is for the fashion conscious who are intentional with the clothes they purchase and wear.  Engage in fashion discourse with other users through outfit reviews, and practice closet mindfulness by reviewing your own clothing items.{" "}
                         <Link href="discover">Discover more here</Link>
                     </h6>
-                    <div className="flex flex-nowrap flex-row gap-2 overflow-scroll my-2">
+                    <div className="flex flex-nowrap flex-row gap-4 overflow-scroll my-2">
                         {outfits &&
                             outfits.map((item) => {
                                 let userRating: Rating | null = null

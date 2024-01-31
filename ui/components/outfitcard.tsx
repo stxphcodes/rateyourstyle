@@ -37,7 +37,7 @@ export function OutfitCard(props: {
 	const [readMore, setReadMore] = useState(false)
 	return (
 		<>
-			<div className="w-40 sm:w-72 shadow-sm border-b-2 break-words">
+			<div className="w-40 sm:w-72 shadow-sm border-b-2 border-background break-words">
 
 				<div className="overflow-hidden h-72 sm:h-96 hover:cursor-pointer">
 					<img
