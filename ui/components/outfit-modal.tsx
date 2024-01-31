@@ -162,7 +162,7 @@ export function OutfitModal(props: { clientServer: string; cookie: string; handl
                                         {!rating.username ? <span className="text-primary">anonymous</span> : <Link href={`/closet/${rating.username}`} passHref={true}>
                                             <a className="">{rating.username}</a>
                                         </Link>} | {rating.date} </div>
-                                    <div className=""><span className="text-primary text-base pr-2">{rating.rating}</span>&quot;{rating.review}&quot;</div>
+                                    <div className=""><span className="text-primary text-base pr-2">{rating.rating}</span>{rating.review}</div>
                                 </div>
                             )
                         })}

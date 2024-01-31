@@ -37,7 +37,7 @@ export function OutfitCard(props: {
 	const [readMore, setReadMore] = useState(false)
 	return (
 		<>
-			<div className="w-40 sm:w-72 shadow-sm break-words">
+			<div className="w-40 sm:w-72 shadow-sm border-b-2 break-words">
 
 				<div className="overflow-hidden h-72 sm:h-96 hover:cursor-pointer">
 					<img
@@ -89,7 +89,7 @@ export function OutfitCard(props: {
 
 				}
 
-				<div className="flex justify-center px-2 pb-1">
+				<div className="flex px-2 pb-1">
 					<a className="text-background-2" onClick={(e) => {
 						e.preventDefault()
 						setReadMore(!readMore)
