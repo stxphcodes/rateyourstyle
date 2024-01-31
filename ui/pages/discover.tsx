@@ -22,6 +22,7 @@ type Props = {
     userRatings: Rating[] | null;
     metadata: PageMetadata;
     businesses: string[];
+    user: User | null;
 };
 
 function checkEmptyUserProfile(profile: UserProfile) {
@@ -73,6 +74,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         outfits: null,
         clientServer: "",
         businesses: [],
+        user: null,
         metadata: {
             title: "Discover",
             description: "Discover fashion inspo, like new clothing brands and outfit ideas on RateYourStyle."
@@ -97,6 +99,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             return { props };
         }
         props.userRatings = ratingResp;
+
+        const userProfileResp = await GetUserProfile(server, props.cookie)
+        if (!(userProfileResp instanceof Error)) {
+           props.user = userProfileResp
+        }
     }
 
     const campaignResp = await GetCampaigns(server);
@@ -130,10 +137,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // sort outfits by date
     props.outfits.sort((a, b) => a.date < b.date ? 1 : -1);
 
+
     return { props };
 };
 
-function DiscoverPage({ campaigns, cookie, userRatings, outfits, clientServer, businesses, error }: Props) {
+function DiscoverPage({ campaigns, cookie, user, userRatings, outfits, clientServer, businesses, error }: Props) {
     const [searchTerms, setSearchTerms] = useState<string[]>([]);
     const [readMore, setReadMore] = useState(() => {
         let intialState =
@@ -146,28 +154,15 @@ function DiscoverPage({ campaigns, cookie, userRatings, outfits, clientServer, b
         return intialState;
     });
 
-    const [userProfile, setUserProfile] = useState<User | null>(null);
     const [similarToMe, setSimilarToMe] = useState<boolean>(false);
     const [similarToMeError, setSimilarToMeError] = useState<string | null>(null);
 
     const [outfitsFiltered, setOutfitsFiltered] = useState<Outfit[] | null>(outfits);
 
     useEffect(() => {
-        async function getuserprofile() {
-            const userResp = await GetUserProfile(clientServer, cookie);
-            if (!(userResp instanceof Error)) {
-                setUserProfile(userResp)
-            }
-        }
-
-
         if (searchTerms.length == 0 && !similarToMe) {
             setOutfitsFiltered(outfits)
             return
-        }
-
-        if (similarToMe) {
-            getuserprofile();
         }
 
         let filtered: Outfit[] = []
@@ -185,9 +180,9 @@ function DiscoverPage({ campaigns, cookie, userRatings, outfits, clientServer, b
                 return;
             }
 
-            if (similarToMe && userProfile && userProfile.user_profile) {
+            if (similarToMe && user && user.user_profile) {
                 if (outfit?.user_profile) {
-                    if (findSimilarToMe(outfit.user_profile, userProfile.user_profile)) {
+                    if (findSimilarToMe(outfit.user_profile, user.user_profile)) {
                         filtered.push(outfit);
                     }
                 }
@@ -220,12 +215,12 @@ function DiscoverPage({ campaigns, cookie, userRatings, outfits, clientServer, b
                                 Similar to me
                                 <input type="checkbox"
                                     onChange={() => {
-                                        if (!userProfile || !userProfile.username) {
+                                        if (!user || !user.username) {
                                             setSimilarToMeError("unknownUser")
                                             return;
                                         }
 
-                                        if (checkEmptyUserProfile(userProfile.user_profile)) {
+                                        if (checkEmptyUserProfile(user.user_profile)) {
                                             setSimilarToMeError("missingProfile")
                                             return;
                                         }
