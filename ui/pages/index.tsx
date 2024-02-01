@@ -151,9 +151,9 @@ function Home({ campaigns, cookie, outfits, outfitsForTable, userRatings, client
             <main className="mt-12 sm:mt-20">
 
                 <section className="px-3 md:px-8 mb-8">
-                    <h1>For the Fashion Conscious</h1>
+                    <h1>Personal Style</h1>
                     <h6 className="py-2 text-sm md:text-base text-balance">
-                        RateYourStyle is for the fashion conscious who are intentional with the clothes they purchase and wear.  Engage in fashion discourse with other users through outfit reviews, and practice closet mindfulness by reviewing your own clothing items.{" "}
+                        Finding your personal style is a journey, but it doesn't have to be a lonely one. Whether it's sharing an outfit that you are proud of, or asking for style feedback, RateYourStyle is a community for anyone interested in fashion.{" "}
                         <Link href="discover">Discover more here</Link>
                     </h6>
                     <div className="flex flex-nowrap flex-row gap-4 overflow-scroll my-2">
@@ -179,10 +179,9 @@ function Home({ campaigns, cookie, outfits, outfitsForTable, userRatings, client
                     </div>
                 </section>
                 <section className="bg-background-2 px-3 md:px-8 py-8">
-                    <h1 className="text-white">For the Fashion Nerd</h1>
+                    <h1 className="text-white">Fashion Data</h1>
                     <h6 className="my-4 text-white text-base">
-                        Is loud budgeting one of your &quot;ins&quot; this year? <br />
-                        The virtual closet feature of RateYourStyle aggreates your clothes into a database-like table and uses data science to visualize your closet data into meaningful graphs.
+                        Is loud budgeting one of your &quot;ins&quot; this year? The virtual closet feature of RateYourStyle aggregates your clothes into a database-like table and uses data science to visualize your closet data into meaningful graphs.
                     </h6>
                     <div className="bg-white p-2 rounded-lg">
 
@@ -194,7 +193,7 @@ function Home({ campaigns, cookie, outfits, outfitsForTable, userRatings, client
                 <section className="bg-white px-3 md:px-8 my-4">
                     <h1>Get Started</h1>
                     <div className="my-4">
-                        RateYourStyle is completely free to use. As a programmer who is interested in fashion, I work on this as a side project because it helps me practice coding, and (this is the real reason) it gives me an excuse to buy clothes and dress up 💃🏻. If you&apos;re interested in joining our little community, please hit the{" "}<span className="text-primary">Create an Account</span>{" "}button on the navbar.
+                        RateYourStyle is completely free to use. As a programmer who is interested in fashion, I work on this as a side project because it helps me practice coding, and (this is the real reason) it gives me an excuse to buy clothes and dress up 💃🏻. If you&apos;re interested in joining our little community, please hit the{" "}<span className="text-primary">Create Account</span>{" "}button on the navbar.
                     </div>
 
                     <div className="mt-8">
