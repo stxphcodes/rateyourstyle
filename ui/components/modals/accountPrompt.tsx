@@ -7,7 +7,7 @@ export function AccountPromptModal(props: { clientServer: string }) {
     const [signInClicked, setSignInClicked] = useState<boolean>(false)
     const [createAccountClicked, setCreateAccountClicked] = useState<boolean>(false)
     return (
-        <Modal handleClose={null} wideScreen={true} noPadding={true}>
+        <Modal handleClose={()=> window.location.href = "/"} wideScreen={true} noPadding={true}>
             <div className="py-64 md:py-80">
                 {
                     signInClicked &&
