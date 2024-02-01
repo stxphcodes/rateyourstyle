@@ -30,7 +30,8 @@ function cookieEnabled() {
 export function Navbar(props: { clientServer: string; cookie: string; user?: string; userNotifs?: UserNotifResp }) {
 	const router = useRouter();
 
-	const mobileMenuRef = useRef(null);
+	const mobileMenuRef = useRef<any>();
+	const mobileMenuButtonRef = useRef<any>();
 
 	const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
 
@@ -112,8 +113,6 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 
 	}, [router])
 
-	
-
 	return (
 		<>
 			<div className="mb-20 shadow-sm px-4 md:px-8 py-2  top-0 w-screen bg-white fixed z-50 text-xs text-primary" style={{ fontFamily: 'custom-serif' }}>
@@ -121,6 +120,7 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 					{
 						useMobileMenu ?
 							<div
+								ref={mobileMenuButtonRef}
 								className="hover:cursor-pointer"
 								onClick={() => setDisplayMobileMenu(!displayMobileMenu)}>
 								<HamburgerMenuIcon />
@@ -228,7 +228,7 @@ export function Navbar(props: { clientServer: string; cookie: string; user?: str
 
 
 function NotificationMenu(props: { clientServer: string; cookie: string; handleClose: any, notifications: Notification[] }) {
-	const menuRef = useRef(null);
+	const menuRef = useRef<any>();
 
 	useEffect(() => {
 		document.addEventListener('mousedown', handleOutsideClick);
@@ -274,7 +274,7 @@ function NotificationMenu(props: { clientServer: string; cookie: string; handleC
 }
 
 function UserMenu(props: { username: string, handleClose: any }) {
-	const menuRef = useRef(null);
+	const menuRef = useRef<any>();
 
 	useEffect(() => {
 		document.addEventListener('mousedown', handleOutsideClick);
@@ -359,7 +359,7 @@ function UserAndNotification(props: { clientServer: string; cookie: string; user
 
 			}
 			{displayUserMenu &&
-				<UserMenu username={props.username} handleClose={()=>setDisplayUserMenu(false)} />
+				<UserMenu username={props.username} handleClose={() => setDisplayUserMenu(false)} />
 			}
 		</div>
 

@@ -153,7 +153,7 @@ function Home({ campaigns, cookie, outfits, outfitsForTable, userRatings, client
                 <section className="px-3 md:px-8 mb-8">
                     <h1>Personal Style</h1>
                     <h6 className="py-2 text-sm md:text-base text-balance">
-                        Finding your personal style is a journey, but it doesn't have to be a lonely one. Whether it's sharing an outfit that you are proud of, or asking for style feedback, RateYourStyle is a community for anyone interested in fashion.{" "}
+                        Finding your personal style is a journey, but it doesn&apos;t have to be a lonely one. Whether it&apos;s sharing an outfit that you are proud of, or asking for style feedback, RateYourStyle is a community for anyone interested in fashion.{" "}
                         <Link href="discover">Discover more here</Link>
                     </h6>
                     <div className="flex flex-nowrap flex-row gap-4 overflow-scroll my-2">
