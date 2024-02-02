@@ -8,6 +8,13 @@
   font-display: "swap";
 }
 
+@font-face {
+  font-family: "custom-p";
+  src:  url("/fonts/Inter.ttf");
+  font-display: "swap";
+}
+
+
 label {
   font-size: 12px;
   font-weight: 600;
@@ -30,6 +37,7 @@ input:focus, textarea:focus {
 
 
 body {
+  font-family: 'custom-p';
   font-size: 14px;
 }
 
@@ -37,6 +45,7 @@ body {
 h1 {
   font-size: 24px;
   font-family: 'custom-serif';
+  text-transform: uppercase;
 }
 
 h2 {
