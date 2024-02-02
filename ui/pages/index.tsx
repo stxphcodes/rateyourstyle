@@ -152,10 +152,10 @@ function Home({ campaigns, cookie, outfits, outfitsForTable, userRatings, client
 
                 <section className="px-3 md:px-8 mb-8">
                     <h1>Personal Style</h1>
-                    <h6 className="py-2 text-sm md:text-base text-balance">
-                        Finding your personal style is a journey, but it doesn&apos;t have to be a lonely one. Whether it&apos;s sharing an outfit that you are proud of, or asking for style feedback, RateYourStyle is a community for anyone interested in fashion.{" "}
+                    <p className="py-2 text-sm md:text-base text-balance">
+                        Finding your personal style is a journey, but it doesn&apos;t have to be a lonely one. Whether it&apos;s sharing an outfit that you are proud of, or asking for style feedback, Rate Your Style is a community for anyone interested in fashion.{" "}
                         <Link href="discover">Discover more here</Link>
-                    </h6>
+                    </p>
                     <div className="flex flex-nowrap flex-row gap-4 overflow-scroll my-2">
                         {outfits &&
                             outfits.map((item) => {
@@ -180,9 +180,9 @@ function Home({ campaigns, cookie, outfits, outfitsForTable, userRatings, client
                 </section>
                 <section className="bg-background-2 px-3 md:px-8 py-8">
                     <h1 className="text-white">Fashion Data</h1>
-                    <h6 className="my-4 text-white text-base">
+                    <p className="my-4 text-white text-base">
                         Is loud budgeting one of your &quot;ins&quot; this year? The virtual closet feature of RateYourStyle aggregates your clothes into a database-like table and uses data science to visualize your closet data into meaningful graphs.
-                    </h6>
+                    </p>
                     <div className="bg-white p-2 rounded-lg">
 
 
@@ -193,14 +193,14 @@ function Home({ campaigns, cookie, outfits, outfitsForTable, userRatings, client
                 <section className="bg-white px-3 md:px-8 my-4">
                     <h1>Get Started</h1>
                     <div className="my-4">
-                        RateYourStyle is completely free to use. As a programmer who is interested in fashion, I work on this as a side project because it helps me practice coding, and (this is the real reason) it gives me an excuse to buy clothes and dress up 💃🏻. If you&apos;re interested in joining our little community, please hit the{" "}<span className="text-primary">Create Account</span>{" "}button on the navbar.
+                        Rate Your Style is free to use. As a programmer who is interested in fashion, I work on this as a side project because it helps me practice coding, and (this is the real reason) it gives me an excuse to buy clothes and dress up 💃🏻. If you&apos;re interested in joining our little community, please hit the{" "}<span className="text-primary">Create Account</span>{" "}button on the navbar.
                     </div>
 
                     <div className="mt-8">
                         <h1>Privacy</h1>
                         <div>We value your privacy. That&apos;s why each outfit post has its own visibility setting and your closet will only display clothing items from public outfit posts. Private outfits and its clothing items can only be viewed by you and the sponsor of a campaign if it uses a campaign #tag. <br /><br />
 
-                            RateYourStyle also uses cookies to maintain your login session. The cookie is only used for the purpose of saving your login details.
+                            Rate Your Style also uses cookies to maintain your login session. The cookie is only used for the purpose of saving your login details.
                         </div>
                     </div>
                 </section>

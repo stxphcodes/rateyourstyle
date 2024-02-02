@@ -49,8 +49,8 @@ export function OutfitCard(props: {
 
 				<div className="p-2">
 					<div
-						style={{ fontFamily: 'custom-serif' }} className="whitespace-nowrap text-ellipsis overflow-hidden">
-						<div className="text-sm">
+						className="whitespace-nowrap text-ellipsis overflow-hidden">
+						<div className="text-sm" style={{ fontFamily: 'custom-serif' }} >
 							{props.data.username ?
 								<Link
 									href={`/closet/${props.data.username}`}
@@ -63,7 +63,7 @@ export function OutfitCard(props: {
 									</a>
 								</Link> : "anonymous"}
 						</div>
-						<div>{props.data.title}</div>
+						<div className="">{props.data.title}</div>
 					</div>
 					<div className="flex items-center mt-1">
 						{
