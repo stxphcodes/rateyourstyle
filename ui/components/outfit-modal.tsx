@@ -47,7 +47,7 @@ export function OutfitModal(props: { clientServer: string; cookie: string; handl
                 setAllRatings(ratingsResp)
             }
         }
-        
+
         fetchData()
     }, [])
 
@@ -86,20 +86,26 @@ export function OutfitModal(props: { clientServer: string; cookie: string; handl
                             </div>
                         }
 
-                        <div className="flex items-center">
-                            <RatingDiv x={props.data.rating_average ? props.data.rating_average : 0} />
-                            <div className="mx-2">
+                        <div className="flex gap-2 items-center pt-4">
+                            {
+                                props.data.rating_average &&
+                                <RatingDiv x={props.data.rating_average} />
+                            }
+
+                            <div className="">
                                 {
                                     !props.data.rating_count ? "no reviews yet" : `from ${props.data.rating_count} ${props.data.rating_count > 1 ? "reviews" : "review"} `
                                 }
                             </div>
                         </div>
-                        {!props.asUser && props.cookie &&  (
+                        {!props.asUser && props.cookie && (
                             <>
                                 {!submitRating ? (
                                     <>
-                                        <div className="flex gap-4 items-center">
-                                            <RatingDiv x={userOutfitRating} />
+                                        <div className="flex gap-2 items-center">
+                                            {userOutfitRating !== 0 &&
+                                                <RatingDiv x={userOutfitRating} />
+                                            }
                                             <a className="hover:cursor-pointer" onClick={() => setSubmitRating(true)}>{userOutfitRating == 0 ? "submit your review" : "edit your review"}</a>
                                         </div>
                                     </>
@@ -162,7 +168,7 @@ export function OutfitModal(props: { clientServer: string; cookie: string; handl
                                         {!rating.username ? <span className="text-primary">anonymous</span> : <Link href={`/closet/${rating.username}`} passHref={true}>
                                             <a className="">{rating.username}</a>
                                         </Link>} | {rating.date} </div>
-                                    <div className=""><span className="text-primary text-base pr-2">{rating.rating}</span>&quot;{rating.review}&quot;</div>
+                                    <div className=""><span className="text-primary text-base pr-2">{rating.rating}</span>{rating.review}</div>
                                 </div>
                             )
                         })}

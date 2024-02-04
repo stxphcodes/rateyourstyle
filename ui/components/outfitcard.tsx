@@ -37,7 +37,7 @@ export function OutfitCard(props: {
 	const [readMore, setReadMore] = useState(false)
 	return (
 		<>
-			<div className="w-40 sm:w-72 shadow-sm break-words">
+			<div className="w-40 sm:w-72 shadow-sm border-b-2 border-background break-words">
 
 				<div className="overflow-hidden h-72 sm:h-96 hover:cursor-pointer">
 					<img
@@ -49,8 +49,8 @@ export function OutfitCard(props: {
 
 				<div className="p-2">
 					<div
-						style={{ fontFamily: 'custom-serif' }} className="whitespace-nowrap text-ellipsis overflow-hidden">
-						<div className="text-sm">
+						className="whitespace-nowrap text-ellipsis overflow-hidden">
+						<div className="text-sm" style={{ fontFamily: 'custom-serif' }} >
 							{props.data.username ?
 								<Link
 									href={`/closet/${props.data.username}`}
@@ -63,7 +63,7 @@ export function OutfitCard(props: {
 									</a>
 								</Link> : "anonymous"}
 						</div>
-						<div>{props.data.title}</div>
+						<div className="">{props.data.title}</div>
 					</div>
 					<div className="flex items-center mt-1">
 						{
@@ -89,7 +89,7 @@ export function OutfitCard(props: {
 
 				}
 
-				<div className="flex justify-center px-2 pb-1">
+				<div className="flex px-2 pb-1">
 					<a className="text-background-2" onClick={(e) => {
 						e.preventDefault()
 						setReadMore(!readMore)
