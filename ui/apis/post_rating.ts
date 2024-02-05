@@ -19,6 +19,7 @@ export async function PostRating(
             "rys-login": cookie },
         })
 
+        // TODO: Check why this is getting text
         const data = await resp.text()
 
         if (resp.ok) {
