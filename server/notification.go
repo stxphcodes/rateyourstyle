@@ -152,10 +152,7 @@ func createNotification(ctx context.Context, bucket *gcs.BucketHandle, n *Notifi
 		}
 	}
 
-	// if !found {
 	data = append(data, n)
-	//}
-
 	writer := obj.NewWriter(ctx)
 	if err := json.NewEncoder(writer).Encode(data); err != nil {
 		return err
