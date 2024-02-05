@@ -78,7 +78,7 @@ func repliesToNotifications(ctx context.Context, bucket *gcs.BucketHandle, userI
 			FromUserId:     r.UserId,
 			FromUsername:   r.Username,
 			Date:           r.Date,
-			Message:        fmt.Sprintf("New reply from %s for %s", r.Username, outfit.Title),
+			Message:        fmt.Sprintf("new reply from %s for %s", r.Username, outfit.Title),
 			Seen:           false,
 			SeenAt:         "",
 		}
