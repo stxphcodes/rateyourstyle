@@ -123,6 +123,8 @@ func run() error {
 
 	mux.GET("/api/ratings/:outfitid", handler.GetRatingsByOutfit())
 
+	mux.GET("/api/replies/:outfitid/:userid", handler.GetReplies())
+
 	mux.GET("/api/user/outfits", handler.GetOutfitsByUser())
 
 	mux.GET("/api/user/public-outfits", handler.GetPublicOutfitsByUser())
@@ -140,6 +142,8 @@ func run() error {
 	mux.POST("/api/outfit", handler.PostOutfit())
 
 	mux.POST("/api/rating", handler.PostRating())
+
+	mux.POST("/api/reply", handler.PostReply())
 
 	mux.POST("/api/signin", handler.PostSignIn())
 

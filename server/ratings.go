@@ -19,11 +19,12 @@ type RatingIndices struct {
 }
 
 type Rating struct {
-	UserId   string      `json:"user_id"`
-	OutfitId string      `json:"outfit_id"`
-	Rating   interface{} `json:"rating"`
-	Review   string      `json:"review"`
-	Date     string      `json:"date"`
+	UserId     string      `json:"user_id"`
+	OutfitId   string      `json:"outfit_id"`
+	Rating     interface{} `json:"rating"`
+	Review     string      `json:"review"`
+	Date       string      `json:"date"`
+	ReplyCount int         `json:"reply_count, omitempty"`
 
 	Username string `json:"username,omitempty"`
 }
@@ -161,4 +162,28 @@ func createRatingIndices(ctx context.Context, client *gcs.Client, bucket *gcs.Bu
 	}
 
 	return indices, nil
+}
+
+func updateRatingReplyCount(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, outfitId string, userId string, replyCount int) error {
+	path := "data/ratings/" + outfitId + ".json"
+	ratings, err := getRatingsByOutfit(ctx, client, bucket, path)
+	if err != nil {
+		return err
+	}
+
+	for i, r := range ratings {
+		if (r.UserId) == userId {
+			ratings[i].ReplyCount = replyCount
+		}
+	}
+
+	obj := bucket.Object(path)
+	writer := obj.NewWriter(ctx)
+	defer writer.Close()
+
+	if err := json.NewEncoder(writer).Encode(ratings); err != nil {
+		return err
+	}
+
+	return nil
 }
