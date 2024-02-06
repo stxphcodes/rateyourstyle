@@ -30,8 +30,10 @@ export function OutfitModal(props: {
   const [userReviewMissing, setUserReviewMissing] = useState<boolean>(false);
   const [allRatings, setAllRatings] = useState<Rating[] | null>(null);
 
-  const [viewReplies, setViewReplies] = useState<string>("");
-  const [replies, setReplies] = useState<Reply[]>([]);
+  const [viewReplies, setViewReplies] = useState<Map<string, Reply[]>>(
+    new Map<string, Reply[]>()
+  );
+
   const [replyKey, setReplyKey] = useState<string>("");
   const [reply, setReply] = useState<string>("");
 
@@ -73,16 +75,22 @@ export function OutfitModal(props: {
       replyKey,
       reply
     );
-    // deal with error
+    // TODO: deal with error
     if (resp instanceof Error) {
       return;
     }
 
-    if (!window.location.href.includes("?outfit=")) {
-      window.location.href = window.location.href + "?outfit=" + props.data.id;
-    } else {
-      window.location.reload();
+    let replies = await GetReplies(props.clientServer, props.cookie, replyKey);
+
+    if (!(replies instanceof Error)) {
+      viewReplies.set(replyKey, replies);
+      let clone = new Map<string, Reply[]>(viewReplies.entries());
+      setViewReplies(clone);
     }
+
+    // reset to default state
+    setReply("");
+    setReplyKey("");
   };
 
   useEffect(() => {
@@ -267,21 +275,21 @@ export function OutfitModal(props: {
                     {rating.review}
                   </div>
 
-                  {rating.reply_count &&
-                  rating.reply_count > 0 &&
-                  viewReplies != ratingKey ? (
+                  {rating.reply_count && !viewReplies.has(ratingKey) ? (
                     <div
                       className="pl-4 text-xs text-background-2 cursor-pointer"
                       onClick={async () => {
-                        setViewReplies(ratingKey);
-
                         let replies = await GetReplies(
                           props.clientServer,
                           props.cookie,
                           ratingKey
                         );
                         if (!(replies instanceof Error)) {
-                          setReplies(replies);
+                          viewReplies.set(ratingKey, replies);
+                          let clone = new Map<string, Reply[]>(
+                            viewReplies.entries()
+                          );
+                          setViewReplies(clone);
                         }
                       }}
                     >
@@ -289,22 +297,22 @@ export function OutfitModal(props: {
                       {rating.reply_count > 1 ? "replies" : "reply"}
                     </div>
                   ) : null}
-                  {rating.reply_count &&
-                  rating.reply_count > 0 &&
-                  replies.length > 0 &&
-                  viewReplies == ratingKey ? (
+
+                  {rating.reply_count && viewReplies.has(ratingKey) ? (
                     <div className="pl-4 text-xs">
                       <div
                         className="text-background-2 cursor-pointer"
                         onClick={() => {
-                          setViewReplies("");
-                          setReplies([]);
+                          viewReplies.delete(ratingKey);
+                          let clone = new Map<string, Reply[]>(
+                            viewReplies.entries()
+                          );
+                          setViewReplies(clone);
                         }}
                       >
                         Hide replies
                       </div>
-
-                      {replies.map((item) => (
+                      {viewReplies.get(ratingKey)?.map((item) => (
                         <div className="pt-2" key={item.id}>
                           <a href={`/closet/${item.username}`}>
                             {item.username}{" "}
