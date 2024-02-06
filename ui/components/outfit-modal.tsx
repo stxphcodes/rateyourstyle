@@ -81,7 +81,6 @@ export function OutfitModal(props: {
     }
 
     let replies = await GetReplies(props.clientServer, props.cookie, replyKey);
-
     if (!(replies instanceof Error)) {
       viewReplies.set(replyKey, replies);
       let clone = new Map<string, Reply[]>(viewReplies.entries());
@@ -91,6 +90,21 @@ export function OutfitModal(props: {
     // reset to default state
     setReply("");
     setReplyKey("");
+  };
+
+  const handleViewReplies = async (e: any, key: string) => {
+    let replies = await GetReplies(props.clientServer, props.cookie, key);
+    if (!(replies instanceof Error)) {
+      viewReplies.set(key, replies);
+      let clone = new Map<string, Reply[]>(viewReplies.entries());
+      setViewReplies(clone);
+    }
+  };
+
+  const handleHideReplies = (e: any, key: string) => {
+    viewReplies.delete(key);
+    let clone = new Map<string, Reply[]>(viewReplies.entries());
+    setViewReplies(clone);
   };
 
   useEffect(() => {
@@ -278,20 +292,7 @@ export function OutfitModal(props: {
                   {rating.reply_count && !viewReplies.has(ratingKey) ? (
                     <div
                       className="pl-4 text-xs text-background-2 cursor-pointer"
-                      onClick={async () => {
-                        let replies = await GetReplies(
-                          props.clientServer,
-                          props.cookie,
-                          ratingKey
-                        );
-                        if (!(replies instanceof Error)) {
-                          viewReplies.set(ratingKey, replies);
-                          let clone = new Map<string, Reply[]>(
-                            viewReplies.entries()
-                          );
-                          setViewReplies(clone);
-                        }
-                      }}
+                      onClick={(e: any) => handleViewReplies(e, ratingKey)}
                     >
                       View {rating.reply_count}{" "}
                       {rating.reply_count > 1 ? "replies" : "reply"}
@@ -302,12 +303,8 @@ export function OutfitModal(props: {
                     <div className="pl-4 text-xs">
                       <div
                         className="text-background-2 cursor-pointer"
-                        onClick={() => {
-                          viewReplies.delete(ratingKey);
-                          let clone = new Map<string, Reply[]>(
-                            viewReplies.entries()
-                          );
-                          setViewReplies(clone);
+                        onClick={(e) => {
+                          handleHideReplies(e, ratingKey);
                         }}
                       >
                         Hide replies
