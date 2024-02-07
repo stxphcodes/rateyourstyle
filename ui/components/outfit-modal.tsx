@@ -68,7 +68,7 @@ export function OutfitModal(props: {
     setSubmitRating(false);
   };
 
-  const handleSubmitReply = async (e: any) => {
+  const handleSubmitReply = async (e: any, key: string) => {
     const resp = await PostReply(
       props.clientServer,
       props.cookie,
@@ -80,9 +80,9 @@ export function OutfitModal(props: {
       return;
     }
 
-    let replies = await GetReplies(props.clientServer, props.cookie, replyKey);
+    let replies = await GetReplies(props.clientServer, props.cookie, key);
     if (!(replies instanceof Error)) {
-      viewReplies.set(replyKey, replies);
+      viewReplies.set(key, replies);
       let clone = new Map<string, Reply[]>(viewReplies.entries());
       setViewReplies(clone);
     }
@@ -299,7 +299,7 @@ export function OutfitModal(props: {
                     </div>
                   ) : null}
 
-                  {rating.reply_count && viewReplies.has(ratingKey) ? (
+                  {viewReplies.has(ratingKey) ? (
                     <div className="pl-4 text-xs">
                       <div
                         className="text-background-2 cursor-pointer"
@@ -340,7 +340,7 @@ export function OutfitModal(props: {
 
                       <button
                         className="text-xs mx-2 px-1 border-2 border-primary bg-primary text-white rounded"
-                        onClick={(e) => handleSubmitReply(e)}
+                        onClick={(e) => handleSubmitReply(e, ratingKey)}
                       >
                         reply
                       </button>
