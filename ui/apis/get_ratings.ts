@@ -6,6 +6,7 @@ export type Rating = {
   rating: any;
   review?: string;
   date?: string;
+  reply_count?: number;
 };
 
 export async function GetRatings(server: string, cookie: string): Promise<Rating[] | Error> {

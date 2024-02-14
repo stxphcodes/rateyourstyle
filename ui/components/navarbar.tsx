@@ -188,7 +188,7 @@ export function Navbar(props: {
       </div>
       {displayMobileMenu && (
         <div
-          className="bg-white shadow-xl border-t-2 border-background rounded w-fit z-50 px-4 pt-4 pb-8 h-full fixed top-8 left-0 flex flex-col gap-4 text-md"
+          className="bg-white shadow-xl border-t-2 border-background rounded w-fit z-50 px-4 pt-4 pb-8 h-full fixed top-8 left-0 flex flex-col gap-4 text-md uppercase"
           style={{ fontFamily: "custom-serif" }}
           ref={mobileMenuRef}
         >

@@ -765,6 +765,98 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 	}
 }
 
+func (h *Handler) GetReplies() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		outfitId := ctx.Param("outfitid")
+		if outfitId == "" {
+			log.Println("outfit id missing")
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		userId := ctx.Param("userid")
+		if userId == "" {
+			log.Println("user id missing")
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		path := "data/replies/" + outfitId + "/" + userId + ".json"
+		replies, err := getReplies(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, path)
+		if err != nil {
+			log.Println("error getting replies " + err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		return ctx.JSON(http.StatusOK, replies.Replies)
+	}
+}
+
+func (h *Handler) PostReply() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		username, ok := h.UserIndices.IdUsername[userId]
+		if !ok {
+			log.Println("username not found based on id " + userId)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		var data *ReplyItem
+		if err := ctx.Bind(&data); err != nil {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+		if data.Reply == "" {
+			return ctx.NoContent(http.StatusNoContent)
+		}
+
+		data.UserId = userId
+		data.Id = uuid()
+		data.Date = time.Now().Format("2006-01-02") + "T" + time.Now().Format("15:04:05")
+		data.Username = username
+
+		replies, err := createReply(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, data)
+		if err != nil {
+			log.Println("Error creating reply: ", err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		// update reply count
+		err = updateRatingReplyCount(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, data.RatingOutfitId, data.RatingUserId, len(replies.Replies))
+		if err != nil {
+			log.Println("Error updating count: ", err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		// create notification
+		notifs, err := repliesToNotifications(ctx.Request().Context(), h.Gcs.Bucket, h.UserIndices.IdUsername, replies, data)
+		if err != nil {
+			log.Println("Error generating notification: ", err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		for _, n := range notifs {
+			if err := createNotification(ctx.Request().Context(), h.Gcs.Bucket, n); err != nil {
+				log.Println("error creating notification " + err.Error())
+				return ctx.NoContent(http.StatusInternalServerError)
+			}
+
+			// update notification index
+			h.NotificationIndices.UserHasNotifications[n.ForUserId] = true
+		}
+
+		return ctx.NoContent(http.StatusCreated)
+	}
+}
+
 func (h *Handler) PostUser() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var data User
