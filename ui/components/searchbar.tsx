@@ -1,37 +1,65 @@
-type Props = {
-  handleInputChange: any;
-  handleSubmit: any;
-  inputValue: string;
-};
+import { useState } from "react";
+import { PostSearch } from "../apis/post_search";
 
-export default function Searchbar({
-  handleInputChange,
-  handleSubmit,
-  inputValue,
-}: Props) {
+export default function Searchbar(props: {
+  clientServer: string;
+  cookie: string;
+  updateSearchResults: any;
+  updateSearchNoResults: any;
+}) {
+  const [searchText, setSearchText] = useState<string>("");
+  const [searchError, setSearchError] = useState<boolean>(false);
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    const resp = await PostSearch(props.clientServer, props.cookie, searchText);
+    if (resp instanceof Error) {
+      setSearchError(true);
+      props.updateSearchNoResults();
+      return;
+    }
+
+    setSearchError(false);
+    if (Array.isArray(resp)) {
+      if (resp.length > 0) {
+        props.updateSearchResults(resp);
+      } else {
+        props.updateSearchNoResults();
+      }
+    }
+  };
+
   return (
-    <div className="p-2 bg-black rounded-lg">
-      <form className="flex items-center">
-        <label className="sr-only">Search</label>
-        <div className="relative w-full">
-          <input
-            type="text"
-            id="simple-search"
-            className="pl-10 p-2 text-sm md:text-lg w-full"
-            placeholder="Search"
-            required
-            onChange={handleInputChange}
-            value={inputValue}
-          />
+    <>
+      {searchError && (
+        <div className="text-primary mb-2">
+          Oh no, our search engine is down :\ We apologize for the inconvience,
+          please try again at a later time.
         </div>
+      )}
+      <form className="flex gap-2" onSubmit={(e) => handleSubmit(e)}>
+        <input
+          className="w-full"
+          id="caption"
+          type="text"
+          placeholder="Search"
+          value={searchText}
+          onChange={(e) => {
+            setSearchText(e.target.value);
+            if (e.target.value == "") {
+              props.updateSearchResults([]);
+              setSearchError(false);
+            }
+          }}
+        ></input>
         <button
           type="submit"
-          className="bg-primary font-medium hover:bg-white ml-2 py-2 px-2 md:px-4 text-xs md:text-md rounded-lg text-white hover:text-primary"
-          onClick={handleSubmit}
+          // onClick={(e) => handleSubmit(e)}
+          className="py-2 px-4 bg-primary text-white rounded hover:bg-background-2"
         >
-          Search
+          Submit
         </button>
       </form>
-    </div>
+    </>
   );
 }
