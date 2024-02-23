@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { PostSearch } from "../apis/post_search";
+import { SearchIcon } from "./icons/search";
 
 export default function Searchbar(props: {
   clientServer: string;
@@ -40,7 +41,7 @@ export default function Searchbar(props: {
 
       <form className="flex mb-2" onSubmit={(e) => handleSubmit(e)}>
         <input
-          className="w-full rounded-l-lg rounded-r-none border-y-2 border-l-2 border-r-0 border-black"
+          className="w-full rounded-l-lg rounded-r-none border-y-2 border-l-2 border-r-0 border-black text-sm"
           id="caption"
           type="text"
           placeholder="Search for specific styles, fashion brands, clothing items..."
@@ -56,9 +57,9 @@ export default function Searchbar(props: {
         <button
           type="submit"
           // onClick={(e) => handleSubmit(e)}
-          className="py-2 px-4 bg-black text-white border-y-2 border-r-2 border-black hover:bg-primary rounded-r-lg"
+          className="py-2 px-4 border-y-2  border-r-2 border-black hover:bg-primary hover:text-white hover:border-primary rounded-r-lg"
         >
-          Submit
+          <SearchIcon />
         </button>
       </form>
     </>
