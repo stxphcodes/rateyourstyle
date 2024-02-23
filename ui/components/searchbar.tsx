@@ -37,12 +37,13 @@ export default function Searchbar(props: {
           please try again at a later time.
         </div>
       )}
-      <form className="flex gap-2" onSubmit={(e) => handleSubmit(e)}>
+
+      <form className="flex mb-2" onSubmit={(e) => handleSubmit(e)}>
         <input
-          className="w-full"
+          className="w-full rounded-l-lg rounded-r-none border-y-2 border-l-2 border-r-0 border-black"
           id="caption"
           type="text"
-          placeholder="Search"
+          placeholder="Search for specific styles, fashion brands, clothing items..."
           value={searchText}
           onChange={(e) => {
             setSearchText(e.target.value);
@@ -55,7 +56,7 @@ export default function Searchbar(props: {
         <button
           type="submit"
           // onClick={(e) => handleSubmit(e)}
-          className="py-2 px-4 bg-primary text-white rounded hover:bg-background-2"
+          className="py-2 px-4 bg-black text-white border-y-2 border-r-2 border-black hover:bg-primary rounded-r-lg"
         >
           Submit
         </button>
