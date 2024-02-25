@@ -17,7 +17,7 @@ export function OutfitModal(props: {
   asUser: boolean;
   userRating: Rating | null;
 }) {
-  const [viewItems, setViewItems] = useState<boolean>(false);
+  const [viewItems, setViewItems] = useState<boolean>(true);
 
   const [submitRating, setSubmitRating] = useState<boolean>(false);
   const [userOutfitRating, setUserOutfitRating] = useState<number>(
@@ -165,10 +165,10 @@ export function OutfitModal(props: {
                 }}
               >
                 {!viewItems
-                  ? `View ${props.data.items.length} ${
-                      props.data.items.length > 1 ? "items" : "item"
+                  ? `View ${props.data.items.length} Oufit Item${
+                      props.data.items.length > 1 ? "s" : ""
                     }`
-                  : `Collapse items:`}
+                  : `Hide Outfit Items`}
               </a>
             </div>
 
