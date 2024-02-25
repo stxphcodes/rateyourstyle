@@ -34,8 +34,8 @@ export default function Searchbar(props: {
     <>
       {/* {searchError && ( */}
       <div className="text-primary mb-2">
-        We're experiencing server issues and apologize if the search engine
-        isn't working. We're working on resolving this asap.
+        We&apos;re experiencing server issues and apologize if the search engine
+        isn&apos;t working. We&apos;re working on resolving this asap.
       </div>
       {/* )} */}
 
