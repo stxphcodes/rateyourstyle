@@ -1,37 +1,67 @@
-type Props = {
-  handleInputChange: any;
-  handleSubmit: any;
-  inputValue: string;
-};
+import { useState } from "react";
+import { PostSearch } from "../apis/post_search";
+import { SearchIcon } from "./icons/search";
 
-export default function Searchbar({
-  handleInputChange,
-  handleSubmit,
-  inputValue,
-}: Props) {
+export default function Searchbar(props: {
+  clientServer: string;
+  cookie: string;
+  updateSearchResults: any;
+  updateSearchNoResults: any;
+}) {
+  const [searchText, setSearchText] = useState<string>("");
+  const [searchError, setSearchError] = useState<boolean>(false);
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    const resp = await PostSearch(props.clientServer, props.cookie, searchText);
+    if (resp instanceof Error) {
+      setSearchError(true);
+      props.updateSearchNoResults();
+      return;
+    }
+
+    setSearchError(false);
+    if (Array.isArray(resp)) {
+      if (resp.length > 0) {
+        props.updateSearchResults(resp);
+      } else {
+        props.updateSearchNoResults();
+      }
+    }
+  };
+
   return (
-    <div className="p-2 bg-black rounded-lg">
-      <form className="flex items-center">
-        <label className="sr-only">Search</label>
-        <div className="relative w-full">
-          <input
-            type="text"
-            id="simple-search"
-            className="pl-10 p-2 text-sm md:text-lg w-full"
-            placeholder="Search"
-            required
-            onChange={handleInputChange}
-            value={inputValue}
-          />
+    <>
+      {searchError && (
+        <div className="text-primary mb-2">
+          Something went wrong :\ Our search server seems to be down. Sorry for
+          the inconvience, we&apos;re working to resolve the issue.
         </div>
+      )}
+
+      <form className="flex mb-2" onSubmit={(e) => handleSubmit(e)}>
+        <input
+          className="w-full rounded-l-lg rounded-r-none border-y-2 border-l-2 border-r-0 border-black text-sm"
+          id="caption"
+          type="text"
+          placeholder="Search for specific styles, fashion brands, clothing items..."
+          value={searchText}
+          onChange={(e) => {
+            setSearchText(e.target.value);
+            if (e.target.value == "") {
+              props.updateSearchResults([]);
+              setSearchError(false);
+            }
+          }}
+        ></input>
         <button
           type="submit"
-          className="bg-primary font-medium hover:bg-white ml-2 py-2 px-2 md:px-4 text-xs md:text-md rounded-lg text-white hover:text-primary"
-          onClick={handleSubmit}
+          // onClick={(e) => handleSubmit(e)}
+          className="py-2 px-4 border-y-2  border-r-2 border-black hover:bg-primary hover:text-white hover:border-primary rounded-r-lg"
         >
-          Search
+          <SearchIcon />
         </button>
       </form>
-    </div>
+    </>
   );
 }

@@ -15,7 +15,7 @@ services:
       # sh -c "tail -f /dev/null"
       - "./mnt/app"
       - "--gcs.creds=/secrets/localdev_sa.json"
-      - "--campaigns.path=/mnt/campaigns.json"
+      - "--campaigns.path=/mnt/campaigns.json"ß
   ui:
     build:
       context: ./ui
