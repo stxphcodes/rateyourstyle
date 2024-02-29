@@ -32,12 +32,12 @@ export default function Searchbar(props: {
 
   return (
     <>
-      {/* {searchError && ( */}
-      <div className="text-primary mb-2">
-        We&apos;re experiencing server issues and apologize if the search engine
-        isn&apos;t working. We&apos;re working on resolving this asap.
-      </div>
-      {/* )} */}
+      {searchError && (
+        <div className="text-primary mb-2">
+          Something went wrong :\ Our search server seems to be down. Sorry for
+          the inconvience, we&apos;re working to resolve the issue.
+        </div>
+      )}
 
       <form className="flex mb-2" onSubmit={(e) => handleSubmit(e)}>
         <input
