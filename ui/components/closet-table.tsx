@@ -9,7 +9,7 @@ import { ClosetCostChart } from "./data-viz/pie-donut";
 import { ItemPricesChart } from "./data-viz/box-and-whisker";
 import { ItemCostPerWear } from "./data-viz/pie";
 import { BarGraph } from "./data-viz/bar";
-import { EyeDropper, OnChangeEyedrop, useEyeDrop } from "react-eyedrop";
+import { EyeDropper, OnChangeEyedrop } from "react-eyedrop";
 import { EyedropperButton } from "./color/eyedropper-button";
 import { ntc } from "./color/ntc";
 import { ColorDiv } from "./color/color-div";

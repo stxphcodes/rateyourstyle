@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { EyeDropper, OnChangeEyedrop, useEyeDrop } from "react-eyedrop";
+import { EyeDropper, OnChangeEyedrop } from "react-eyedrop";
 
 import { Campaign, GetCampaigns } from "../apis/get_campaigns";
 import { GetOutfitsByUser, Outfit, OutfitItem } from "../apis/get_outfits";
