@@ -24,6 +24,9 @@ type OutfitItem struct {
 	Review      string      `json:"review"`
 	Rating      interface{} `json:"rating"`
 	Color       string      `json:"color"`
+	ColorRGB    string      `json:"color_rgb"`
+	ColorHex    string      `json:"color_hex"`
+	ColorName   string      `json:"color_name"`
 	Store       string      `json:"store"`
 }
 
