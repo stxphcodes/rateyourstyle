@@ -14,6 +14,9 @@ export type OutfitItem = {
   rating: number;
   review: string;
   color: string;
+  color_rgb?: string;
+  color_hex?:string;
+  color_name?:string;
   store: string;
 };
 
