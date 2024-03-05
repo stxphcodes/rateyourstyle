@@ -143,10 +143,6 @@ export function ClosetTable(props: {
       newItem.brand = e.target.value;
     }
 
-    // if (e.target.id == "color") {
-    //   newItem.color = e.target.value;
-    // }
-
     if (e.target.id == "store") {
       newItem.store = e.target.value;
     }

@@ -80,16 +80,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     // sort previous items by brand, color then description,
     props.previousOutfitItems.sort((a, b) => {
-      let aDescription: string = (
-        a.brand +
-        a.color +
-        a.description
-      ).toLowerCase();
-      let bDescription: string = (
-        b.brand +
-        b.color +
-        b.description
-      ).toLowerCase();
+      let aDescription: string = (a.brand + a.description).toLowerCase();
+      let bDescription: string = (b.brand + b.description).toLowerCase();
       if (aDescription < bDescription) {
         return -1;
       }
@@ -656,7 +648,7 @@ function OutfitItemForm(props: {
             <option value="">--Please select an item--</option>
             {props.previousOutfitItems.map((item) => (
               <option value={item.id} key={item.id}>
-                {item.brand} {item.color} {item.description}
+                {item.brand} {item.description}
               </option>
             ))}
           </select>
