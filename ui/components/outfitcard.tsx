@@ -6,6 +6,7 @@ import { GetRatings, GetRatingsByOutfit, Rating } from "../apis/get_ratings";
 import { VerifiedCheckIcon } from "./icons/verified-check-icon";
 import Link from "next/link";
 import { OutfitModal } from "./outfit-modal";
+import { ColorDiv } from "./color/color-div";
 
 export function RatingDiv(props: { x: number; small?: boolean }) {
   return (
@@ -133,14 +134,21 @@ export function OutfitItemList(props: { outfitItems: OutfitItem[] }) {
               {count}.{" "}
               {item.link ? (
                 <a href={item.link} target="_blank" className="">
-                  {item.color} {item.description}{" "}
+                  {item.description}
                 </a>
               ) : (
                 <span className="hover:cursor-not-allowed">
-                  {item.color} {item.description}
+                  {item.description}
                 </span>
               )}
             </h6>
+
+            <ColorDiv
+              hex={item.color_hex}
+              name={item.color_name}
+              color={item.color}
+            />
+
             {item.brand && <PSpan p={item.brand} span="Brand" />}
             {item.store && <PSpan p={item.store} span="Store" />}
             <PSpan p={item.size ? item.size : "n/a"} span="Size" />
