@@ -9,12 +9,10 @@ import {
   Outfit,
   OutfitItem,
 } from "../apis/get_outfits";
-import { GetRatings, Rating } from "../apis/get_ratings";
 import { Footer } from "../components/footer";
 import { Navbar } from "../components/navarbar";
 import { OutfitCard } from "../components/outfitcard";
 import { GetServerURL } from "../apis/get_server";
-import { ClosetTable } from "../components/closet/table";
 import { PageMetadata } from "./_app";
 import { GetBusinesses } from "../apis/get_businesses";
 import { CircleCheckIcon } from "../components/icons/circle-check";
@@ -36,21 +34,55 @@ const howItWorks = [
     picture_url: "/screenshot-closet.png",
     title: "1. Upload your outfits",
     description: "Create an account and start posting your favorite outfits!",
-    bgcolor: "rgba(216,227,3,1)",
+    bgcolor: "custom-lime",
+    content: (
+      <div>
+        Create an account and start posting your favorite outfits! Your outfits
+        will populate your closet page.
+        <br />
+        <br />
+        See an{" "}
+        <a href="/closet/stxphcodes" className="hover:text-custom-pink">
+          example closet here
+        </a>
+        .
+      </div>
+    ),
   },
   {
-    picture_url: "/screenshot-review.png",
+    picture_url: "/screenshot-requestfeedback.png",
     title: "2. Get outfit feedback",
-    description:
-      "The Rate Your Style community will rate and review your outfits. \n\n(Coming Soon)\n There are professional stylists on Rate Your Style. If you'd like their specific outfit feedback, you can send a request to them directly.",
-    bgcolor: "rgba(250,123,225,1)",
+    content: (
+      <div>
+        The Rate Your Style community will rate and review your outfits.
+        <br />
+        <br />
+        (Coming Soon)
+        <br /> There are professional stylists on Rate Your Style. If you'd like
+        their specific outfit feedback, you can send a request to them directly.
+      </div>
+    ),
+    bgcolor: "custom-pink",
   },
   {
     picture_url: "/screenshot-review.png",
     title: "3. Give outfit feedback",
-    description:
-      "Use the Discover page to find style inspo, and to rate & review other users' outfits.\n\n(Coming Soon)\nIf other users like your style, they can request feedback from you. You can charge a styling fee if you'd like.",
-    bgcolor: "rgba(216,227,3,1)",
+    content: (
+      <div>
+        Use the{" "}
+        <a href="/discover" className="hover:text-custom-pink">
+          Discover page
+        </a>{" "}
+        to find fashion inspo, and to rate & review other users' outfits.
+        <br />
+        <br />
+        (Coming Soon)
+        <br />
+        If other users like your style, they can request feedback from you. You
+        can charge a styling fee if you'd like.
+      </div>
+    ),
+    bgcolor: "custom-lime",
   },
 ];
 
@@ -149,7 +181,7 @@ function Home({ cookie, outfits, clientServer, businesses, error }: Props) {
           </h1>
 
           <div className="sm:w-3/4 m-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-4">
               {heroSectionOutfit && (
                 <OutfitCard
                   cookie={cookie}
@@ -237,15 +269,10 @@ function Home({ cookie, outfits, clientServer, businesses, error }: Props) {
           <h1 className="px-4 md:px-8 py-8 bg-custom-tan">How It Works</h1>
           <div className="grid grid-cols-1 sm:grid-cols-3 ">
             {howItWorks.map((item) => (
-              <div
-                className="p-8 whitespace-pre-line"
-                style={{
-                  background: item.bgcolor,
-                }}
-              >
+              <div className={`p-8 whitespace-pre-line bg-${item.bgcolor}`}>
                 <h2>{item.title}</h2>
                 <div className="flex gap-2 items-start mt-4">
-                  <p>{item.description}</p>
+                  {item.content}
                   <img
                     src={item.picture_url}
                     className="w-1/2 border-4 border-black"
