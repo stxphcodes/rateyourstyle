@@ -278,6 +278,7 @@ function Home({ cookie, outfits, clientServer, businesses, error }: Props) {
                 <div className="flex gap-2 items-start mt-4">
                   {item.content}
                   <img
+                    alt={`how-it-works-img-${index}`}
                     src={item.picture_url}
                     className="w-1/2 border-4 border-black"
                   ></img>

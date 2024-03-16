@@ -398,6 +398,7 @@ function PostOutfitPage({
             {imageURL ? (
               <div className="flex flex-wrap gap-4">
                 <img
+                  alt={"outfit image to post"}
                   src={URL.createObjectURL(file as File)}
                   className="object-cover"
                   style={{ height: "600px" }}

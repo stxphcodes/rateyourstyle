@@ -41,6 +41,7 @@ export function ClosetHeader(props: {
       <div className="flex gap-2 items-center">
         {profileImage && (
           <img
+            alt={`profile pic for ${props.closetName}`}
             src={profileImage}
             className="object-contain w-12 h-12 rounded-full"
           />

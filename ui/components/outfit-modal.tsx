@@ -130,7 +130,11 @@ export function OutfitModal(props: {
     >
       <div className="md:flex md:gapx-2 md:align-start md:flex-row w-full">
         <div className="basis-1/2">
-          <img className="mb-2" src={props.data.picture_url}></img>
+          <img
+            alt={props.data.description}
+            className="mb-2"
+            src={props.data.picture_url}
+          ></img>
         </div>
 
         <div className="basis-1/2 w-full">

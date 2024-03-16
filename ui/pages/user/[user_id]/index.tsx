@@ -149,43 +149,9 @@ export default function Index({
   user,
   outfits,
   userRatings,
-  businessProfile,
   error,
 }: Props) {
   const [switchToBusinessAccount, setSwitchToBusinessAccount] = useState(false);
-  if (error) {
-    if (error == "forbidden") {
-      return (
-        <>
-          <Navbar
-            clientServer={clientServer}
-            cookie={cookie}
-            user={user.username}
-          />
-          <main className="mt-12 sm:mt-20 px-4 md:px-8">
-            <h1>✋ Forbidden </h1>
-            Please sign in as the user to view their posts.
-          </main>
-        </>
-      );
-    }
-
-    return (
-      <>
-        <Navbar
-          clientServer={clientServer}
-          cookie={cookie}
-          user={user.username}
-        />
-        <main className="mt-12 sm:mt-20 px-4 md:px-8">
-          <h1>😕 Oh no</h1>
-          Looks like there&apos;s an error on our end. Please refresh the page
-          in a few minutes. If the issue persists, please email
-          sitesbystephanie@gmail.com.
-        </main>
-      </>
-    );
-  }
 
   const outfitItemToIds: Map<string, string[]> = useMemo(() => {
     if (!outfits) {
@@ -227,6 +193,40 @@ export default function Index({
     return arr;
   }, []);
 
+  if (error) {
+    if (error == "forbidden") {
+      return (
+        <>
+          <Navbar
+            clientServer={clientServer}
+            cookie={cookie}
+            user={user.username}
+          />
+          <main className="mt-12 sm:mt-20 px-4 md:px-8">
+            <h1>✋ Forbidden </h1>
+            Please sign in as the user to view their posts.
+          </main>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Navbar
+          clientServer={clientServer}
+          cookie={cookie}
+          user={user.username}
+        />
+        <main className="mt-12 sm:mt-20 px-4 md:px-8">
+          <h1>😕 Oh no</h1>
+          Looks like there&apos;s an error on our end. Please refresh the page
+          in a few minutes. If the issue persists, please email
+          sitesbystephanie@gmail.com.
+        </main>
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar
@@ -238,8 +238,8 @@ export default function Index({
         <section className="mb-4">
           <div className="bg-custom-pink p-2 rounded ">
             RateYourStyle is still being developed - we&apos;re working as fast
-            as we can on new features. If there&apos;s an outfit you'd like to
-            edit, or want to report a bug or feature idea, please email
+            as we can on new features. If there&apos;s an outfit you&apos;d like
+            to edit, or want to report a bug or feature idea, please email
             sitesbystephanie@gmail.com. Thank you for your patience and
             understanding 💛.
           </div>

@@ -467,6 +467,7 @@ export function ClosetTable(props: {
 
                                   {itemEditColorImageFile && (
                                     <img
+                                      alt={"image being edited"}
                                       src={URL.createObjectURL(
                                         itemEditColorImageFile as File
                                       )}

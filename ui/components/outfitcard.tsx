@@ -41,6 +41,7 @@ export function OutfitCard(props: {
       <div className="shadow-sm shadow-custom-tan border-b-2 border-custom-tan  break-words bg-white hover:scale-105">
         <div className="h-72 sm:h-96 overflow-hidden hover:cursor-pointer">
           <img
+            alt={props.data.description}
             onClick={() => setExpandImage(true)}
             className="object-cover w-full h-full"
             src={props.data.picture_url_resized}
