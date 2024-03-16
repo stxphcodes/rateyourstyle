@@ -24,8 +24,8 @@ export function RequestFeedbackModal(props: {
         </h1>
 
         <div>
-          We're actively working on this feature! Please check back in a few
-          weeks.
+          We&apos;re actively working on this feature! Please check back in a
+          few weeks.
         </div>
       </>
     </Modal>

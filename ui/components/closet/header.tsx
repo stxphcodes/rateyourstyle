@@ -70,7 +70,10 @@ export function ClosetHeader(props: {
         <div className="font-bold flex flex-wrap gap-2 items-center">
           Aesthetic:
           {aestheticsFiltered.map((item) => (
-            <div className="rounded-full px-1 font-normal bg-gradient">
+            <div
+              className="rounded-full px-1 font-normal bg-gradient"
+              key={item}
+            >
               {item}
             </div>
           ))}

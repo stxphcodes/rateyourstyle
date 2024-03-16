@@ -237,9 +237,9 @@ export default function Index({
       <main className="mt-12 sm:mt-20 px-4 md:px-8">
         <section className="mb-4">
           <div className="bg-custom-pink p-2 rounded ">
-            RateYourStyle is still being developed - we're working as fast as we
-            can on new features. If there's an outfit you'd like to edit, or
-            want to report a bug or feature idea, please email
+            RateYourStyle is still being developed - we&apos;re working as fast
+            as we can on new features. If there&apos;s an outfit you'd like to
+            edit, or want to report a bug or feature idea, please email
             sitesbystephanie@gmail.com. Thank you for your patience and
             understanding 💛.
           </div>

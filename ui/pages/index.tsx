@@ -42,9 +42,9 @@ const howItWorks = [
         <br />
         <br />
         See an{" "}
-        <a href="/closet/stxphcodes" className="hover:text-custom-pink">
-          example closet here
-        </a>
+        <Link href="/closet/stxphcodes" passHref={true}>
+          <a className="hover:text-custom-pink">example closet here</a>
+        </Link>
         .
       </div>
     ),
@@ -58,8 +58,9 @@ const howItWorks = [
         <br />
         <br />
         (Coming Soon)
-        <br /> There are professional stylists on Rate Your Style. If you'd like
-        their specific outfit feedback, you can send a request to them directly.
+        <br /> There are professional stylists on Rate Your Style. If you&apos;d
+        like their specific outfit feedback, you can send a request to them
+        directly.
       </div>
     ),
     bgcolor: "custom-pink",
@@ -70,16 +71,16 @@ const howItWorks = [
     content: (
       <div>
         Use the{" "}
-        <a href="/discover" className="hover:text-custom-pink">
-          Discover page
-        </a>{" "}
-        to find fashion inspo, and to rate & review other users' outfits.
+        <Link href="/discover" passHref={true}>
+          <a className="hover:text-custom-pink">Discover page</a>
+        </Link>{" "}
+        to find fashion inspo, and to rate & review other users&apos; outfits.
         <br />
         <br />
         (Coming Soon)
         <br />
         If other users like your style, they can request feedback from you. You
-        can charge a styling fee if you'd like.
+        can charge a styling fee if you&apos;d like.
       </div>
     ),
     bgcolor: "custom-lime",
@@ -268,8 +269,11 @@ function Home({ cookie, outfits, clientServer, businesses, error }: Props) {
         <section>
           <h1 className="px-4 md:px-8 py-8 bg-custom-tan">How It Works</h1>
           <div className="grid grid-cols-1 sm:grid-cols-3 ">
-            {howItWorks.map((item) => (
-              <div className={`p-8 whitespace-pre-line bg-${item.bgcolor}`}>
+            {howItWorks.map((item, index) => (
+              <div
+                className={`p-8 whitespace-pre-line bg-${item.bgcolor}`}
+                key={`how-it-works-step-${index}`}
+              >
                 <h2>{item.title}</h2>
                 <div className="flex gap-2 items-start mt-4">
                   {item.content}
