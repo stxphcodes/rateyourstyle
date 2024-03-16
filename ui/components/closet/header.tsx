@@ -67,16 +67,10 @@ export function ClosetHeader(props: {
       )}
 
       {aestheticsFiltered && aestheticsFiltered.length > 0 && (
-        <div className="font-bold flex gap-2 items-center">
+        <div className="font-bold flex flex-wrap gap-2 items-center">
           Aesthetic:
           {aestheticsFiltered.map((item) => (
-            <div
-              className="rounded-full px-2 py-1"
-              style={{
-                background:
-                  "linear-gradient(90deg, rgba(216,227,3,1) 0%, rgba(230,207,171,1) 53%, rgba(250,123,225,1) 100%)",
-              }}
-            >
+            <div className="rounded-full px-1 font-normal bg-gradient">
               {item}
             </div>
           ))}

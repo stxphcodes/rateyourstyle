@@ -9,7 +9,7 @@ import { GetServerURL } from "../../apis/get_server";
 import { ClosetTable } from "../../components/closet/table";
 import { GetUser, GetUsername, User } from "../../apis/get_user";
 import { Footer } from "../../components/footer";
-import { SubmitOutfit } from "../../components/modals/submitoutfit";
+import { RequestFeedbackModal } from "../../components/modals/requestfeedback";
 import { ClosetHeader } from "../../components/closet/header";
 import { PageMetadata } from "../_app";
 
@@ -174,7 +174,7 @@ export default function UserClosetPage({
       <Navbar clientServer={clientServer} cookie={cookie} />
       {/* {!cookie && <AccountPromptModal clientServer={clientServer} />} */}
       <main className="mt-12 sm:mt-20 px-4 md:px-8">
-        <section className="mb-4">
+        <section className="mb-4 flex gap-2">
           <ClosetHeader
             closetName={closetName}
             outfitCount={outfits ? outfits.length : 0}
@@ -184,6 +184,18 @@ export default function UserClosetPage({
               outfits && outfits.map((item) => item.picture_url_resized)
             }
           />
+
+          <button
+            className="bg-gradient rounded p-2 font-bold uppercase hover:scale-110 h-fit text-left"
+            onClick={(e) => {
+              e.preventDefault();
+              setSubmitOutfitClicked(true);
+            }}
+          >
+            Like their style? <br />
+            Request Outfit Feedback <br />
+            from {closetName}
+          </button>
         </section>
         <section>
           {!outfits || outfits.length == 0 ? (
@@ -204,12 +216,12 @@ export default function UserClosetPage({
         </section>
       </main>
       {submitOutfitClicked && (
-        <SubmitOutfit
+        <RequestFeedbackModal
           clientServer={clientServer}
           cookie={cookie}
           handleClose={() => {
             setSubmitOutfitClicked(false);
-            location.reload();
+            // location.reload();
           }}
           closetName={closetName}
         />
