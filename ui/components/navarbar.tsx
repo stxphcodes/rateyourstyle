@@ -57,7 +57,6 @@ export function Navbar(props: {
   const [outfit, setOutfit] = useState<Outfit | null>(null);
 
   const checkMobileScreenWidth = (window: any) => {
-    // const { innerWidth: width, innerHeight: height } = window;
     if (window.innerWidth <= 600) {
       setUseMobileMenu(true);
       return;
@@ -124,10 +123,7 @@ export function Navbar(props: {
 
   return (
     <>
-      <div
-        className="mb-20 shadow-sm px-4 md:px-8 py-2  top-0 w-screen bg-white fixed z-50 text-xs text-primary uppercase"
-        style={{ fontFamily: "custom-serif" }}
-      >
+      <div className="mb-20 shadow-sm px-4 md:px-8 py-2  top-0 w-screen  bg-white fixed z-50 text-xs uppercase">
         <div className="flex items-center gap-2 justify-between">
           {useMobileMenu ? (
             <div
@@ -154,14 +150,14 @@ export function Navbar(props: {
           ) : (
             <div className="flex flex-row gap-2 items-center">
               <button
-                className="mr-2 w-fi uppercase"
+                className="mr-2 uppercase"
                 onClick={() => setShowSignInModal(true)}
               >
                 <a>Sign in</a>
               </button>
 
               <button
-                className="px-1 bg-primary text-white rounded-lg uppercase"
+                className="px-1 bg-custom-lime font-bold rounded-lg uppercase"
                 onClick={() => setShowCreateAccountModal(true)}
               >
                 Create Account
@@ -189,7 +185,6 @@ export function Navbar(props: {
       {displayMobileMenu && (
         <div
           className="bg-white shadow-xl border-t-2 border-background rounded w-fit z-50 px-4 pt-4 pb-8 h-full fixed top-8 left-0 flex flex-col gap-4 text-md uppercase"
-          style={{ fontFamily: "custom-serif" }}
           ref={mobileMenuRef}
         >
           <Link href="/" passHref={true}>
@@ -263,17 +258,15 @@ function NotificationMenu(props: {
 
   return (
     <div
-      className="bg-white border-t-2 border-background rounded-md w-1/2 md:w-1/3 z-50 overflow-scroll fixed top-8 sm:top-12 right-4 flex flex-col  shadow-xl text-lg max-h-screen"
+      className="bg-white border-t-2 border-background rounded-md w-1/2 md:w-1/3 z-50 overflow-scroll fixed top-8 sm:top-12 right-4 flex flex-col  shadow-xl text-lg max-h-screen text-xs"
       ref={menuRef}
     >
       {props.notifications.length < 1 ? (
-        <div className="text-background-2 text-xs p-2">
-          no notifications to show
-        </div>
+        <div className="p-2">no notifications to show</div>
       ) : (
         props.notifications.map((n) => (
           <button
-            className="px-2 py-3 hover:bg-background text-left overflow-clip shrink-0"
+            className="p-3 hover:bg-custom-tan text-left overflow-clip shrink-0"
             onClick={() => {
               let url = window.location.href;
               url += `?outfit=${n.for_outfit_id}`;
@@ -281,10 +274,8 @@ function NotificationMenu(props: {
             }}
             key={n.id}
           >
-            <div className="text-background-2 text-xs">{n.date}</div>
-            <div className="text-xs" style={{ fontFamily: "custom-p" }}>
-              {n.message}
-            </div>
+            <div className="text-custom-grey-brown">{n.date}</div>
+            <div className="">{n.message}</div>
           </button>
         ))
       )}
@@ -311,16 +302,15 @@ function UserMenu(props: { username: string; handleClose: any }) {
   return (
     <div
       className="bg-white border-t-2 border-background rounded-md z-50 overflow-scroll fixed top-8 sm:top-10 right-2 flex flex-col  shadow-xl text-lg max-h-screen"
-      style={{ fontFamily: "custom-serif" }}
       ref={menuRef}
     >
       <Link href={`/user/${props.username}`} passHref={true}>
-        <button className="px-8 py-2  hover:bg-background text-left overflow-clip shrink-0 text-xs uppercase">
+        <button className="px-8 py-2  hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase">
           Account
         </button>
       </Link>
       <button
-        className="px-8 py-2  hover:bg-background text-left overflow-clip shrink-0 text-xs uppercase"
+        className="px-8 py-2  hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase"
         onClick={() => {
           // delete cookie
           document.cookie = "rys-login=;expires=Thu, 01 Jan 1970 00:00:01 GMT";
@@ -362,25 +352,31 @@ function UserAndNotification(props: {
   return (
     <div className="flex flex-row gap-2 items-center">
       <button
-        className="hover:text-black"
         onClick={() => {
           setDisplayNotifMenu(!displayNotifMenu);
         }}
       >
         {props.hasNotifs ? (
-          <NotificationFilledIcon />
+          <div className="flex">
+            <div className="animate-pulse">
+              <NotificationFilledIcon />
+            </div>
+            <div
+              className="animate-ping rounded-full "
+              style={{ background: "#d8e303", width: "0.6em", height: "0.6em" }}
+            ></div>
+          </div>
         ) : (
           <NotificationEmptyIcon />
         )}
       </button>
-      <button
-        className="text-primary hover:text-black"
+      <a
         onClick={() => {
           setDisplayUserMenu(!displayUserMenu);
         }}
       >
         {props.username}
-      </button>
+      </a>
 
       {displayNotifMenu && (
         <NotificationMenu

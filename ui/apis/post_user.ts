@@ -1,4 +1,4 @@
-import { UserProfile } from "./get_user";
+import { UserProfile, UserGeneral } from "./get_user";
 
 export async function SetCookieExpiration(cookie: string, expDays: number)  {
   let date = new Date();
@@ -58,6 +58,31 @@ export async function PostUserProfile(
   await fetch(`${server}/api/user-profile`, {
       method: "POST",
       body: JSON.stringify(userProfile),
+      headers: {
+          "content-type": "application/json",
+          "rys-login": cookie
+      },
+  }).then((response) => {
+      if (!response.ok) {
+          throw new Error("response not ok");
+      }
+  }).catch((err: Error) => {
+      error = err
+  });
+
+  return error
+}
+
+export async function PostUserGeneral(
+  server: string,
+  cookie: string,
+  userGeneral: UserGeneral,
+): Promise<Error | null> {
+  let error: Error | null = null
+
+  await fetch(`${server}/api/user-general`, {
+      method: "POST",
+      body: JSON.stringify(userGeneral),
       headers: {
           "content-type": "application/json",
           "rys-login": cookie

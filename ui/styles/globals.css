@@ -2,14 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "custom-serif";
-  src:  url("/fonts/RobotoMono-VariableFont_wght.ttf");
-  font-display: "swap";
-}
 
 @font-face {
-  font-family: "custom-p";
+  font-family: "custom-font";
   src:  url("/fonts/Inter.ttf");
   font-display: "swap";
 }
@@ -30,46 +25,42 @@ input, textarea {
 }
 
 input:focus, textarea:focus {
-  border: 2px solid #aa3c16;
+  border: 2px solid #cdbda8;
   color: black;
   outline: none;
 }
 
 
 body {
-  font-family: 'custom-p';
+  font-family: 'custom-font';
   font-size: 14px;
 }
 
 
 h1 {
-  font-size: 24px;
-  font-family: 'custom-serif';
+  font-size: 30px;
+  font-weight: bold;
   text-transform: uppercase;
 }
 
 h2 {
   font-size: 24px;
-  /* font-family: 'custom-serif'; */
+  font-weight: bold;
 }
 
 h3 {
   font-size: 20px;
-  font-family: 'custom-serif';
 }
 
 h4 {
   font-size: 18px;
-  font-family: 'custom-serif';
 }
 
 h5 {
-  font-family: 'custom-serif';
   font-size: 17px;
 }
 
 h6 {
-  font-family: 'custom-serif';
   font-size: 14px;
 }
 
@@ -78,38 +69,48 @@ p {
 }
 
 a {
-  color: #aa3c16;
+  font-weight: bold; 
+  color: black;
 }
 
 a:hover {
-  color: black;
+  color: #d8e303;
   cursor: pointer;
+  text-decoration: underline;
 }
 
 .primaryButton {
-  background-color: #aa3c16;
+  background-color: black;
   padding: 0 4px;
   border: 2px solid;
   border-radius: 4px;
-  border-color: #aa3c16;
+  border-color: black;
   color: white;
 }
 
 .primaryButton:hover {
-  color: #aa3c16;
+  color: black;
   background-color: white;
 }
 
 .inverseButton {
-  color: #aa3c16;
+  color: black;
   padding: 0 4px;
   border: 2px solid;
   border-radius: 4px;
-  border-color: #aa3c16;
+  border-color: black;
 }
 
 .inverseButton:hover {
   color: white;
-  background-color: #aa3c16;
+  background-color: black;
 }
 
+
+.gradientBackground {
+  background: linear-gradient(90deg, rgba(216,227,3,1) 0%, rgba(230,207,171,1) 53%, rgba(250,123,225,1) 100%);
+}
+
+.requiredLabel {
+  color: rgba(250,123,225,1);
+}

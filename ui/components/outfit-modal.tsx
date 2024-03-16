@@ -130,11 +130,11 @@ export function OutfitModal(props: {
     >
       <div className="md:flex md:gapx-2 md:align-start md:flex-row w-full">
         <div className="basis-1/2">
-          <img className=" mb-2" src={props.data.picture_url}></img>
+          <img className="mb-2" src={props.data.picture_url}></img>
         </div>
 
         <div className="basis-1/2 w-full">
-          <div className="px-4">
+          <div className="px-4 mb-4">
             <div>
               {props.data.username ? (
                 <a className="" href={`/closet/${props.data.username}`}>
@@ -147,7 +147,8 @@ export function OutfitModal(props: {
                 {" | "} {props.data.date}
               </span>
             </div>
-            <h3 className="">{props.data.title}</h3>
+
+            <div className="text-2xl">{props.data.title}</div>
             <div className="flex gap-2">
               {props.data.style_tags.map((item) => (
                 <div className="" key={item}>
@@ -256,7 +257,7 @@ export function OutfitModal(props: {
                       </div>
                     )}
                     <button
-                      className="bg-primary text-white p-1 rounded hover:bg-black"
+                      className="primaryButton"
                       onClick={handleSubmitRating}
                     >
                       submit
@@ -267,14 +268,14 @@ export function OutfitModal(props: {
             )}
           </div>
 
-          <div className="border-t-2 border-background px-4">
+          <div className="border-t-2 border-custom-grey-brown px-4">
             {allRatings?.map((rating) => {
               let ratingKey = rating.outfit_id + "-" + rating.user_id;
               return (
                 <div className="my-3" key={ratingKey}>
                   <div className="text-xs">
                     {!rating.username ? (
-                      <span className="text-primary">anonymous</span>
+                      <span>anonymous</span>
                     ) : (
                       <Link href={`/closet/${rating.username}`} passHref={true}>
                         <a className="">{rating.username}</a>
@@ -283,15 +284,13 @@ export function OutfitModal(props: {
                     | {rating.date}{" "}
                   </div>
                   <div className="">
-                    <span className="text-primary text-base pr-2">
-                      {rating.rating}
-                    </span>
+                    <span className=" text-base pr-2">{rating.rating}</span>
                     {rating.review}
                   </div>
 
                   {rating.reply_count && !viewReplies.has(ratingKey) ? (
                     <div
-                      className="pl-4 text-xs text-background-2 cursor-pointer"
+                      className="pl-4 text-xs text-custom-grey-brown cursor-pointer"
                       onClick={(e: any) => handleViewReplies(e, ratingKey)}
                     >
                       View {rating.reply_count}{" "}
@@ -302,7 +301,7 @@ export function OutfitModal(props: {
                   {viewReplies.has(ratingKey) ? (
                     <div className="pl-4 text-xs">
                       <div
-                        className="text-background-2 cursor-pointer"
+                        className="text-custom-grey-brown cursor-pointer"
                         onClick={(e) => {
                           handleHideReplies(e, ratingKey);
                         }}
@@ -323,7 +322,7 @@ export function OutfitModal(props: {
 
                   {props.cookie && replyKey !== ratingKey ? (
                     <button
-                      className="text-xs pl-4 text-background-2"
+                      className="text-xs pl-4 text-custom-grey-brown"
                       onClick={() => setReplyKey(ratingKey)}
                     >
                       Reply
@@ -339,13 +338,13 @@ export function OutfitModal(props: {
                       ></textarea>
 
                       <button
-                        className="text-xs mx-2 px-1 border-2 border-primary bg-primary text-white rounded"
+                        className="text-xs mx-2 px-1 primaryButton"
                         onClick={(e) => handleSubmitReply(e, ratingKey)}
                       >
                         reply
                       </button>
                       <button
-                        className="text-xs px-1 border-2 rounded border-primary text-primary"
+                        className="text-xs px-1 inverseButton "
                         onClick={() => {
                           setReplyKey("");
                           setReply("");

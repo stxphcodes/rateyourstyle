@@ -6,7 +6,7 @@ import { Campaign, GetCampaigns } from "../apis/get_campaigns";
 import { GetOutfits, Outfit } from "../apis/get_outfits";
 import { GetRatings, Rating } from "../apis/get_ratings";
 import { GetServerURL } from "../apis/get_server";
-import { GetUserProfile, User, UserProfile } from "../apis/get_user";
+import { GetUser, User, UserProfile } from "../apis/get_user";
 import { Footer } from "../components/footer";
 import { AccountPromptModal } from "../components/modals/accountPrompt";
 import { Navbar } from "../components/navarbar";
@@ -84,7 +84,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     metadata: {
       title: "Discover",
       description:
-        "Discover fashion inspo, like new clothing brands and outfit ideas on RateYourStyle.",
+        "Discover fashion and outfit inspo from real people. Rate Your Style is a community for fashion lovers.",
     },
   };
 
@@ -106,7 +106,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
     props.userRatings = ratingResp;
 
-    const userProfileResp = await GetUserProfile(server, props.cookie);
+    const userProfileResp = await GetUser(server, props.cookie, "test1234");
     if (!(userProfileResp instanceof Error)) {
       props.user = userProfileResp;
     }
@@ -236,17 +236,11 @@ function DiscoverPage({
     <>
       <Navbar clientServer={clientServer} cookie={cookie} />
       {!cookie && <AccountPromptModal clientServer={clientServer} />}
-      <main className="mt-12 sm:mt-20 px-4 md:px-8 overflow-y-hidden">
-        <section className="mb-4">
-          <h1>Discover</h1>
-          <div>
-            Select a username to see the user&apos;s closet. Submit a rating for
-            an outfit by clicking &apos;submit your rating&apos;.
-          </div>
-          <div className="mb-2">
-            Select the filter(s) below to see matching outfits.
-          </div>
-          <div className="flex flex-wrap justify-start items-start gap-2">
+      <main className="mt-8 sm:mt-14 overflow-y-hidden">
+        <section className="mb-4 p-4 md:p-8 bg-gradient ">
+          <h1 className="mb-4">Discover Outfits and Stylists</h1>
+
+          <div className="flex flex-wrap justify-start items-start gap-2 mb-4">
             <div className="bg-black text-white p-2 rounded w-60">
               <div className="flex gap-2 items-center">
                 Similar to me
@@ -273,7 +267,7 @@ function DiscoverPage({
                 weight.
               </div>
               {similarToMeError && (
-                <div className="text-primary">
+                <div className="text-custom-pink">
                   {similarToMeError == "unknownUser"
                     ? "You must be signed into an account to use this filter."
                     : similarToMeError == "missingProfile" &&
@@ -339,9 +333,7 @@ function DiscoverPage({
               </div>
             ))}
           </div>
-        </section>
 
-        <section className="py-2">
           <Searchbar
             clientServer={clientServer}
             cookie={cookie}
@@ -350,7 +342,7 @@ function DiscoverPage({
           />
         </section>
 
-        <section className="flex flex-row flex-wrap justify-center gap-4">
+        <section className="p-4 md:p-8 grid grid-cols-2  md:grid-cols-3 lg:grid-cols-4 gap-4">
           {(!outfitsFiltered || outfitsFiltered.length == 0) && (
             <div className="h-screen">No results at this time </div>
           )}

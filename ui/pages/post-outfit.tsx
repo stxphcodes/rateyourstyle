@@ -355,7 +355,7 @@ function PostOutfitPage({
       <main className="mt-12 sm:mt-20 px-4 md:px-8 w-full md:w-3/4">
         <section className="mb-4">
           <h1>Outfit Post</h1>
-          <div className="bg-background p-2 rounded">
+          <div className="bg-custom-tan p-2 rounded">
             <h3>FAQs</h3>
             <div className="font-semibold mt-2">
               Who can see my outfit posts?
@@ -443,9 +443,7 @@ function PostOutfitPage({
                   accept="image/*"
                   onChange={handleFileChange}
                 />
-                <label className="text-primary italic font-normal">
-                  Required*
-                </label>
+                <label className="requiredLabel">Required*</label>
               </>
             )}
             <div className="my-4">
@@ -487,9 +485,7 @@ function PostOutfitPage({
                 value={outfitCaption}
                 onChange={handleFormInput}
               ></input>
-              <label className="text-primary italic font-normal">
-                Required*
-              </label>
+              <label className="requiredLabel">Required*</label>
             </div>
 
             <div className="my-4">
@@ -505,19 +501,18 @@ function PostOutfitPage({
                 value={styleTags}
                 onChange={handleFormInput}
               ></input>
-              <label className="text-primary italic font-normal">
-                Required*
-              </label>
-              <div className="flex gap-2 mt-2 flex-wrap">
-                {campaigns &&
-                  campaigns.map((item) => (
+              <label className="requiredLabel">Required*</label>
+
+              {campaigns && (
+                <div className="flex gap-2 mt-2 flex-wrap">
+                  {campaigns.map((item) => (
                     <button
                       key={item.tag}
                       className={`${
                         styleTags.includes(item.tag)
-                          ? "bg-primary text-white"
-                          : "bg-white text-primary"
-                      } border-2 border-primary p-1 rounded`}
+                          ? "bg-custom-lime"
+                          : "bg-white"
+                      } border-2 border-custom-lime p-1 rounded`}
                       onClick={(e) => {
                         e.preventDefault();
                         if (!styleTags.includes(item.tag)) {
@@ -530,7 +525,8 @@ function PostOutfitPage({
                       {item.tag}
                     </button>
                   ))}
-              </div>
+                </div>
+              )}
             </div>
 
             <div className="mb-4">
@@ -570,15 +566,14 @@ function PostOutfitPage({
               </ul>
               <button
                 onClick={handleAddItem}
-                className="p-2 bg-primary text-white rounded float-right"
+                className="primaryButton float-right"
               >
                 add item
               </button>
             </div>
 
             <button
-              className="bg-primary hover:bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mt-8"
-              type="button"
+              className="bg-gradient hover:scale-105 font-bold py-2 px-4 rounded  w-full mt-8"
               onClick={handleSubmit}
             >
               Submit
@@ -686,9 +681,7 @@ function OutfitItemForm(props: {
               cursorInactive="default"
               customComponent={EyedropperButton}
             />
-            <label htmlFor="" className="text-primary italic font-normal">
-              Required*
-            </label>
+            <label className="requiredLabel">Required*</label>
           </div>
 
           <div>
@@ -701,7 +694,7 @@ function OutfitItemForm(props: {
               value={props.item.description}
               onChange={(e) => props.handleItemChange(e, props.index)}
             ></input>
-            <label htmlFor="" className="text-primary italic font-normal">
+            <label htmlFor="" className="requiredLabel">
               Required*
             </label>
           </div>
@@ -721,7 +714,7 @@ function OutfitItemForm(props: {
           value={props.item.brand}
           onChange={(e) => props.handleItemChange(e, props.index)}
         ></input>
-        <label htmlFor="" className="text-primary italic font-normal">
+        <label htmlFor="" className="requiredLabel">
           Required*
         </label>
 
@@ -818,7 +811,7 @@ function OutfitItemForm(props: {
           onChange={(e) => props.handleItemChange(e, props.index)}
           value={props.item.review}
         ></textarea>
-        <label className="text-primary italic font-normal">Required*</label>
+        <label className="requiredLabel">Required*</label>
       </div>
     </div>
   );

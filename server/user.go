@@ -32,15 +32,25 @@ type UserProfile struct {
 	HeightRange string `json:"height_range"`
 }
 
-type UserProfileResponse struct {
+type UserGeneral struct {
+	Aesthetics  []string `json:"aesthetics"`
+	Country     string   `json:"country"`
+	Description string   `json:"description"`
+	Links       []string `json:"links"`
+	Date        string   `json:"date"`
+}
+
+type UserResponse struct {
 	Username    string       `json:"username"`
 	Email       string       `json:"email"`
 	UserProfile *UserProfile `json:"user_profile"`
+	UserGeneral *UserGeneral `json:"user_general"`
 }
 
-type UserProfileFile struct {
+type UserFile struct {
 	User         *User          `json:"user"`
 	UserProfiles []*UserProfile `json:"user_profiles"`
+	UserGeneral  *UserGeneral   `json:"user_general"`
 }
 
 type UserIndices struct {
@@ -95,15 +105,16 @@ func getRecentUserProfile(profiles []*UserProfile) *UserProfile {
 	return profiles[len(profiles)-1]
 }
 
-func getUserProfileFile(ctx context.Context, bucket *gcs.BucketHandle, user *User) (*UserProfileFile, error) {
+func getUserFile(ctx context.Context, bucket *gcs.BucketHandle, user *User) (*UserFile, error) {
 	obj := bucket.Object("data/users/" + user.Id + ".json")
 	reader, err := obj.NewReader(ctx)
 	if err != nil {
 		// user profile doesn't exist, just return default one.
 		if strings.Contains(err.Error(), "exist") {
-			return &UserProfileFile{
+			return &UserFile{
 				User:         user,
 				UserProfiles: []*UserProfile{},
+				UserGeneral:  nil,
 			}, nil
 		}
 
@@ -116,7 +127,7 @@ func getUserProfileFile(ctx context.Context, bucket *gcs.BucketHandle, user *Use
 		return nil, err
 	}
 
-	var f UserProfileFile
+	var f UserFile
 	if err := json.Unmarshal(bytes, &f); err != nil {
 		return nil, err
 	}
@@ -124,7 +135,7 @@ func getUserProfileFile(ctx context.Context, bucket *gcs.BucketHandle, user *Use
 	return &f, nil
 }
 
-func createUserProfileFile(ctx context.Context, bucket *gcs.BucketHandle, data *UserProfileFile) error {
+func createUserFile(ctx context.Context, bucket *gcs.BucketHandle, data *UserFile) error {
 	obj := bucket.Object("data/users/" + data.User.Id + ".json")
 	writer := obj.NewWriter(ctx)
 	defer writer.Close()

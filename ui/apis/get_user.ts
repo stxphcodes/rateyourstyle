@@ -74,6 +74,7 @@ export type User = {
     username: string;
     email: string;
     user_profile: UserProfile;
+    user_general?: UserGeneral;
 }
 
 export type UserProfile = {
@@ -83,8 +84,14 @@ export type UserProfile = {
     height_range: string;
 }
 
+export type UserGeneral = {
+    description: string;
+    aesthetics: string[];
+    links: string[];
+    country: string;
+}
 
-export async function GetUserProfile(server: string, cookie: string): Promise<User | Error> {
+export async function GetUser(server: string, cookie: string, username: string): Promise<User | Error> {
     let error: Error | null = null
     let user: User = {
         username: "",
@@ -94,10 +101,16 @@ export async function GetUserProfile(server: string, cookie: string): Promise<Us
             age_range: "",
             weight_range: "",
             height_range: ""
+        },
+        user_general: {
+            description: "",
+            aesthetics: [],
+            links: [],
+            country: "",
         }
     }
 
-    await fetch(`${server}/api/user-profile`, {
+    await fetch(`${server}/api/user/${username}`, {
         method: "GET",
         headers: {
             'content-type': "text/plain",

@@ -491,10 +491,10 @@ func (h *Handler) GetUsername() echo.HandlerFunc {
 	}
 }
 
-func (h *Handler) GetUserProfile() echo.HandlerFunc {
+func (h *Handler) GetUser() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		cookie, err := getCookie(ctx.Request())
-		if err != nil {
+		username := strings.ToLower(ctx.Param("username"))
+		if username == "" {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 
@@ -504,23 +504,24 @@ func (h *Handler) GetUserProfile() echo.HandlerFunc {
 		}
 
 		for _, user := range users {
-			if user.Cookie == cookie {
-				p, err := getUserProfileFile(ctx.Request().Context(), h.Gcs.Bucket, &user)
+			if strings.ToLower(user.Username) == username {
+				p, err := getUserFile(ctx.Request().Context(), h.Gcs.Bucket, &user)
 				if err != nil {
 					return ctx.NoContent(http.StatusInternalServerError)
 				}
 
-				resp := UserProfileResponse{
+				resp := UserResponse{
 					Username:    p.User.Username,
 					Email:       p.User.Email,
 					UserProfile: getRecentUserProfile(p.UserProfiles),
+					UserGeneral: p.UserGeneral,
 				}
 
 				return ctx.JSON(http.StatusOK, resp)
 			}
 		}
 
-		return ctx.String(http.StatusNotFound, "no user found with cookie "+cookie)
+		return ctx.String(http.StatusNotFound, "no user found with username "+username)
 	}
 }
 
@@ -903,7 +904,7 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 		h.UserIndices.IdCookie[data.Id] = data.Cookie
 
 		// create blank user profile file
-		userProfile := UserProfileFile{
+		userProfile := UserFile{
 			User: &data,
 			UserProfiles: []*UserProfile{
 				{
@@ -914,9 +915,16 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 					HeightRange: "",
 				},
 			},
+			UserGeneral: &UserGeneral{
+				Aesthetics:  []string{""},
+				Country:     "",
+				Description: "",
+				Links:       []string{""},
+				Date:        "",
+			},
 		}
 
-		if err := createUserProfileFile(ctx.Request().Context(), h.Gcs.Bucket, &userProfile); err != nil {
+		if err := createUserFile(ctx.Request().Context(), h.Gcs.Bucket, &userProfile); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
@@ -1083,7 +1091,7 @@ func (h *Handler) PostUserProfile() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusForbidden)
 		}
 
-		f, err := getUserProfileFile(ctx.Request().Context(), h.Gcs.Bucket, user)
+		f, err := getUserFile(ctx.Request().Context(), h.Gcs.Bucket, user)
 		if err != nil {
 			log.Println("error getting user profile + " + err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
@@ -1099,7 +1107,52 @@ func (h *Handler) PostUserProfile() echo.HandlerFunc {
 		f.User = user
 		f.UserProfiles = append(f.UserProfiles, &data)
 
-		if err := createUserProfileFile(ctx.Request().Context(), h.Gcs.Bucket, f); err != nil {
+		if err := createUserFile(ctx.Request().Context(), h.Gcs.Bucket, f); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		return ctx.NoContent(http.StatusCreated)
+	}
+}
+
+func (h *Handler) PostUserGeneral() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		user, err := getUser(ctx.Request().Context(), h.Gcs.Bucket, userId)
+		if err != nil {
+			log.Println("user not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		f, err := getUserFile(ctx.Request().Context(), h.Gcs.Bucket, user)
+		if err != nil {
+			log.Println("error getting user profile + " + err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		var data UserGeneral
+		if err := ctx.Bind(&data); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+		data.Date = time.Now().Format("2006-01-02")
+
+		f.User = user
+		f.UserGeneral = &data
+
+		if err := createUserFile(ctx.Request().Context(), h.Gcs.Bucket, f); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}

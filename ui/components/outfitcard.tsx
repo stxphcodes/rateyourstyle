@@ -10,10 +10,7 @@ import { ColorDiv } from "./color/color-div";
 
 export function RatingDiv(props: { x: number; small?: boolean }) {
   return (
-    <div
-      style={{ fontSize: props.small ? "18px" : "30px" }}
-      className="text-primary"
-    >
+    <div style={{ fontSize: props.small ? "16px" : "30px" }}>
       {props.x == 0 ? "" : props.x}
     </div>
   );
@@ -39,11 +36,10 @@ export function OutfitCard(props: {
 }) {
   const [expandImage, setExpandImage] = useState<boolean>(false);
 
-  const [readMore, setReadMore] = useState(false);
   return (
     <>
-      <div className="w-40 sm:w-72 shadow-sm border-b-2 border-background break-words">
-        <div className="overflow-hidden h-72 sm:h-96 hover:cursor-pointer">
+      <div className="shadow-sm shadow-custom-tan border-b-2 border-custom-tan  break-words bg-white hover:scale-105">
+        <div className="h-72 sm:h-96 overflow-hidden hover:cursor-pointer">
           <img
             onClick={() => setExpandImage(true)}
             className="object-cover w-full h-full"
@@ -53,7 +49,7 @@ export function OutfitCard(props: {
 
         <div className="p-2">
           <div className="whitespace-nowrap text-ellipsis overflow-hidden">
-            <div className="text-sm" style={{ fontFamily: "custom-serif" }}>
+            <div className="text-sm">
               {props.data.username ? (
                 <Link href={`/closet/${props.data.username}`} passHref={true}>
                   <a className="flex flex-wrap items-center gap-1">
@@ -67,44 +63,32 @@ export function OutfitCard(props: {
                 "anonymous"
               )}
             </div>
-            <div className="">{props.data.title}</div>
+            {props.data.title}
           </div>
-          <div className="flex items-center mt-1">
-            {props.data.rating_average && (
-              <div
-                className="hover:cursor-pointer mr-2"
-                onClick={() => setExpandImage(true)}
-              >
-                <RatingDiv x={props.data.rating_average} small={true} />
-              </div>
-            )}
-            <a
-              className="text-background-2"
-              onClick={() => setExpandImage(true)}
-            >
-              {!props.data.rating_count
-                ? "no reviews yet"
-                : `from ${props.data.rating_count} ${
-                    props.data.rating_count > 1 ? "reviews" : "review"
-                  } `}
-            </a>
-          </div>
-        </div>
-        {readMore && <OutfitItemList outfitItems={props.data.items} />}
 
-        <div className="flex px-2 pb-1">
           <a
-            className="text-primary"
+            className="flex items-center  gap-2 my-2 text-sm"
+            onClick={() => setExpandImage(true)}
+          >
+            {props.data.rating_average && (
+              <RatingDiv x={props.data.rating_average} small={true} />
+            )}
+
+            {!props.data.rating_count
+              ? "no reviews yet"
+              : `from ${props.data.rating_count} ${
+                  props.data.rating_count > 1 ? "reviews" : "review"
+                } `}
+          </a>
+
+          <a
             onClick={(e) => {
               e.preventDefault();
-              setReadMore(!readMore);
+              setExpandImage(!expandImage);
             }}
           >
-            {!readMore
-              ? `View ${props.data.items.length} Oufit Item${
-                  props.data.items.length > 1 ? "s" : ""
-                }`
-              : "Hide Outfit Items"}
+            View {props.data.items.length} Oufit Item
+            {props.data.items.length > 1 ? "s" : ""}
           </a>
         </div>
       </div>
