@@ -107,10 +107,6 @@ a:hover {
 }
 
 
-.gradientBackground {
-  background: linear-gradient(90deg, rgba(216,227,3,1) 0%, rgba(230,207,171,1) 53%, rgba(250,123,225,1) 100%);
-}
-
 .requiredLabel {
-  color: rgba(250,123,225,1);
+  color: #fa7be1;
 }
