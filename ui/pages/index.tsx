@@ -284,7 +284,7 @@ function Home({ cookie, outfits, clientServer, businesses, error }: Props) {
         </section>
 
         <section className="bg-white p-4 md:p-8">
-          <h1 className="my-4">Privacy</h1>
+          <h1 className="mb-4">Privacy</h1>
           <div>
             We value your privacy. That&apos;s why each outfit post has its own
             visibility setting and your closet will only display clothing items
