@@ -174,7 +174,7 @@ export default function UserClosetPage({
       <Navbar clientServer={clientServer} cookie={cookie} />
       {/* {!cookie && <AccountPromptModal clientServer={clientServer} />} */}
       <main className="mt-12 sm:mt-20 px-4 md:px-8">
-        <section className="mb-4 flex gap-2">
+        <section className="mb-4 flex flex-wrap gap-2">
           <ClosetHeader
             closetName={closetName}
             outfitCount={outfits ? outfits.length : 0}
