@@ -110,7 +110,7 @@ export async function GetUser(server: string, cookie: string, username: string):
         }
     }
 
-    await fetch(`${server}/api/user/${username}`, {
+    await fetch(`${server}/api/user/${username.toLowerCase()}`, {
         method: "GET",
         headers: {
             'content-type': "text/plain",

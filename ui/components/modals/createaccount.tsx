@@ -15,7 +15,8 @@ export function CreateAccount(props: {
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.id == "username") {
-      setUsername(event.target.value);
+      let username = event.target.value;
+      setUsername(username.toLowerCase());
     }
 
     if (event.target.id == "password") {
@@ -71,6 +72,7 @@ export function CreateAccount(props: {
               placeholder="Email"
               onChange={handleInputChange}
               value={email}
+              autoCapitalize="off"
             />
             <label htmlFor="Email" className="requiredLabel">
               Required
@@ -87,6 +89,8 @@ export function CreateAccount(props: {
               placeholder="Username"
               onChange={handleInputChange}
               value={username}
+              autoCapitalize="off"
+              autoCorrect="off"
             />
             <label htmlFor="Email" className="requiredLabel">
               Required
@@ -103,6 +107,7 @@ export function CreateAccount(props: {
               placeholder="******************"
               onChange={handleInputChange}
               value={password}
+              autoCapitalize="off"
             />
             <label htmlFor="Email" className="requiredLabel">
               Required

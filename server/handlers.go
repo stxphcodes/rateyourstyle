@@ -865,6 +865,8 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusBadRequest)
 		}
+		// ensure username is all lowercase
+		data.Username = strings.ToLower(data.Username)
 
 		// uniqueness checks
 		_, ok := h.UserIndices.Usernames[data.Username]
