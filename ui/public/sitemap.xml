@@ -2,23 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
    <url>
       <loc>https://rateyourstyle.com</loc>
-      <lastmod>2024-01-28</lastmod>
+      <lastmod>2024-03-16</lastmod>
       <priority>1</priority>
    </url>
    <url>
-      <loc>https://rateyourstyle.com/for-businesses</loc>
-      <lastmod>2023-12-17</lastmod>
-   </url>
-   <url>
       <loc>https://rateyourstyle.com/discover</loc>
-      <lastmod>2024-01-28</lastmod>
+      <lastmod>2024-03-16</lastmod>
    </url>
    <url>
       <loc>https://rateyourstyle.com/post-outfit</loc>
-      <lastmod>2023-12-17</lastmod>
+      <lastmod>2023-03-16</lastmod>
    </url>
    <url>
-      <loc>https://rateyourstyle.com/request-closet</loc>
-      <lastmod>2023-12-17</lastmod>
+      <loc>https://rateyourstyle.com/closet/stxphcodes</loc>
+      <lastmod>2023-03-16</lastmod>
+   </url>
+    <url>
+      <loc>https://rateyourstyle.com/closet/the.second.button</loc>
+      <lastmod>2023-03-16</lastmod>
+   </url>
+       <url>
+      <loc>https://rateyourstyle.com/closet/noah</loc>
+      <lastmod>2023-03-16</lastmod>
    </url>
 </urlset> 

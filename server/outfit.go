@@ -136,7 +136,7 @@ func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle
 
 	// get user profile of outfit poster
 	u := &User{Id: o.UserId}
-	upf, err := getUserProfileFile(ctx, bucket, u)
+	upf, err := getUserFile(ctx, bucket, u)
 	if err == nil {
 		resp.UserProfile = getRecentUserProfile(upf.UserProfiles)
 	}

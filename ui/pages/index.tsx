@@ -1,213 +1,311 @@
-import { GetServerSideProps } from 'next';
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { GetServerSideProps } from "next";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
-import { Campaign, GetCampaigns } from '../apis/get_campaigns';
-import { GetOutfits, GetPublicOutfitsByUser, Outfit, OutfitItem } from '../apis/get_outfits';
-import { GetRatings, Rating } from '../apis/get_ratings';
-import { Footer } from '../components/footer';
-import { Navbar } from '../components/navarbar';
-import { OutfitCard } from '../components/outfitcard';
+import { Campaign, GetCampaigns } from "../apis/get_campaigns";
+import {
+  GetOutfits,
+  GetPublicOutfitsByUser,
+  Outfit,
+  OutfitItem,
+} from "../apis/get_outfits";
+import { Footer } from "../components/footer";
+import { Navbar } from "../components/navarbar";
+import { OutfitCard } from "../components/outfitcard";
 import { GetServerURL } from "../apis/get_server";
-import { ClosetTable } from '../components/closet-table';
-import { PageMetadata } from './_app';
-import { GetBusinesses } from '../apis/get_businesses';
+import { PageMetadata } from "./_app";
+import { GetBusinesses } from "../apis/get_businesses";
+import { CircleCheckIcon } from "../components/icons/circle-check";
+
+const personalStylistList = [
+  "Connect with new clients",
+  "Get paid for outfit reviews and consultations",
+  "Improve SEO for your styling business",
+];
+
+const fashionEnthusiastList = [
+  "Document your favorite outfits",
+  "Build your virtual closet",
+  "Get style advice from real people or pay to get styling advice from a professional stylist",
+];
+
+const howItWorks = [
+  {
+    picture_url: "/screenshot-closet.png",
+    title: "1. Upload your outfits",
+    description: "Create an account and start posting your favorite outfits!",
+    bgcolor: "custom-lime",
+    content: (
+      <div>
+        Create an account and start posting your favorite outfits! Your outfits
+        will populate your closet page.
+        <br />
+        <br />
+        See an{" "}
+        <Link href="/closet/stxphcodes" passHref={true}>
+          <a className="hover:text-custom-pink">example closet here</a>
+        </Link>
+        .
+      </div>
+    ),
+  },
+  {
+    picture_url: "/screenshot-requestfeedback.png",
+    title: "2. Get outfit feedback",
+    content: (
+      <div>
+        The Rate Your Style community will rate and review your outfits.
+        <br />
+        <br />
+        (Coming Soon)
+        <br /> There are professional stylists on Rate Your Style. If you&apos;d
+        like their specific outfit feedback, you can send a request to them
+        directly.
+      </div>
+    ),
+    bgcolor: "custom-pink",
+  },
+  {
+    picture_url: "/screenshot-review.png",
+    title: "3. Give outfit feedback",
+    content: (
+      <div>
+        Use the{" "}
+        <Link href="/discover" passHref={true}>
+          <a className="hover:text-custom-pink">Discover page</a>
+        </Link>{" "}
+        to find fashion inspo, and to rate & review other users&apos; outfits.
+        <br />
+        <br />
+        (Coming Soon)
+        <br />
+        If other users like your style, they can request feedback from you. You
+        can charge a styling fee if you&apos;d like.
+      </div>
+    ),
+    bgcolor: "custom-lime",
+  },
+];
 
 type Props = {
-    campaigns: Campaign[] | null;
-    cookie: string;
-    clientServer: string;
-    error: string | null;
-    outfits: Outfit[] | null;
-    outfitsForTable: Outfit[] | null;
-    userRatings: Rating[] | null;
-    metadata: PageMetadata;
-    businesses: string[] | null;
+  cookie: string;
+  clientServer: string;
+  error: string | null;
+  outfits: Outfit[] | null;
+  // outfitsForTable: Outfit[] | null;
+  metadata: PageMetadata;
+  businesses: string[] | null;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    let props: Props = {
-        campaigns: null,
-        cookie: "",
-        userRatings: null,
-        error: null,
-        outfits: null,
-        outfitsForTable: null,
-        clientServer: "",
-        businesses: [],
-        metadata: {
-            title: "",
-            description: "Get style feedback on Rate Your Style through outfit reviews and keep track of the clothes you wear through our virtual closet, a database-like table that takes inventory of your clothes and uses data science to create graphs about your closet."
-        }
-    };
+  let props: Props = {
+    cookie: "",
+    error: null,
+    outfits: null,
+    clientServer: "",
+    businesses: [],
+    metadata: {
+      title: "",
+      description:
+        "Rate Your Style i  a styling marketplace that connects people seeking fashion advice to personal stylists. Use Rate Your Style to get outfit feedback and style advice, and to find fashion outfit inspo.",
+    },
+  };
 
-    let server = GetServerURL()
-    if (server instanceof Error) {
-        props.error = server.message;
-        return { props };
-    }
-
-    if (context.req.cookies["rys-login"]) {
-        props.cookie = context.req.cookies["rys-login"];
-    }
-
-    if (props.cookie) {
-        const ratingResp = await GetRatings(server, props.cookie);
-        if (ratingResp instanceof Error) {
-            props.error = ratingResp.message;
-            return { props };
-        }
-        props.userRatings = ratingResp;
-    }
-
-    const campaignResp = await GetCampaigns(server);
-    if (campaignResp instanceof Error) {
-        props.error = campaignResp.message;
-        return { props };
-    }
-    props.campaigns = campaignResp;
-
-    const businessResp = await GetBusinesses(server, props.cookie);
-    if (businessResp instanceof Error) {
-        props.error = businessResp.message;
-        return { props };
-    }
-    props.businesses = businessResp;
-
-    const outfitResp = await GetOutfits(server, 8);
-    if (outfitResp instanceof Error) {
-        props.error = outfitResp.message;
-        return { props };
-    }
-    props.outfits = outfitResp;
-
-    let sampleCloset="stxphcodes"
-    if (process.env.NODE_ENV == "development") {
-        sampleCloset = "test1234"
-    }
-
-    const userOutfits = await GetPublicOutfitsByUser(server, props.cookie, sampleCloset);
-    if (userOutfits instanceof Error) {
-        props.error = userOutfits.message;
-        return { props };
-    }
-    props.outfitsForTable = userOutfits;
-
-
-    const clientServer = GetServerURL(true);
-    if (clientServer instanceof Error) {
-        props.error = clientServer.message;
-        return { props };
-    }
-    props.clientServer = clientServer;
-
+  let server = GetServerURL();
+  if (server instanceof Error) {
+    props.error = server.message;
     return { props };
+  }
+
+  if (context.req.cookies["rys-login"]) {
+    props.cookie = context.req.cookies["rys-login"];
+  }
+
+  const businessResp = await GetBusinesses(server, props.cookie);
+  if (businessResp instanceof Error) {
+    props.error = businessResp.message;
+    return { props };
+  }
+  props.businesses = businessResp;
+
+  const outfitResp = await GetOutfits(server, 8);
+  if (outfitResp instanceof Error) {
+    props.error = outfitResp.message;
+    return { props };
+  }
+  props.outfits = outfitResp;
+
+  const clientServer = GetServerURL(true);
+  if (clientServer instanceof Error) {
+    props.error = clientServer.message;
+    return { props };
+  }
+  props.clientServer = clientServer;
+
+  return { props };
 };
 
-function Home({ campaigns, cookie, outfits, outfitsForTable, userRatings, clientServer, businesses, error }: Props) {
-    const [heroSectionImage, setHeroSectionImage] = useState(outfits ? outfits[0].picture_url : "/clothing-photo.jpg")
+function Home({ cookie, outfits, clientServer, businesses, error }: Props) {
+  const [heroSectionOutfit, setHeroSectionOutfit] = useState(
+    outfits ? outfits[0] : null
+  );
+  const [heroSectionOutfit2, setHeroSectionOutfit2] = useState(
+    outfits ? outfits[1] : null
+  );
 
-    let outfitItems: OutfitItem[] = [];
+  useEffect(() => {
+    let id = setInterval(() => {
+      if (outfits) {
+        let num = Math.floor(Math.random() * outfits.length);
+        setHeroSectionOutfit(outfits[num]);
 
-    outfits && outfits.map(outfit => {
-        outfit.items && outfit.items.map(item => {
-            outfitItems.push(item);
-        })
-    })
+        let num2 = Math.floor(Math.random() * outfits.length);
+        setHeroSectionOutfit2(outfits[num2]);
+      }
+    }, 3000);
 
-    const [readMore, setReadMore] = useState(() => {
-        let intialState =
-            campaigns &&
-            campaigns.map((item) => ({
-                tag: item.tag,
-                readMore: false,
-            }));
+    return () => clearInterval(id);
+  }, []);
 
-        return intialState;
-    });
+  if (error) {
+    return <div>error {error} </div>;
+  }
 
+  return (
+    <>
+      <Navbar clientServer={clientServer} cookie={cookie} />
+      <main className="">
+        <section className="p-4 md:p-8 bg-gradient mt-8">
+          <h1 className="text-4xl text-center py-8">
+            Welcome to Rate Your Style, <br />
+            An Innovative Styling Marketplace
+          </h1>
 
-    useEffect(() => {
-        const id = setInterval(() => {
-            if (outfits) {
-                let num = Math.floor(Math.random() * (outfits.length));
-                setHeroSectionImage(outfits[num].picture_url)
-            }
+          <div className="sm:w-3/4 m-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-4">
+              {heroSectionOutfit && (
+                <OutfitCard
+                  cookie={cookie}
+                  data={heroSectionOutfit}
+                  userRating={null}
+                  clientServer={clientServer}
+                  verifiedBusiness={
+                    businesses &&
+                    businesses.filter((id) => heroSectionOutfit.username == id)
+                      .length > 0
+                      ? true
+                      : false
+                  }
+                />
+              )}
+              {heroSectionOutfit2 && (
+                <div className="hidden sm:block">
+                  <OutfitCard
+                    cookie={cookie}
+                    data={heroSectionOutfit2}
+                    userRating={null}
+                    clientServer={clientServer}
+                    verifiedBusiness={
+                      businesses &&
+                      businesses.filter(
+                        (id) => heroSectionOutfit2.username == id
+                      ).length > 0
+                        ? true
+                        : false
+                    }
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
 
-        }, 3000)
-
-        return () => clearInterval(id);
-
-    }, [])
-
-
-    if (error) {
-        return <div>error {error} </div>;
-    }
-
-    return (
-        <>
-            <Navbar clientServer={clientServer} cookie={cookie} />
-            <main className="mt-12 sm:mt-20">
-
-                <section className="px-3 md:px-8 mb-8">
-                    <h1>Personal Style</h1>
-                    <p className="py-2 text-sm md:text-base text-balance">
-                        Finding your personal style is a journey, but it doesn&apos;t have to be a lonely one. Whether it&apos;s sharing an outfit that you are proud of, or asking for style feedback, Rate Your Style is a community for anyone interested in fashion.{" "}
-                        <Link href="discover">Discover more here</Link>
-                    </p>
-                    <div className="flex flex-nowrap flex-row gap-4 overflow-scroll my-2">
-                        {outfits &&
-                            outfits.map((item) => {
-                                let userRating: Rating | null = null
-                                if (userRatings) {
-                                    userRating = userRatings?.filter(r => r.outfit_id == item.id)[0]
-                                }
-
-                                return (
-                                    <div className="flex-none" key={item.id}>
-                                        <OutfitCard
-                                            cookie={cookie}
-                                            data={item}
-                                            userRating={userRating}
-                                            clientServer={clientServer}
-                                            verifiedBusiness={businesses && businesses.filter(id => item.username == id).length > 0 ? true : false}
-                                        />
-                                    </div>
-                                )
-                            })}
+        <section className="p-4 md:p-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-8">
+            <div>
+              <h1>For Personal Stylists</h1>
+              <h5 className="my-4">
+                Rate Your Style is a marketplace that connects people seeking
+                fashion advice to personal stylists.
+              </h5>
+              <ul className="text-lg">
+                {personalStylistList.map((item, index) => (
+                  <li
+                    key={`personal-stylist-reason-${index}`}
+                    className="flex gap-2 items-center mb-4"
+                  >
+                    <div className="flex-none">
+                      <CircleCheckIcon />
                     </div>
-                </section>
-                <section className="bg-background-2 px-3 md:px-8 py-8">
-                    <h1 className="text-white">Fashion Data</h1>
-                    <p className="my-4 text-white text-base">
-                        Is loud budgeting one of your &quot;ins&quot; this year? The virtual closet feature of RateYourStyle aggregates your clothes into a database-like table and uses data science to visualize your closet data into meaningful graphs.
-                    </p>
-                    <div className="bg-white p-2 rounded-lg">
-
-
-                        <h6>Sample Closet</h6>
-                        <ClosetTable outfits={outfitsForTable ? outfitsForTable : []} cookie={cookie} clientServer={clientServer} userRatings={null} onlyTable={true} />
+                    <div className="flex-none">{item}</div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h1>For Fashion Enthusiasts</h1>
+              <h5 className="my-4">
+                Rate Your Style is an online community for anyone interested in
+                fashion.
+              </h5>
+              <ul className="text-lg">
+                {fashionEnthusiastList.map((item, index) => (
+                  <li
+                    key={`fashion-enthusiast-reason-${index}`}
+                    className="flex gap-2 items-center mb-4 flex-none"
+                  >
+                    <div className="shrink-0">
+                      <CircleCheckIcon />
                     </div>
-                </section>
-                <section className="bg-white px-3 md:px-8 my-4">
-                    <h1>Get Started</h1>
-                    <div className="my-4">
-                        Rate Your Style is free to use. As a programmer who is interested in fashion, I work on this as a side project because it helps me practice coding, and (this is the real reason) it gives me an excuse to buy clothes and dress up 💃🏻. If you&apos;re interested in joining our little community, please hit the{" "}<span className="text-primary">Create Account</span>{" "}button on the navbar.
-                    </div>
 
-                    <div className="mt-8">
-                        <h1>Privacy</h1>
-                        <div>We value your privacy. That&apos;s why each outfit post has its own visibility setting and your closet will only display clothing items from public outfit posts. Private outfits and its clothing items can only be viewed by you and the sponsor of a campaign if it uses a campaign #tag. <br /><br />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
 
-                            Rate Your Style also uses cookies to maintain your login session. The cookie is only used for the purpose of saving your login details.
-                        </div>
-                    </div>
-                </section>
-            </main>
-            <Footer />
-        </>
-    );
+        <section>
+          <h1 className="px-4 md:px-8 py-8 bg-custom-tan">How It Works</h1>
+          <div className="grid grid-cols-1 sm:grid-cols-3 ">
+            {howItWorks.map((item, index) => (
+              <div
+                className={`p-8 whitespace-pre-line bg-${item.bgcolor}`}
+                key={`how-it-works-step-${index}`}
+              >
+                <h2>{item.title}</h2>
+                <div className="flex gap-2 items-start mt-4">
+                  {item.content}
+                  <img
+                    alt={`how-it-works-img-${index}`}
+                    src={item.picture_url}
+                    className="w-1/2 border-4 border-black"
+                  ></img>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="bg-white p-4 md:p-8">
+          <h1 className="mb-4">Privacy</h1>
+          <div>
+            We value your privacy. That&apos;s why each outfit post has its own
+            visibility setting and your closet will only display clothing items
+            from public outfit posts. Private outfits and its clothing items can
+            only be viewed by you and the sponsor of a campaign if it uses a
+            campaign #tag. <br />
+            <br />
+            Rate Your Style also uses cookies to maintain your login session.
+            The cookie is only used for the purpose of saving your login
+            details.
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </>
+  );
 }
 
 export default Home;

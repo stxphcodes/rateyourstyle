@@ -21,9 +21,14 @@ module.exports = {
     },
     extend: {
       colors: {
-        "background": "#f2f1eb",
-        "primary": "#aa3c16",
-        "background-2": "#b5ada2",
+        "custom-grey-brown": "#b5ada2",
+        "custom-lime": "#d8e303",
+        "custom-pink": "#fa7be1",
+        "custom-tan": "#e6cfab",
+      },
+        backgroundImage: {
+          "gradient": "linear-gradient(90deg, rgba(216,227,3,1) 0%, rgba(230,207,171,1) 53%, rgba(250,123,225,1) 100%)",
+
       },
       maxHeight: {
         card: "400px",

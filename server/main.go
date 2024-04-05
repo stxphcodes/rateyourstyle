@@ -129,7 +129,7 @@ func run() error {
 
 	mux.GET("/api/user/public-outfits", handler.GetPublicOutfitsByUser())
 
-	mux.GET("/api/user-profile", handler.GetUserProfile())
+	mux.GET("/api/user/:username", handler.GetUser())
 
 	mux.GET("/api/username", handler.GetUsername())
 
@@ -150,6 +150,8 @@ func run() error {
 	mux.POST("/api/user", handler.PostUser())
 
 	mux.POST("/api/user-profile", handler.PostUserProfile())
+
+	mux.POST("/api/user-general", handler.PostUserGeneral())
 
 	mux.POST("/api/business-profile", handler.PostBusinessProfile())
 
