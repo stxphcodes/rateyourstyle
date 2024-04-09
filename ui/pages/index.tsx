@@ -2,7 +2,6 @@ import { GetServerSideProps } from "next";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-import { Campaign, GetCampaigns } from "../apis/get_campaigns";
 import {
   GetOutfits,
   GetPublicOutfitsByUser,
@@ -92,7 +91,6 @@ type Props = {
   clientServer: string;
   error: string | null;
   outfits: Outfit[] | null;
-  // outfitsForTable: Outfit[] | null;
   metadata: PageMetadata;
   businesses: string[] | null;
 };
