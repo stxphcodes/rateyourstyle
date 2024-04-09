@@ -46,7 +46,7 @@ export function ClosetHeader(props: {
             className="object-contain w-12 h-12 rounded-full"
           />
         )}
-        <h1 className="capitalize mb-1">{props.closetName}&apos;s Closet</h1>
+        <h1 className="mb-1 capitalize">{props.closetName}&apos;s closet</h1>
       </div>
 
       <div className="flex gap-4 my-2">

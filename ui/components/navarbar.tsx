@@ -368,6 +368,7 @@ function UserAndNotification(props: {
         )}
       </button>
       <a
+        className="normal-case"
         onClick={() => {
           setDisplayUserMenu(!displayUserMenu);
         }}
