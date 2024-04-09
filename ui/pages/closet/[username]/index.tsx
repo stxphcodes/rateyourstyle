@@ -7,7 +7,7 @@ import { GetRatings, Rating } from "../../../apis/get_ratings";
 import { Navbar } from "../../../components/navarbar";
 import { GetServerURL } from "../../../apis/get_server";
 import { ClosetTable } from "../../../components/closet/table";
-import { GetUserByUsername, GetUsername, User } from "../../../apis/get_user";
+import { GetUserByUsername, User } from "../../../apis/get_user";
 import { Footer } from "../../../components/footer";
 import { RequestFeedbackModal } from "../../../components/modals/requestfeedback";
 import { ClosetHeader } from "../../../components/closet/header";
