@@ -12,7 +12,6 @@ import { GetRatings, Rating } from "../../../apis/get_ratings";
 import { GetUser, User } from "../../../apis/get_user";
 import { Navbar } from "../../../components/navarbar";
 import { GetServerURL } from "../../../apis/get_server";
-import { PostUserProfile } from "../../../apis/post_user";
 import { ClosetTable } from "../../../components/closet/table";
 import { Footer } from "../../../components/footer";
 import {
@@ -59,6 +58,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     businessProfile: null,
   };
 
+  const clientServer = GetServerURL(true);
+  if (clientServer instanceof Error) {
+    props.error = clientServer.message;
+    return { props };
+  }
+  props.clientServer = clientServer;
+
   let server = GetServerURL();
   if (server instanceof Error) {
     props.error = server.message;
@@ -69,15 +75,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   props.cookie = cookie ? cookie : "";
 
   if (cookie) {
-    let userid = context.query["user_id"];
-    if (typeof userid !== "string") {
+    let username = context.query["username"];
+    if (typeof username !== "string") {
       props.error = "missing username for closet";
       return { props };
     }
 
-    const userResp = await GetUser(server, cookie, userid);
+    const userResp = await GetUser(server, cookie);
     if (userResp instanceof Error) {
       props.error = userResp.message;
+      return { props };
+    }
+    if (userResp.username !== username) {
+      props.error = "forbidden";
       return { props };
     }
     props.user = userResp;
@@ -93,11 +103,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (!(businessProfileResp instanceof Error)) {
       props.businessProfile = businessProfileResp;
     }
-  }
-
-  if (context.query["user_id"] !== props.user.username) {
-    props.error = "forbidden";
-    return { props };
   }
 
   const resp = await GetOutfitsByUser(server, props.cookie);
@@ -121,13 +126,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   // sort outfits by date
   props.outfits.sort((a, b) => (a.date < b.date ? 1 : -1));
-
-  const clientServer = GetServerURL(true);
-  if (clientServer instanceof Error) {
-    props.error = clientServer.message;
-    return { props };
-  }
-  props.clientServer = clientServer;
 
   return { props };
 };
@@ -197,11 +195,7 @@ export default function Index({
     if (error == "forbidden") {
       return (
         <>
-          <Navbar
-            clientServer={clientServer}
-            cookie={cookie}
-            user={user.username}
-          />
+          <Navbar clientServer={clientServer} cookie={cookie} />
           <main className="mt-12 sm:mt-20 px-4 md:px-8">
             <h1>✋ Forbidden </h1>
             Please sign in as the user to view their posts.
@@ -212,11 +206,7 @@ export default function Index({
 
     return (
       <>
-        <Navbar
-          clientServer={clientServer}
-          cookie={cookie}
-          user={user.username}
-        />
+        <Navbar clientServer={clientServer} cookie={cookie} />
         <main className="mt-12 sm:mt-20 px-4 md:px-8">
           <h1>😕 Oh no</h1>
           Looks like there&apos;s an error on our end. Please refresh the page
@@ -232,7 +222,7 @@ export default function Index({
       <Navbar
         clientServer={clientServer}
         cookie={cookie}
-        user={user.username}
+        username={user.username}
       />
       <main className="mt-12 sm:mt-20 px-4 md:px-8">
         <section className="mb-4">

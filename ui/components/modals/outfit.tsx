@@ -1,17 +1,17 @@
-import { Modal } from "./modals";
-import { Outfit } from "../apis/get_outfits";
+import { Modal } from ".";
+import { Outfit } from "../../apis/get_outfits";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { OutfitItemList } from "./outfitcard";
-import { RatingDiv } from "./outfitcard";
-import { PostRating } from "../apis/post_rating";
-import { GetRatingsByOutfit, Rating } from "../apis/get_ratings";
-import { PostReply } from "../apis/post_reply";
-import { GetReplies, Reply } from "../apis/get_replies";
+import { OutfitItemList } from "../outfitcard";
+import { RatingDiv } from "../outfitcard";
+import { PostRating } from "../../apis/post_rating";
+import { GetRatingsByOutfit, Rating } from "../../apis/get_ratings";
+import { PostReply } from "../../apis/post_reply";
+import { GetReplies, Reply } from "../../apis/get_replies";
 
 export function OutfitModal(props: {
   clientServer: string;
-  cookie: string;
+  cookie?: string;
   handleClose: any;
   data: Outfit;
   asUser: boolean;
@@ -39,6 +39,10 @@ export function OutfitModal(props: {
 
   const handleSubmitRating = async (e: any) => {
     e.preventDefault();
+
+    if (!props.cookie) {
+      return;
+    }
 
     if (userOutfitReview == "") {
       setUserReviewMissing(true);
@@ -69,6 +73,10 @@ export function OutfitModal(props: {
   };
 
   const handleSubmitReply = async (e: any, key: string) => {
+    if (!props.cookie) {
+      return;
+    }
+
     const resp = await PostReply(
       props.clientServer,
       props.cookie,
@@ -93,6 +101,10 @@ export function OutfitModal(props: {
   };
 
   const handleViewReplies = async (e: any, key: string) => {
+    if (!props.cookie) {
+      return;
+    }
+
     let replies = await GetReplies(props.clientServer, props.cookie, key);
     if (!(replies instanceof Error)) {
       viewReplies.set(key, replies);
@@ -196,78 +208,70 @@ export function OutfitModal(props: {
                     } `}
               </div>
             </div>
-            {!props.asUser && props.cookie && (
+            {!props.asUser && props.cookie && !submitRating && (
               <>
-                {!submitRating ? (
-                  <>
-                    <div className="flex gap-2 items-center">
-                      {userOutfitRating !== 0 && (
-                        <RatingDiv x={userOutfitRating} />
-                      )}
-                      <a
-                        className="hover:cursor-pointer"
-                        onClick={() => setSubmitRating(true)}
-                      >
-                        {userOutfitRating == 0
-                          ? "submit your review"
-                          : "edit your review"}
-                      </a>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex gap-4 items-center">
-                      <RatingDiv x={userOutfitRating} />
-                      <div className="w-fit">
-                        <label>Your rating</label>
-                        <input
-                          id="rating"
-                          type="range"
-                          min="1"
-                          max="5"
-                          step="0.5"
-                          className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer  p-0 m-0"
-                          onChange={(e) =>
-                            setUserOutfitRating(Number(e.target.value))
-                          }
-                          list="rating"
-                          value={userOutfitRating}
-                        />
-                        <datalist
-                          className="flex text-primary -mt-2 p-0 justify-between items-start"
-                          id="rating"
-                        >
-                          <option className="text-xs">|</option>
-                          <option className="text-xs">|</option>
-                          <option className="text-xs">|</option>
-                          <option className="text-xs">|</option>
-                          <option className="text-xs">|</option>
-                        </datalist>
-                      </div>
-                    </div>
+                <div className="flex gap-2 items-center">
+                  {userOutfitRating !== 0 && <RatingDiv x={userOutfitRating} />}
+                  <a
+                    className="hover:cursor-pointer"
+                    onClick={() => setSubmitRating(true)}
+                  >
+                    {userOutfitRating == 0
+                      ? "submit your review"
+                      : "edit your review"}
+                  </a>
+                </div>
+              </>
+            )}
 
-                    <div>
-                      <textarea
-                        rows={4}
-                        className="m-2 w-full md:w-1/2"
-                        placeholder="Leave a comment"
-                        onChange={(e) => setOutfitReview(e.target.value)}
-                        value={userOutfitReview}
-                      ></textarea>
-                    </div>
-                    {userReviewMissing && (
-                      <div className="text-primary">
-                        Please leave a comment.
-                      </div>
-                    )}
-                    <button
-                      className="primaryButton"
-                      onClick={handleSubmitRating}
+            {!props.asUser && props.cookie && submitRating && (
+              <>
+                <div className="flex gap-4 items-center">
+                  <RatingDiv x={userOutfitRating} />
+                  <div className="w-fit">
+                    <label>Your rating</label>
+                    <input
+                      id="rating"
+                      type="range"
+                      min="1"
+                      max="5"
+                      step="0.5"
+                      className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer  p-0 m-0"
+                      onChange={(e) =>
+                        setUserOutfitRating(Number(e.target.value))
+                      }
+                      list="rating"
+                      value={userOutfitRating}
+                    />
+                    <datalist
+                      className="flex text-primary -mt-2 p-0 justify-between items-start"
+                      id="rating"
                     >
-                      submit
-                    </button>
-                  </>
+                      <option className="text-xs">|</option>
+                      <option className="text-xs">|</option>
+                      <option className="text-xs">|</option>
+                      <option className="text-xs">|</option>
+                      <option className="text-xs">|</option>
+                    </datalist>
+                  </div>
+                </div>
+
+                <div>
+                  <textarea
+                    rows={4}
+                    className="m-2 w-full md:w-1/2"
+                    placeholder="Leave a comment"
+                    onChange={(e) => setOutfitReview(e.target.value)}
+                    value={userOutfitReview}
+                  ></textarea>
+                </div>
+                {userReviewMissing && (
+                  <div className="text-primary">Please leave a comment.</div>
                 )}
+
+                <button className="primaryButton" onClick={handleSubmitRating}>
+                  submit
+                </button>
               </>
             )}
           </div>

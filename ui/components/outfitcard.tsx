@@ -5,7 +5,7 @@ import { GetRatings, GetRatingsByOutfit, Rating } from "../apis/get_ratings";
 
 import { VerifiedCheckIcon } from "./icons/verified-check-icon";
 import Link from "next/link";
-import { OutfitModal } from "./outfit-modal";
+import { OutfitModal } from "./modals/outfit";
 import { ColorDiv } from "./color/color-div";
 
 export function RatingDiv(props: { x: number; small?: boolean }) {

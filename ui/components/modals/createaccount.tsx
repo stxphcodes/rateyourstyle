@@ -12,8 +12,12 @@ export function CreateAccount(props: {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string>(
+    "missing required fields"
+  );
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setValidationError("");
     if (event.target.id == "username") {
       let username = event.target.value;
       setUsername(username.toLowerCase());
@@ -30,6 +34,23 @@ export function CreateAccount(props: {
 
   async function handleSubmit(event: React.FormEvent<HTMLButtonElement>) {
     event.preventDefault();
+
+    if (username.length < 3) {
+      setValidationError("Username is too short.");
+      return;
+    }
+
+    if (!email.includes("@")) {
+      setValidationError("Email is invalid.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setValidationError("Password is too short.");
+      return;
+    }
+
+    setValidationError("");
 
     const resp = await PostUser(props.clientServer, username, email, password);
     if (resp instanceof Error) {
@@ -60,6 +81,12 @@ export function CreateAccount(props: {
         {error && error.includes("taken") && (
           <div className="p-2 my-2 bg-red-500 text-white">
             {error}. please choose another.
+          </div>
+        )}
+
+        {validationError && !validationError.includes("missing") && (
+          <div className="p-2 my-2 bg-red-500 text-white">
+            {validationError}
           </div>
         )}
         <form className="">
@@ -119,6 +146,7 @@ export function CreateAccount(props: {
               className="primaryButton"
               type="submit"
               onClick={handleSubmit}
+              disabled={validationError !== ""}
             >
               Create Account
             </button>

@@ -91,9 +91,8 @@ export type UserGeneral = {
     country: string;
 }
 
-export async function GetUser(server: string, cookie: string, username: string): Promise<User | Error> {
-    let error: Error | null = null
-    let user: User = {
+function defaultUser(): User {
+    return {
         username: "",
         email: "",
         user_profile: {
@@ -109,6 +108,44 @@ export async function GetUser(server: string, cookie: string, username: string):
             country: "",
         }
     }
+}
+
+export async function GetUser(server: string, cookie: string): Promise<User | Error> {
+    let error: Error | null = null
+    let user: User = defaultUser()
+
+    await fetch(`${server}/api/user`, {
+        method: "GET",
+        headers: {
+            'content-type': "text/plain",
+            'rys-login': cookie,
+        },
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("response not ok");
+            }
+
+            return response.json()
+        }).then(data => {
+            user = data
+        })
+        .catch((err: Error) => {
+            error = err
+        });
+
+    if (error) {
+        return error
+    }
+
+    return user
+}
+
+
+
+export async function GetUserByUsername(server: string, cookie: string, username: string): Promise<User | Error> {
+    let error: Error | null = null
+    let user: User = defaultUser()
 
     await fetch(`${server}/api/user/${username.toLowerCase()}`, {
         method: "GET",

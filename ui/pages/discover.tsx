@@ -106,7 +106,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
     props.userRatings = ratingResp;
 
-    const userProfileResp = await GetUser(server, props.cookie, "test1234");
+    const userProfileResp = await GetUser(server, props.cookie);
     if (!(userProfileResp instanceof Error)) {
       props.user = userProfileResp;
     }
@@ -234,7 +234,11 @@ function DiscoverPage({
 
   return (
     <>
-      <Navbar clientServer={clientServer} cookie={cookie} />
+      <Navbar
+        clientServer={clientServer}
+        cookie={cookie}
+        username={user?.username}
+      />
       {!cookie && <AccountPromptModal clientServer={clientServer} />}
       <main className="mt-8 sm:mt-14 overflow-y-hidden">
         <section className="mb-4 p-4 md:p-8 bg-gradient ">
