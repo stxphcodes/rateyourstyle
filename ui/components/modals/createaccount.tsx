@@ -40,6 +40,11 @@ export function CreateAccount(props: {
       return;
     }
 
+    if (username.length > 20) {
+      setValidationError("Username is too long.");
+      return;
+    }
+
     if (!email.includes("@")) {
       setValidationError("Email is invalid.");
       return;
