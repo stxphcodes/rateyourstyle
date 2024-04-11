@@ -153,7 +153,7 @@ export async function GetPublicOutfitsByUser(server: string, cookie: string, use
   let error: Error | null = null;
   let outfits: Outfit[] = [];
 
-  await fetch(`${server}/api/user/public-outfits?username=`+username, {
+  await fetch(`${server}/api/user/public-outfits?username=`+username.toLowerCase(), {
     method: "GET",
     headers: {
       'content-type': "application/json",

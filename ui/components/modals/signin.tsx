@@ -12,7 +12,8 @@ export function SignIn(props: { clientServer: string; handleClose: any }) {
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.id == "username") {
-      setUsername(event.target.value);
+      let username = event.target.value;
+      setUsername(username.toLowerCase());
     }
 
     if (event.target.id == "password") {
@@ -54,6 +55,8 @@ export function SignIn(props: { clientServer: string; handleClose: any }) {
               type="text"
               placeholder="Username"
               onChange={handleInputChange}
+              autoCapitalize="off"
+              autoCorrect="off"
             ></input>
           </div>
           <div className="mb-6">
@@ -66,6 +69,7 @@ export function SignIn(props: { clientServer: string; handleClose: any }) {
               type="password"
               placeholder="******************"
               onChange={handleInputChange}
+              autoCapitalize="off"
             ></input>
           </div>
           <div className="flex items-center justify-between">

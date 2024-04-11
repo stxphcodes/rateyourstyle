@@ -1,17 +1,17 @@
 import { GetServerSideProps } from "next";
 import { useState, useEffect, useMemo } from "react";
-import { OutfitItem } from "../../apis/get_outfits";
 
-import { GetPublicOutfitsByUser, Outfit } from "../../apis/get_outfits";
-import { GetRatings, Rating } from "../../apis/get_ratings";
-import { Navbar } from "../../components/navarbar";
-import { GetServerURL } from "../../apis/get_server";
-import { ClosetTable } from "../../components/closet/table";
-import { GetUser, GetUsername, User } from "../../apis/get_user";
-import { Footer } from "../../components/footer";
-import { RequestFeedbackModal } from "../../components/modals/requestfeedback";
-import { ClosetHeader } from "../../components/closet/header";
-import { PageMetadata } from "../_app";
+import { OutfitItem } from "../../../apis/get_outfits";
+import { GetPublicOutfitsByUser, Outfit } from "../../../apis/get_outfits";
+import { GetRatings, Rating } from "../../../apis/get_ratings";
+import { Navbar } from "../../../components/navarbar";
+import { GetServerURL } from "../../../apis/get_server";
+import { ClosetTable } from "../../../components/closet/table";
+import { GetUserByUsername, User } from "../../../apis/get_user";
+import { Footer } from "../../../components/footer";
+import { RequestFeedbackModal } from "../../../components/modals/requestfeedback";
+import { ClosetHeader } from "../../../components/closet/header";
+import { PageMetadata } from "../../_app";
 
 type Props = {
   cookie: string;
@@ -46,7 +46,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
   props.clientServer = clientServer;
 
-  let closetName = context.query["user_id"];
+  let closetName = context.query["username"];
   if (typeof closetName !== "string") {
     props.error = "missing username for closet";
     return { props };
@@ -73,7 +73,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props.userRatings = ratingResp;
   }
 
-  const userResp = await GetUser(server, props.cookie, closetName);
+  const userResp = await GetUserByUsername(server, props.cookie, closetName);
   if (userResp instanceof Error) {
     props.error = userResp.message;
     return { props };
@@ -104,7 +104,7 @@ function Rating(props: { x: number; small?: boolean }) {
   );
 }
 
-export default function UserClosetPage({
+export default function Index({
   clientServer,
   cookie,
   outfits,

@@ -11,7 +11,7 @@ export async function PostSignIn(
   await fetch(`${server}/api/signin`, {
     method: "POST",
     body: JSON.stringify({
-      username: username,
+      username: username.toLowerCase(),
       password: password,
     }),
     headers: {"content-type": "application/json"},

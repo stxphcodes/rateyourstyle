@@ -11,7 +11,7 @@ import { NotificationEmptyIcon } from "./icons/notification-empty";
 import { NotificationFilledIcon } from "./icons/notification-filled";
 import { CreateAccount } from "./modals/createaccount";
 import { SignIn } from "./modals/signin";
-import { OutfitModal } from "./outfit-modal";
+import { OutfitModal } from "./modals/outfit";
 
 // check if browser allows cookies to be set
 function cookieEnabled() {
@@ -28,9 +28,8 @@ function cookieEnabled() {
 
 export function Navbar(props: {
   clientServer: string;
-  cookie: string;
-  user?: string;
-  userNotifs?: UserNotifResp;
+  cookie?: string;
+  username?: string;
 }) {
   const router = useRouter();
 
@@ -42,12 +41,10 @@ export function Navbar(props: {
   const [showCreateAccountModal, setShowCreateAccountModal] =
     useState<boolean>(false);
 
-  const [username, setUsername] = useState<string>(
-    props.userNotifs ? props.userNotifs.username : ""
-  );
+  const [hasNotifs, setHasNotifs] = useState<boolean>(false);
 
-  const [hasNotifs, setHasNotifs] = useState<boolean>(
-    props.userNotifs ? props.userNotifs.has_notifications : false
+  const [user, setUser] = useState<string>(
+    props.username ? props.username : ""
   );
 
   const [useMobileMenu, setUseMobileMenu] = useState(false);
@@ -77,23 +74,23 @@ export function Navbar(props: {
 
   useEffect(() => {
     async function getusernotif() {
-      const resp = await GetUsernameAndNotifications(
-        props.clientServer,
-        props.cookie
-      );
-      if (!(resp instanceof Error)) {
-        setUsername(resp.username);
-        setHasNotifs(resp.has_notifications);
-        return;
-      } else {
-        // delete cookie if there was an error retreiving user info
-        document.cookie = "rys-login=;expires=Thu, 01 Jan 1970 00:00:01 GMT";
+      if (props.cookie) {
+        const resp = await GetUsernameAndNotifications(
+          props.clientServer,
+          props.cookie
+        );
+        if (!(resp instanceof Error)) {
+          setUser(resp.username);
+          setHasNotifs(resp.has_notifications);
+          return;
+        } else {
+          // delete cookie if there was an error retreiving user info
+          document.cookie = "rys-login=;expires=Thu, 01 Jan 1970 00:00:01 GMT";
+        }
       }
     }
 
-    if (props.cookie && !username) {
-      getusernotif();
-    }
+    getusernotif();
 
     checkMobileScreenWidth(window);
     window.addEventListener("resize", () => {
@@ -140,12 +137,12 @@ export function Navbar(props: {
               </Link>
             </div>
           )}
-          {username ? (
+          {user && props.cookie ? (
             <UserAndNotification
               clientServer={props.clientServer}
               cookie={props.cookie}
               hasNotifs={hasNotifs}
-              username={username}
+              username={user}
             />
           ) : (
             <div className="flex flex-row gap-2 items-center">
@@ -371,6 +368,7 @@ function UserAndNotification(props: {
         )}
       </button>
       <a
+        className="normal-case"
         onClick={() => {
           setDisplayUserMenu(!displayUserMenu);
         }}

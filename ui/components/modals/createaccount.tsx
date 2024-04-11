@@ -12,10 +12,15 @@ export function CreateAccount(props: {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string>(
+    "missing required fields"
+  );
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setValidationError("");
     if (event.target.id == "username") {
-      setUsername(event.target.value);
+      let username = event.target.value;
+      setUsername(username.toLowerCase());
     }
 
     if (event.target.id == "password") {
@@ -29,6 +34,28 @@ export function CreateAccount(props: {
 
   async function handleSubmit(event: React.FormEvent<HTMLButtonElement>) {
     event.preventDefault();
+
+    if (username.length < 3) {
+      setValidationError("Username is too short.");
+      return;
+    }
+
+    if (username.length > 20) {
+      setValidationError("Username is too long.");
+      return;
+    }
+
+    if (!email.includes("@")) {
+      setValidationError("Email is invalid.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setValidationError("Password is too short.");
+      return;
+    }
+
+    setValidationError("");
 
     const resp = await PostUser(props.clientServer, username, email, password);
     if (resp instanceof Error) {
@@ -61,6 +88,12 @@ export function CreateAccount(props: {
             {error}. please choose another.
           </div>
         )}
+
+        {validationError && !validationError.includes("missing") && (
+          <div className="p-2 my-2 bg-red-500 text-white">
+            {validationError}
+          </div>
+        )}
         <form className="">
           <div className="mb-4">
             <label htmlFor="Email">Email</label>
@@ -71,6 +104,7 @@ export function CreateAccount(props: {
               placeholder="Email"
               onChange={handleInputChange}
               value={email}
+              autoCapitalize="off"
             />
             <label htmlFor="Email" className="requiredLabel">
               Required
@@ -87,6 +121,8 @@ export function CreateAccount(props: {
               placeholder="Username"
               onChange={handleInputChange}
               value={username}
+              autoCapitalize="off"
+              autoCorrect="off"
             />
             <label htmlFor="Email" className="requiredLabel">
               Required
@@ -103,6 +139,7 @@ export function CreateAccount(props: {
               placeholder="******************"
               onChange={handleInputChange}
               value={password}
+              autoCapitalize="off"
             />
             <label htmlFor="Email" className="requiredLabel">
               Required
@@ -114,6 +151,7 @@ export function CreateAccount(props: {
               className="primaryButton"
               type="submit"
               onClick={handleSubmit}
+              disabled={validationError !== ""}
             >
               Create Account
             </button>

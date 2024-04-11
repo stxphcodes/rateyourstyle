@@ -493,6 +493,39 @@ func (h *Handler) GetUsername() echo.HandlerFunc {
 
 func (h *Handler) GetUser() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		user, err := getUser(ctx.Request().Context(), h.Gcs.Bucket, userId)
+		if err != nil {
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		uf, err := getUserFile(ctx.Request().Context(), h.Gcs.Bucket, user)
+		if err != nil {
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		resp := UserResponse{
+			Username:    uf.User.Username,
+			Email:       uf.User.Email,
+			UserProfile: getRecentUserProfile(uf.UserProfiles),
+			UserGeneral: uf.UserGeneral,
+		}
+
+		return ctx.JSON(http.StatusOK, resp)
+	}
+}
+
+func (h *Handler) GetUserByUsername() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
 		username := strings.ToLower(ctx.Param("username"))
 		if username == "" {
 			return ctx.NoContent(http.StatusBadRequest)
@@ -865,6 +898,8 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusBadRequest)
 		}
+		// ensure username is all lowercase
+		data.Username = strings.ToLower(data.Username)
 
 		// uniqueness checks
 		_, ok := h.UserIndices.Usernames[data.Username]
