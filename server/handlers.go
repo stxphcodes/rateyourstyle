@@ -62,7 +62,7 @@ func (h Handler) GetOutfit() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 
-		outfit, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfitId)
+		outfit, err := getOutfit(ctx.Request().Context(), h.Gcs.Bucket, h.UserIndices.IdUsername, outfitId)
 		if err != nil {
 			log.Println("error getting outfit ", err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
@@ -96,7 +96,7 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 		outfitsc := make(chan *OutfitResponse)
 		for outfit := range h.OutfitIndices.PublicOutfits {
 			go func(outfit string) {
-				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
+				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
 				if err != nil {
 					errc <- err
 				}
@@ -152,7 +152,7 @@ func (h Handler) GetPublicOutfitsByUser() echo.HandlerFunc {
 		done := make(chan struct{})
 		for _, outfit := range outfitIds {
 			go func(outfit string) {
-				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
+				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
 				if err != nil {
 					errc <- err
 					return
@@ -210,7 +210,7 @@ func (h Handler) GetOutfitsByUser() echo.HandlerFunc {
 
 		for _, outfit := range outfitIds {
 			go func(outfit string) {
-				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
+				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
 				if err != nil {
 					errc <- err
 					return
@@ -246,7 +246,7 @@ func (h Handler) GetRatingsByOutfit() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 
-		ratings, err := getRatingsByOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, "data/ratings/"+outfitId+".json")
+		ratings, err := getRatingsByOutfit(ctx.Request().Context(), h.Gcs.Bucket, "data/ratings/"+outfitId+".json")
 		if err != nil {
 			log.Println("error getting ratings for outfit " + outfitId)
 			return ctx.NoContent(http.StatusInternalServerError)

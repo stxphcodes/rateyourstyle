@@ -74,7 +74,7 @@ func listAllRatings(ctx context.Context, bucket *gcs.BucketHandle) ([]string, er
 	return reviewItemPaths, nil
 }
 
-func getRatingsByOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, path string) ([]*Rating, error) {
+func getRatingsByOutfit(ctx context.Context, bucket *gcs.BucketHandle, path string) ([]*Rating, error) {
 	obj := bucket.Object(path)
 	reader, err := obj.NewReader(ctx)
 
@@ -98,7 +98,7 @@ func getRatingsByOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.Buc
 
 func createRating(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, r *Rating) (bool, error) {
 	// read original file
-	ratings, err := getRatingsByOutfit(ctx, client, bucket, "data/ratings/"+r.OutfitId+".json")
+	ratings, err := getRatingsByOutfit(ctx, bucket, "data/ratings/"+r.OutfitId+".json")
 	if err != nil {
 		// not object doesn't exist error
 		if !strings.Contains(err.Error(), "exist") {
@@ -143,7 +143,7 @@ func createRatingIndices(ctx context.Context, client *gcs.Client, bucket *gcs.Bu
 	}
 
 	for _, path := range ratingPaths {
-		ratings, err := getRatingsByOutfit(ctx, client, bucket, path)
+		ratings, err := getRatingsByOutfit(ctx, bucket, path)
 		if err != nil {
 			return nil, err
 		}
@@ -165,7 +165,7 @@ func createRatingIndices(ctx context.Context, client *gcs.Client, bucket *gcs.Bu
 
 func updateRatingReplyCount(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, outfitId string, userId string, replyCount int) error {
 	path := "data/ratings/" + outfitId + ".json"
-	ratings, err := getRatingsByOutfit(ctx, client, bucket, path)
+	ratings, err := getRatingsByOutfit(ctx, bucket, path)
 	if err != nil {
 		return err
 	}
