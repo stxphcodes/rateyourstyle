@@ -8,7 +8,6 @@ import (
 	"log"
 	"path/filepath"
 	"strings"
-	"time"
 
 	gcs "cloud.google.com/go/storage"
 	"google.golang.org/api/iterator"
@@ -112,7 +111,7 @@ func createRating(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHan
 		if rating.UserId == r.UserId {
 			ratings[i].Rating = r.Rating
 			ratings[i].Review = r.Review
-			ratings[i].Date = time.Now().Format("2006-01-02")
+			ratings[i].Date = timeNow()
 			found = true
 			break
 		}

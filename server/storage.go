@@ -6,10 +6,15 @@ import (
 	"io"
 	"log"
 	"path/filepath"
+	"time"
 
 	gcs "cloud.google.com/go/storage"
 	"google.golang.org/api/iterator"
 )
+
+func timeNow() string {
+	return time.Now().Format("2006-01-02") + "T" + time.Now().Format("15:04:05")
+}
 
 func joinPaths(dir string, id string) string {
 	return filepath.Join(dir, id+".json")

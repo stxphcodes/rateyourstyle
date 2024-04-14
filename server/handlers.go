@@ -2,14 +2,12 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 
 	gcs "cloud.google.com/go/storage"
 	"github.com/labstack/echo"
@@ -445,7 +443,7 @@ func (h *Handler) GetNotifications() echo.HandlerFunc {
 			for index, notification := range notifications {
 				if !notification.Seen {
 					notifications[index].Seen = true
-					notifications[index].SeenAt = time.Now().Format("2006-01-02")
+					notifications[index].SeenAt = timeNow()
 				}
 			}
 
@@ -573,11 +571,7 @@ func (h Handler) PostClosetRequest() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 
-		current_time := time.Now()
-		now := fmt.Sprintf("%d-%02d-%02dT%02d-%02d-%02d",
-			current_time.Year(), current_time.Month(), current_time.Day(),
-			current_time.Hour(), current_time.Minute(), current_time.Second())
-
+		now := timeNow()
 		data["user_id"] = userId
 		data["date_created"] = now
 
@@ -694,7 +688,7 @@ func (h Handler) PostOutfit() echo.HandlerFunc {
 		}
 
 		data.UserId = userId
-		data.Date = time.Now().Format("2006-01-02")
+		data.Date = timeNow()
 
 		itemIds, err := createItemsFromOutfit(ctx.Request().Context(), h.Gcs.Bucket, &data)
 		if err != nil {
@@ -741,7 +735,7 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 		data.UserId = userId
-		data.Date = time.Now().Format("2006-01-02")
+		data.Date = timeNow()
 		fromUsername, ok := h.UserIndices.IdUsername[userId]
 		if !ok {
 			fromUsername = "anonymous"
@@ -836,7 +830,7 @@ func (h *Handler) PostReply() echo.HandlerFunc {
 
 		data.UserId = userId
 		data.Id = uuid()
-		data.Date = time.Now().Format("2006-01-02") + "T" + time.Now().Format("15:04:05")
+		data.Date = timeNow()
 		data.Username = username
 
 		replies, err := createReply(ctx.Request().Context(), h.Gcs.Bucket, data)
@@ -925,7 +919,7 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 			User: &data,
 			UserProfiles: []*UserProfile{
 				{
-					Date:        time.Now().Format("2006-01-02"),
+					Date:        timeNow(),
 					Department:  "",
 					AgeRange:    "",
 					WeightRange: "",
@@ -992,7 +986,7 @@ func (h *Handler) PostBusinessOutfit() echo.HandlerFunc {
 				OutfitId:    data.OutfitId,
 				ItemIds:     data.ItemIds,
 				Approved:    true,
-				DateCreated: time.Now().Format("2006-01-02"),
+				DateCreated: timeNow(),
 			}
 
 			if err := createBusinessOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, businessOutfit); err != nil {
@@ -1024,7 +1018,7 @@ func (h *Handler) PostBusinessProfile() echo.HandlerFunc {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusBadRequest)
 		}
-		data.DateCreated = time.Now().Format("2006-01-02")
+		data.DateCreated = timeNow()
 		data.UserId = userId
 
 		if err := createBusinessProfile(ctx.Request().Context(), h.Gcs.Bucket, &data); err != nil {
@@ -1070,7 +1064,7 @@ func (h *Handler) PostUserProfile() echo.HandlerFunc {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusBadRequest)
 		}
-		data.Date = time.Now().Format("2006-01-02")
+		data.Date = timeNow()
 
 		f.User = user
 		f.UserProfiles = append(f.UserProfiles, &data)
@@ -1115,7 +1109,7 @@ func (h *Handler) PostUserGeneral() echo.HandlerFunc {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusBadRequest)
 		}
-		data.Date = time.Now().Format("2006-01-02")
+		data.Date = timeNow()
 
 		f.User = user
 		f.UserGeneral = &data
