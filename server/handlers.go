@@ -704,8 +704,6 @@ func (h Handler) PostOutfit() echo.HandlerFunc {
 		data.ItemIds = itemIds
 		data.Items = nil
 
-		fmt.Println("using new write obj")
-
 		path := filepath.Join("data", "outfits", data.Id+".json")
 		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, path, data); err != nil {
 			log.Println(err.Error())
@@ -798,7 +796,7 @@ func (h *Handler) GetReplies() echo.HandlerFunc {
 		}
 
 		path := "data/replies/" + outfitId + "/" + userId + ".json"
-		replies, err := getReplies(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, path)
+		replies, err := getReplies(ctx.Request().Context(), h.Gcs.Bucket, path)
 		if err != nil {
 			log.Println("error getting replies " + err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
@@ -841,7 +839,7 @@ func (h *Handler) PostReply() echo.HandlerFunc {
 		data.Date = time.Now().Format("2006-01-02") + "T" + time.Now().Format("15:04:05")
 		data.Username = username
 
-		replies, err := createReply(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, data)
+		replies, err := createReply(ctx.Request().Context(), h.Gcs.Bucket, data)
 		if err != nil {
 			log.Println("Error creating reply: ", err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
@@ -1159,9 +1157,7 @@ func (h Handler) PutOutfitItem() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusForbidden)
 		}
 
-		path := filepath.Join("data", "outfit-items", data.Id+".json")
-		obj := h.Gcs.Bucket.Object(path)
-
+		obj := h.Gcs.Bucket.Object(joinPaths(outfitItemsDir, data.Id))
 		_, err = obj.Attrs(ctx.Request().Context())
 		if err != nil {
 			if strings.Contains(err.Error(), "exist") {

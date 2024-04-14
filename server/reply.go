@@ -27,7 +27,7 @@ type ReplyChain struct {
 	Replies []*ReplyItem `json:"replies"`
 }
 
-func getReplies(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, path string) (*ReplyChain, error) {
+func getReplies(ctx context.Context, bucket *gcs.BucketHandle, path string) (*ReplyChain, error) {
 	obj := bucket.Object(path)
 	reader, err := obj.NewReader(ctx)
 	if err != nil {
@@ -48,11 +48,11 @@ func getReplies(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandl
 	return r, nil
 }
 
-func createReply(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, reply *ReplyItem) (*ReplyChain, error) {
+func createReply(ctx context.Context, bucket *gcs.BucketHandle, reply *ReplyItem) (*ReplyChain, error) {
 	path := "data/replies/" + reply.RatingOutfitId + "/" + reply.RatingUserId + ".json"
 	// read original file
 	objExists := true
-	replies, err := getReplies(ctx, client, bucket, path)
+	replies, err := getReplies(ctx, bucket, path)
 	if err != nil {
 		// not object doesn't exist error
 		if !strings.Contains(err.Error(), "exist") {
@@ -72,11 +72,7 @@ func createReply(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHand
 		replies.Replies = append(replies.Replies, reply)
 	}
 
-	obj := bucket.Object(path)
-	writer := obj.NewWriter(ctx)
-	defer writer.Close()
-
-	if err := json.NewEncoder(writer).Encode(replies); err != nil {
+	if err := writeObject(ctx, bucket, path, replies); err != nil {
 		return nil, err
 	}
 
