@@ -22,106 +22,7 @@ type Handler struct {
 	UserIndices         *UserIndices
 	OutfitIndices       *OutfitIndices
 	RatingIndices       *RatingIndices
-	BusinessIndices     *BusinessIndices
 	NotificationIndices *NotificationIndices
-}
-
-func (h Handler) GetBusinessUsernames() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		businesses := []string{}
-
-		for id := range h.BusinessIndices.Businesses {
-			username, ok := h.UserIndices.IdUsername[id]
-			if ok {
-				businesses = append(businesses, username)
-			}
-		}
-
-		return ctx.JSON(http.StatusOK, businesses)
-	}
-}
-
-func (h Handler) GetBusinessOutfits() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		businessId := ""
-		businessRequested := ctx.QueryParam("business")
-		if businessRequested != "" {
-			for id, username := range h.UserIndices.IdUsername {
-				if username == businessRequested {
-					businessId = id
-				}
-			}
-		} else {
-			cookie, err := getCookie(ctx.Request())
-			if err != nil {
-				log.Println("error retrieving cookie")
-				return ctx.NoContent(http.StatusForbidden)
-			}
-
-			userId, ok := h.UserIndices.CookieId[cookie]
-			if !ok {
-				log.Println("user id not found for cookie " + cookie)
-				return ctx.NoContent(http.StatusForbidden)
-			}
-
-			businessId = userId
-		}
-
-		_, ok := h.BusinessIndices.Businesses[businessId]
-		if !ok {
-			log.Println("user id not business profile " + businessId)
-			return ctx.NoContent(http.StatusFailedDependency)
-		}
-
-		outfits, err := getBusinessOutfits(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, businessId)
-		if err != nil {
-			// object doesn't exist
-			if !strings.Contains(err.Error(), "exist") {
-				log.Println(err.Error())
-				return ctx.NoContent(http.StatusInternalServerError)
-			}
-
-			return ctx.JSON(http.StatusOK, outfits)
-		}
-
-		return ctx.JSON(http.StatusOK, outfits)
-	}
-}
-
-func (h Handler) GetBusinessProfile() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		businessId := ""
-		businessRequested := ctx.QueryParam("business")
-		if businessRequested != "" {
-			for id, username := range h.UserIndices.IdUsername {
-				if username == businessRequested {
-					businessId = id
-				}
-			}
-		} else {
-			cookie, err := getCookie(ctx.Request())
-			if err != nil {
-				log.Println("error retrieving cookie")
-				return ctx.NoContent(http.StatusForbidden)
-			}
-
-			userId, ok := h.UserIndices.CookieId[cookie]
-			if !ok {
-				log.Println("user id not found for cookie " + cookie)
-				return ctx.NoContent(http.StatusForbidden)
-			}
-
-			businessId = userId
-		}
-
-		business, ok := h.BusinessIndices.Businesses[businessId]
-		if !ok {
-			log.Println("user id not business profile " + businessId)
-			return ctx.NoContent(http.StatusFailedDependency)
-		}
-
-		return ctx.JSON(http.StatusOK, business)
-	}
 }
 
 func (h Handler) GetCookie() echo.HandlerFunc {
@@ -994,40 +895,6 @@ func (h *Handler) PostBusinessOutfit() echo.HandlerFunc {
 				return ctx.NoContent(http.StatusInternalServerError)
 			}
 		}
-
-		return ctx.NoContent(http.StatusCreated)
-	}
-}
-
-func (h *Handler) PostBusinessProfile() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		cookie, err := getCookie(ctx.Request())
-		if err != nil {
-			log.Println("error retrieving cookie")
-			return ctx.NoContent(http.StatusForbidden)
-		}
-
-		userId, ok := h.UserIndices.CookieId[cookie]
-		if !ok {
-			log.Println("user id not found based on cookie " + cookie)
-			return ctx.NoContent(http.StatusForbidden)
-		}
-
-		var data BusinessProfile
-		if err := ctx.Bind(&data); err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusBadRequest)
-		}
-		data.DateCreated = timeNow()
-		data.UserId = userId
-
-		if err := createBusinessProfile(ctx.Request().Context(), h.Gcs.Bucket, &data); err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
-		}
-
-		// update indexes
-		h.BusinessIndices.Businesses[data.UserId] = &data
 
 		return ctx.NoContent(http.StatusCreated)
 	}

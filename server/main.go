@@ -107,17 +107,11 @@ func run() error {
 		return ctx.JSON(200, a)
 	})
 
-	mux.GET("/api/business-profile", handler.GetBusinessProfile())
-
-	mux.GET("/api/businesses", handler.GetBusinessUsernames())
-
 	mux.GET("/api/cookie", handler.GetCookie())
 
 	mux.GET("/api/outfit/:outfitid", handler.GetOutfit())
 
 	mux.GET("/api/outfits", handler.GetOutfits())
-
-	mux.GET("/api/business-outfits", handler.GetBusinessOutfits())
 
 	mux.GET("/api/ratings", handler.GetRatingsByUser())
 
@@ -154,8 +148,6 @@ func run() error {
 	mux.POST("/api/user-profile", handler.PostUserProfile())
 
 	mux.POST("/api/user-general", handler.PostUserGeneral())
-
-	mux.POST("/api/business-profile", handler.PostBusinessProfile())
 
 	mux.POST("/api/business-outfits", handler.PostBusinessOutfit())
 
@@ -200,12 +192,6 @@ func initiateIndices(ctx context.Context, h *Handler) error {
 	}
 	fmt.Println("created rating indices")
 
-	businessIndices, err := createBusinessIndices(ctx, h.Gcs.Client, h.Gcs.Bucket)
-	if err != nil {
-		return err
-	}
-	fmt.Println("created business indices")
-
 	notificationIndices, err := createNotificationIndices(ctx, h.Gcs.Bucket)
 	if err != nil {
 		return err
@@ -215,7 +201,6 @@ func initiateIndices(ctx context.Context, h *Handler) error {
 	h.UserIndices = userIndices
 	h.OutfitIndices = outfitIndices
 	h.RatingIndices = ratingIndices
-	h.BusinessIndices = businessIndices
 	h.NotificationIndices = notificationIndices
 
 	return nil
