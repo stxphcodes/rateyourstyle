@@ -141,13 +141,8 @@ func (h Handler) GetCookie() echo.HandlerFunc {
 		}
 
 		// write new user to original file
-		obj := h.Gcs.Bucket.Object("data/users/users.json")
-		writer := obj.NewWriter(ctx.Request().Context())
-		defer writer.Close()
-
 		users = append(users, user)
-		if err := json.NewEncoder(writer).Encode(users); err != nil {
-			log.Println(err.Error())
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, "data/users/users.json", users); err != nil {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
@@ -187,7 +182,7 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 		count := len(h.OutfitIndices.PublicOutfits)
 		if countStr != "" {
 			countInt, err := strconv.Atoi(countStr)
-			// make sure there's enough outfits to fulfill the count count query param
+			// make sure there's enough outfits to fulfill the count query param
 			if count > countInt && err == nil {
 				count = countInt
 			}
@@ -454,11 +449,8 @@ func (h *Handler) GetNotifications() echo.HandlerFunc {
 				}
 			}
 
-			obj := h.Gcs.Bucket.Object(joinPaths(notificationsDir, userId))
-			writer := obj.NewWriter(ctx.Request().Context())
-			defer writer.Close()
-
-			if err := json.NewEncoder(writer).Encode(notifications); err != nil {
+			// update notification seen in file
+			if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(notificationsDir, userId), notifications); err != nil {
 				log.Println(err.Error())
 				return ctx.NoContent(http.StatusInternalServerError)
 			}
@@ -589,11 +581,8 @@ func (h Handler) PostClosetRequest() echo.HandlerFunc {
 		data["user_id"] = userId
 		data["date_created"] = now
 
-		obj := h.Gcs.Bucket.Object("data/requests/" + now + ".json")
-		writer := obj.NewWriter(ctx.Request().Context())
-		defer writer.Close()
-
-		if err := json.NewEncoder(writer).Encode(data); err != nil {
+		path := "data/requests/" + now + ".json"
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, path, data); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
@@ -716,17 +705,10 @@ func (h Handler) PostOutfit() echo.HandlerFunc {
 		data.Items = nil
 
 		path := filepath.Join("data", "outfits", data.Id+".json")
-		obj := h.Gcs.Bucket.Object(path)
-
-		writer := obj.NewWriter(ctx.Request().Context())
-		defer writer.Close()
-
-		if err := json.NewEncoder(writer).Encode(data); err != nil {
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, path, data); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
-
-		writer.Close()
 
 		// update indices
 		h.OutfitIndices.OutfitUser[data.Id] = data.UserId
@@ -1056,11 +1038,7 @@ func (h *Handler) PostNotificationsSeen() echo.HandlerFunc {
 			}
 		}
 
-		obj := h.Gcs.Bucket.Object(joinPaths(notificationsDir, userId))
-		writer := obj.NewWriter(ctx.Request().Context())
-		defer writer.Close()
-
-		if err := json.NewEncoder(writer).Encode(n); err != nil {
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(notificationsDir, userId), n); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
