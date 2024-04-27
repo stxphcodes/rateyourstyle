@@ -153,6 +153,8 @@ func run() error {
 
 	mux.POST("/api/closet-request", handler.PostClosetRequest())
 
+	mux.POST("/api/feedback-request", handler.PostFeedback())
+
 	mux.PUT("/api/outfit-item", handler.PutOutfitItem())
 
 	return mux.Start(cfg.HttpAddr)
@@ -160,11 +162,11 @@ func run() error {
 
 func validateConfig(cfg *Config) error {
 	if cfg.GCS.CredsPath == "" {
-		return fmt.Errorf("Missing gcs creds path")
+		return fmt.Errorf("missing gcs creds path")
 	}
 
 	if cfg.GCS.BucketName == "" {
-		return fmt.Errorf("Missing gcs bucket name")
+		return fmt.Errorf("missing gcs bucket name")
 	}
 
 	return nil

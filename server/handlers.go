@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -1040,6 +1041,83 @@ func (h Handler) PutOutfitItem() echo.HandlerFunc {
 		}
 
 		writer.Close()
+
+		return ctx.NoContent(http.StatusCreated)
+	}
+}
+
+func (h Handler) PostFeedback() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		fromUserId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		var data FeedbackRequestReq
+		if err := ctx.Bind(&data); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		toUserId := ""
+		for id, username := range h.UserIndices.IdUsername {
+			if (username) == data.ToUsername {
+				toUserId = id
+			}
+		}
+		if toUserId == "" {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusNotFound)
+		}
+
+		// create feedback request
+		requests, err := getFeedbackRequestsByUser(ctx.Request().Context(), h.Gcs.Bucket, fromUserId)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		feedbackReq := toFeedbackRequest(&data, fromUserId, toUserId)
+		if !uniqueRequest(requests, toUserId, feedbackReq.OutfitId) {
+			fmt.Println("already requestsed")
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+		requests = append(requests, *feedbackReq)
+
+		// create feedback response
+		responses, err := getFeedbackResponseByUser(ctx.Request().Context(), h.Gcs.Bucket, toUserId)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+		feedbackResp := toFeedbackResponse(feedbackReq)
+		responses = append(responses, *feedbackResp)
+
+		// create feedback content
+		feedbackContent := toFeedbackContent(feedbackReq, data.Questions)
+
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackRequestsDir, fromUserId), requests); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+
+		}
+
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackResponsesDir, toUserId), responses); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackContentDir, feedbackReq.RequestId), feedbackContent); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
 
 		return ctx.NoContent(http.StatusCreated)
 	}

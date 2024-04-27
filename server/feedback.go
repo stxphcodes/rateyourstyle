@@ -1,13 +1,20 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
-	"log"
-	"net/http"
+	"io"
 	"strings"
 
-	"github.com/labstack/echo"
+	gcs "cloud.google.com/go/storage"
 )
+
+type FeedbackRequestReq struct {
+	ToUsername     string   `json:"to_username"`
+	OutfitId       string   `json:"outfit_id"`
+	ExpirationDate string   `json:"expiration_date"`
+	Questions      []string `json:"questions"`
+}
 
 type FeedbackRequest struct {
 	RequestId      string `json:"request_id"`
@@ -26,80 +33,134 @@ type FeedbackRequestResp struct {
 }
 
 type FeedbackResponse struct {
-	RequestId    string
-	Accepted     bool
-	ResponseDate string
+	RequestId    string `json:"request_id"`
+	FromUserId   string `json:"from_userid"`
+	ToUserId     string `json:"to_userid"`
+	OutfitId     string `json:"outfit_id"`
+	Accepted     bool   `json:"accepted"`
+	ResponseDate string `json:"response_date"`
 }
 
 type FeedbackContent struct {
-	RequestId         string
-	QuestionResponses []*QuestionResponse
-	LastEdited        string
+	RequestId         string              `json:"request_id"`
+	QuestionResponses []*QuestionResponse `json:"question_responses"`
+	LastEdited        string              `json:"last_edited"`
 }
 
 type QuestionResponse struct {
-	QuestionId string
-	Question   string
-	Response   string
+	QuestionId string `json:"question_id"`
+	Question   string `json:"question"`
+	Response   string `json:"response"`
 }
 
 const (
-	feedbackRequestDir  = "data/feedback/requests"
-	feedbackResponseDir = "data/feedback/responses"
-	feedbackContentDir  = "data/feedback/content"
+	feedbackRequestsDir  = "data/feedback/requests"
+	feedbackResponsesDir = "data/feedback/responses"
+	feedbackContentDir   = "data/feedback/content"
 )
 
-func getFeedbackRequests() {
+func uniqueRequest(requests []FeedbackRequest, toUserId, outfitId string) bool {
+	for _, r := range requests {
+		if r.ToUserId == toUserId {
+			if r.OutfitId == outfitId {
+				return false
+			}
+		}
+	}
 
+	return true
 }
 
-func (h Handler) PostFeedback() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		cookie, err := getCookie(ctx.Request())
-		if err != nil {
-			log.Println("error retrieving cookie")
-			return ctx.NoContent(http.StatusForbidden)
+func getFeedbackRequestsByUser(ctx context.Context, bucket *gcs.BucketHandle, userId string) ([]FeedbackRequest, error) {
+	obj := bucket.Object(joinPaths(feedbackRequestsDir, userId))
+	reader, err := obj.NewReader(ctx)
+	if err != nil {
+		// doesn't exist, just return default one.
+		if strings.Contains(err.Error(), "exist") {
+			return []FeedbackRequest{}, nil
 		}
 
-		userId, ok := h.UserIndices.CookieId[cookie]
-		if !ok {
-			log.Println("user id not found based on cookie " + cookie)
-			return ctx.NoContent(http.StatusForbidden)
+		return nil, err
+	}
+	defer reader.Close()
+
+	bytes, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	var data []FeedbackRequest
+	if err := json.Unmarshal(bytes, &data); err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func getFeedbackResponseByUser(ctx context.Context, bucket *gcs.BucketHandle, userId string) ([]FeedbackResponse, error) {
+	obj := bucket.Object(joinPaths(feedbackResponsesDir, userId))
+	reader, err := obj.NewReader(ctx)
+	if err != nil {
+		// doesn't exist, just return default one.
+		if strings.Contains(err.Error(), "exist") {
+			return []FeedbackResponse{}, nil
 		}
 
-		var data FeedbackRequest
-		if err := ctx.Bind(&data); err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
+		return nil, err
+	}
+	defer reader.Close()
+
+	bytes, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	var data []FeedbackResponse
+	if err := json.Unmarshal(bytes, &data); err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func toFeedbackRequest(req *FeedbackRequestReq, fromUser, toUser string) *FeedbackRequest {
+	return &FeedbackRequest{
+		RequestId:      uuid(),
+		RequestDate:    timeNow(),
+		RequestType:    "outfit",
+		OutfitId:       req.OutfitId,
+		FromUserId:     fromUser,
+		ToUserId:       toUser,
+		ExpirationDate: req.ExpirationDate,
+	}
+}
+
+func toFeedbackResponse(req *FeedbackRequest) *FeedbackResponse {
+	return &FeedbackResponse{
+		RequestId:    req.RequestId,
+		FromUserId:   req.FromUserId,
+		ToUserId:     req.ToUserId,
+		OutfitId:     req.OutfitId,
+		Accepted:     false,
+		ResponseDate: "",
+	}
+}
+
+func toFeedbackContent(req *FeedbackRequest, questions []string) *FeedbackContent {
+	questionResponses := []*QuestionResponse{}
+	for _, q := range questions {
+		qr := &QuestionResponse{
+			QuestionId: uuid(),
+			Question:   q,
+			Response:   "",
 		}
-		data.RequestId = uuid()
-		data.RequestDate = timeNow()
 
-		path := joinPaths(feedbackRequestDir, data.FromUserId)
+		questionResponses = append(questionResponses, qr)
+	}
 
-		obj := h.Gcs.Bucket.Object(joinPaths(outfitItemsDir, data.Id))
-		_, err = obj.Attrs(ctx.Request().Context())
-		if err != nil {
-			if strings.Contains(err.Error(), "exist") {
-				// can only edit item that exists.
-				return ctx.NoContent(http.StatusConflict)
-			}
-
-			// not sure what the error is
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
-		}
-
-		writer := obj.NewWriter(ctx.Request().Context())
-		defer writer.Close()
-
-		if err := json.NewEncoder(writer).Encode(data); err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
-		}
-
-		writer.Close()
-
-		return ctx.NoContent(http.StatusCreated)
+	return &FeedbackContent{
+		RequestId:         req.RequestId,
+		QuestionResponses: questionResponses,
+		LastEdited:        "",
 	}
 }
