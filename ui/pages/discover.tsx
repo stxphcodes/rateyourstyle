@@ -1,7 +1,6 @@
 import { GetServerSideProps } from "next";
 import { useEffect, useState } from "react";
 
-import { GetBusinesses } from "../apis/get_businesses";
 import { Campaign, GetCampaigns } from "../apis/get_campaigns";
 import { GetOutfits, Outfit } from "../apis/get_outfits";
 import { GetRatings, Rating } from "../apis/get_ratings";
@@ -22,7 +21,6 @@ type Props = {
   outfits: Outfit[] | null;
   userRatings: Rating[] | null;
   metadata: PageMetadata;
-  businesses: string[];
   user: User | null;
 };
 
@@ -79,7 +77,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     error: null,
     outfits: null,
     clientServer: "",
-    businesses: [],
     user: null,
     metadata: {
       title: "Discover",
@@ -126,13 +123,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
   props.outfits = outfitResp;
 
-  const businessResp = await GetBusinesses(server, props.cookie);
-  if (businessResp instanceof Error) {
-    props.error = businessResp.message;
-    return { props };
-  }
-  props.businesses = businessResp;
-
   const clientServer = GetServerURL(true);
   if (clientServer instanceof Error) {
     props.error = clientServer.message;
@@ -153,7 +143,6 @@ function DiscoverPage({
   userRatings,
   outfits,
   clientServer,
-  businesses,
   error,
 }: Props) {
   const [searchTerms, setSearchTerms] = useState<string[]>([]);
@@ -366,12 +355,7 @@ function DiscoverPage({
                   key={item.id}
                   userRating={userRating}
                   clientServer={clientServer}
-                  verifiedBusiness={
-                    businesses &&
-                    businesses.filter((id) => item.username == id).length > 0
-                      ? true
-                      : false
-                  }
+                  verifiedBusiness={false}
                 />
               );
             })}

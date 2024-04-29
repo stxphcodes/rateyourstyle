@@ -13,7 +13,6 @@ import { Navbar } from "../components/navarbar";
 import { OutfitCard } from "../components/outfitcard";
 import { GetServerURL } from "../apis/get_server";
 import { PageMetadata } from "./_app";
-import { GetBusinesses } from "../apis/get_businesses";
 import { CircleCheckIcon } from "../components/icons/circle-check";
 
 const personalStylistList = [
@@ -92,7 +91,6 @@ type Props = {
   error: string | null;
   outfits: Outfit[] | null;
   metadata: PageMetadata;
-  businesses: string[] | null;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -101,7 +99,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     error: null,
     outfits: null,
     clientServer: "",
-    businesses: [],
     metadata: {
       title: "",
       description:
@@ -118,13 +115,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (context.req.cookies["rys-login"]) {
     props.cookie = context.req.cookies["rys-login"];
   }
-
-  const businessResp = await GetBusinesses(server, props.cookie);
-  if (businessResp instanceof Error) {
-    props.error = businessResp.message;
-    return { props };
-  }
-  props.businesses = businessResp;
 
   const outfitResp = await GetOutfits(server, 8);
   if (outfitResp instanceof Error) {
@@ -143,7 +133,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return { props };
 };
 
-function Home({ cookie, outfits, clientServer, businesses, error }: Props) {
+function Home({ cookie, outfits, clientServer, error }: Props) {
   const [heroSectionOutfit, setHeroSectionOutfit] = useState(
     outfits ? outfits[0] : null
   );
@@ -187,13 +177,7 @@ function Home({ cookie, outfits, clientServer, businesses, error }: Props) {
                   data={heroSectionOutfit}
                   userRating={null}
                   clientServer={clientServer}
-                  verifiedBusiness={
-                    businesses &&
-                    businesses.filter((id) => heroSectionOutfit.username == id)
-                      .length > 0
-                      ? true
-                      : false
-                  }
+                  verifiedBusiness={false}
                 />
               )}
               {heroSectionOutfit2 && (
@@ -203,14 +187,7 @@ function Home({ cookie, outfits, clientServer, businesses, error }: Props) {
                     data={heroSectionOutfit2}
                     userRating={null}
                     clientServer={clientServer}
-                    verifiedBusiness={
-                      businesses &&
-                      businesses.filter(
-                        (id) => heroSectionOutfit2.username == id
-                      ).length > 0
-                        ? true
-                        : false
-                    }
+                    verifiedBusiness={false}
                   />
                 </div>
               )}

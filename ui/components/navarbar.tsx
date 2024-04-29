@@ -306,6 +306,13 @@ function UserMenu(props: { username: string; handleClose: any }) {
           Account
         </button>
       </Link>
+
+      <Link href={`/requests/${props.username}`} passHref={true}>
+        <button className="px-8 py-2  hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase">
+          Requests
+        </button>
+      </Link>
+
       <button
         className="px-8 py-2  hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase"
         onClick={() => {

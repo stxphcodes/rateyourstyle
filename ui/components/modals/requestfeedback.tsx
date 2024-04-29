@@ -3,12 +3,10 @@ import { useEffect, useState } from "react";
 import { Modal } from "./";
 import { Outfit } from "../../apis/get_outfits";
 import { GetOutfitsByUser } from "../../apis/get_outfits";
-import Link from "next/link";
-import { OutfitItem } from "../../apis/get_outfits";
 import {
-  BusinessOutfitSelected,
-  PostBusinessOutfits,
-} from "../../apis/post_businessoutfits";
+  FeedbackRequest,
+  PostFeedbackRequest,
+} from "../../apis/post_feedbackrequest";
 
 const questions = [
   "How would you describe this outfit?",
@@ -37,6 +35,8 @@ export function RequestFeedbackModal(props: {
     "",
   ]);
 
+  const [submissionState, setSubmissionState] = useState<string>("");
+
   useEffect(() => {
     async function getData() {
       const resp = await GetOutfitsByUser(props.clientServer, props.cookie);
@@ -53,6 +53,7 @@ export function RequestFeedbackModal(props: {
 
   const handleOutfitClick = (outfit: Outfit) => {
     setOutfitSelected(outfit);
+    setShowForm(!showForm);
   };
 
   const handleQuestionCheckbox = (q: string) => {
@@ -85,6 +86,36 @@ export function RequestFeedbackModal(props: {
     setAdditionalQuestions([...additionalQuestions]);
   };
 
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    if (!outfitSelected) {
+      return;
+    }
+
+    let q = questions.filter((question) => question);
+    let addQ = additionalQuestions.filter((question) => question);
+
+    let req: FeedbackRequest = {
+      to_username: props.closetName,
+      outfit_id: outfitSelected?.id,
+      expiration_date: "",
+      questions: [...q, ...addQ],
+    };
+
+    const resp = await PostFeedbackRequest(
+      props.clientServer,
+      props.cookie,
+      req
+    );
+
+    if (!resp) {
+      setSubmissionState("success");
+    } else {
+      setSubmissionState("error");
+    }
+  };
+
   return (
     <Modal handleClose={props.handleClose} wideScreen={true} fullHeight={true}>
       <>
@@ -92,7 +123,28 @@ export function RequestFeedbackModal(props: {
           Request Outfit Feedback from {props.closetName}
         </h1>
 
-        {!showForm && (
+        {submissionState && (
+          <div>
+            {submissionState === "success" ? (
+              <>
+                Request sent to {props.closetName}. You will be notified if they
+                accept your request. You can also keep track of your request
+                status by going to your request page.
+              </>
+            ) : (
+              <div>
+                <h3>Uh oh :\</h3>
+                <div>
+                  We are encountering server issues. Please try refreshing the
+                  page. If the issue persists, please contact
+                  sitesbystephanie@gmail.com.
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {!showForm && !submissionState && (
           <>
             <div className="mb-4">
               Please select one outfit you'd like to get feedback on.
@@ -107,13 +159,18 @@ export function RequestFeedbackModal(props: {
           </>
         )}
 
-        {outfitSelected && showForm && (
+        {outfitSelected && showForm && !submissionState && (
           <>
-            <div className="mb-4">
-              The following questions will be sent to {props.closetName} along
-              with your selected outfit. <br />
-              Please un-select any question(s) you don't want feedback on.
-            </div>
+            <button
+              className="bg-custom-pink w-1/4  rounded p-2 my-4"
+              onClick={(e) => {
+                e.preventDefault();
+                setShowForm(!showForm);
+              }}
+            >
+              Go Back
+            </button>
+
             <div className="my-4">
               <div
                 className={`w-48 shadow-md break-words 
@@ -130,6 +187,11 @@ export function RequestFeedbackModal(props: {
                 </div>
               </div>
             </div>
+            <div className="my-6">
+              The following questions will be sent to {props.closetName} along
+              with your selected outfit. <br />
+              Please un-select any question(s) you don't want feedback on.
+            </div>
             <RequestForm
               questionsSelected={questionsSelected}
               additionalQuestions={additionalQuestions}
@@ -141,15 +203,14 @@ export function RequestFeedbackModal(props: {
           </>
         )}
 
-        <button
-          className="bg-gradient w-full  rounded p-2 my-4"
-          onClick={(e) => {
-            e.preventDefault();
-            setShowForm(!showForm);
-          }}
-        >
-          {!showForm ? "Next" : "Back"}
-        </button>
+        {showForm && !submissionState && (
+          <button
+            className="bg-gradient w-full md:w-1/2 rounded p-2 my-4"
+            onClick={handleSubmit}
+          >
+            submit
+          </button>
+        )}
       </>
     </Modal>
   );
