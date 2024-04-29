@@ -9,6 +9,14 @@ import (
 	gcs "cloud.google.com/go/storage"
 )
 
+type GetFeedbackResponse struct {
+	RequestId         string              `json:"request_id"`
+	RequestDate       string              `json:"request_date"`
+	ToUsername        string              `json:"to_username"`
+	Outfit            *Outfit             `json:"outfit"`
+	QuestionResponses []*QuestionResponse `json:"question_responses"`
+}
+
 type FeedbackRequestReq struct {
 	ToUsername     string   `json:"to_username"`
 	OutfitId       string   `json:"outfit_id"`
@@ -69,6 +77,50 @@ func uniqueRequest(requests []FeedbackRequest, toUserId, outfitId string) bool {
 	}
 
 	return true
+}
+
+func toGetFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle, requests []FeedbackRequest, idToUsername map[string]string) ([]GetFeedbackResponse, error) {
+	responses := []GetFeedbackResponse{}
+
+	for _, request := range requests {
+		bytes, err := readObjectBytes(ctx, bucket, "data/outfits/"+request.OutfitId+".json")
+		if err != nil {
+			return nil, err
+		}
+
+		var outfit Outfit
+		if err := json.Unmarshal(bytes, &outfit); err != nil {
+			return nil, err
+		}
+
+		bytes, err = readObjectBytes(ctx, bucket, joinPaths(feedbackContentDir, request.RequestId))
+		if err != nil {
+			return nil, err
+		}
+
+		var content FeedbackContent
+		if err := json.Unmarshal(bytes, &content); err != nil {
+			return nil, err
+		}
+
+		toUsername, ok := idToUsername[request.ToUserId]
+		if !ok {
+			continue
+		}
+
+		resp := GetFeedbackResponse{
+			RequestId:         request.RequestId,
+			Outfit:            &outfit,
+			RequestDate:       request.RequestDate,
+			ToUsername:        toUsername,
+			QuestionResponses: content.QuestionResponses,
+		}
+
+		responses = append(responses, resp)
+
+	}
+
+	return responses, nil
 }
 
 func getFeedbackRequestsByUser(ctx context.Context, bucket *gcs.BucketHandle, userId string) ([]FeedbackRequest, error) {

@@ -109,6 +109,8 @@ func run() error {
 
 	mux.GET("/api/cookie", handler.GetCookie())
 
+	mux.GET("/api/feedback-request", handler.GetFeedbackRequest())
+
 	mux.GET("/api/outfit/:outfitid", handler.GetOutfit())
 
 	mux.GET("/api/outfits", handler.GetOutfits())
@@ -153,7 +155,7 @@ func run() error {
 
 	mux.POST("/api/closet-request", handler.PostClosetRequest())
 
-	mux.POST("/api/feedback-request", handler.PostFeedback())
+	mux.POST("/api/feedback-request", handler.PostFeedbackRequest())
 
 	mux.PUT("/api/outfit-item", handler.PutOutfitItem())
 

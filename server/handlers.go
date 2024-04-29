@@ -1046,7 +1046,38 @@ func (h Handler) PutOutfitItem() echo.HandlerFunc {
 	}
 }
 
-func (h Handler) PostFeedback() echo.HandlerFunc {
+func (h Handler) GetFeedbackRequest() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		requests, err := getFeedbackRequestsByUser(ctx.Request().Context(), h.Gcs.Bucket, userId)
+		if err != nil {
+			log.Println("error getting requests for " + userId)
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		resp, err := toGetFeedbackResponse(ctx.Request().Context(), h.Gcs.Bucket, requests, h.UserIndices.IdUsername)
+		if err != nil {
+			log.Println("error converting to resp for " + userId)
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		return ctx.JSON(http.StatusOK, resp)
+
+	}
+}
+
+func (h Handler) PostFeedbackRequest() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		cookie, err := getCookie(ctx.Request())
 		if err != nil {
