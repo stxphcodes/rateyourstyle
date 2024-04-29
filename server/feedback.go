@@ -34,12 +34,6 @@ type FeedbackRequest struct {
 	ExpirationDate string `json:"expiration_date"`
 }
 
-type FeedbackRequestResp struct {
-	Request      *FeedbackRequest
-	FromUsername string
-	ToUsername   string
-}
-
 type FeedbackResponse struct {
 	RequestId    string `json:"request_id"`
 	FromUserId   string `json:"from_userid"`
