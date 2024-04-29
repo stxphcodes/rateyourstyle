@@ -1091,7 +1091,7 @@ func (h Handler) PostFeedbackRequest() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusForbidden)
 		}
 
-		var data FeedbackRequestReq
+		var data GetFeedbackRequest
 		if err := ctx.Bind(&data); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)

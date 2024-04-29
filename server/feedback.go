@@ -17,7 +17,7 @@ type GetFeedbackResponse struct {
 	QuestionResponses []*QuestionResponse `json:"question_responses"`
 }
 
-type FeedbackRequestReq struct {
+type GetFeedbackRequest struct {
 	ToUsername     string   `json:"to_username"`
 	OutfitId       string   `json:"outfit_id"`
 	ExpirationDate string   `json:"expiration_date"`
@@ -175,7 +175,7 @@ func getFeedbackResponseByUser(ctx context.Context, bucket *gcs.BucketHandle, us
 	return data, nil
 }
 
-func toFeedbackRequest(req *FeedbackRequestReq, fromUser, toUser string) *FeedbackRequest {
+func toFeedbackRequest(req *GetFeedbackRequest, fromUser, toUser string) *FeedbackRequest {
 	return &FeedbackRequest{
 		RequestId:      uuid(),
 		RequestDate:    timeNow(),
