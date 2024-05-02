@@ -560,7 +560,7 @@ export function ClosetTable(props: {
                         )}
                       </td>
                       <td className="p-2 ">{item.rating}</td>
-                      <td className="p-2 w-52 normal-case">
+                      <td className="p-2 normal-case">
                         {itemEdit && itemEdit.id == item.id ? (
                           <textarea
                             rows={6}

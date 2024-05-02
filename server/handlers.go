@@ -650,7 +650,7 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		n, err := ratingToNotification(&data, ctx.Request().Context(), h.Gcs.Bucket, h.UserIndices.IdUsername)
+		n, err := ratingToNotification(ctx.Request().Context(), h.Gcs.Bucket, &data, h.UserIndices.IdUsername)
 		if err != nil {
 			log.Println("error transforming rating to notification " + err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
@@ -1148,6 +1148,18 @@ func (h Handler) PostFeedbackRequest() echo.HandlerFunc {
 		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackContentDir, feedbackReq.RequestId), feedbackContent); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		// create notification
+		notif, err := feedbackRequestToNotification(ctx.Request().Context(), h.Gcs.Bucket, feedbackReq, h.UserIndices.IdUsername)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusCreated)
+		}
+
+		if err := createNotification(ctx.Request().Context(), h.Gcs.Bucket, notif); err != nil {
+			log.Println("error creating notification " + err.Error())
+			return ctx.NoContent(http.StatusCreated)
 		}
 
 		return ctx.NoContent(http.StatusCreated)
