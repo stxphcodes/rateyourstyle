@@ -2,28 +2,24 @@ import { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useState, useMemo } from "react";
 
-import {
-  GetOutfitsByUser,
-  Outfit,
-  OutfitItem,
-} from "../../../apis/get_outfits";
-import { GetRatings, Rating } from "../../../apis/get_ratings";
 import { GetUser, User } from "../../../apis/get_user";
 import { Navbar } from "../../../components/navarbar";
 import { GetServerURL } from "../../../apis/get_server";
 import { ClosetTable } from "../../../components/closet/table";
 import { Footer } from "../../../components/footer";
-import { UserProfileForm } from "../../../components/forms/user-profile";
-import { UserGeneralForm } from "../../../components/forms/user-general";
 import {
+  GetIncomingFeedback,
+  GetIncomingFeedbackResponse,
   GetOutgoingFeedback,
   GetOutgoingFeedbackResponse,
-} from "../../../apis/get_feedbackrequest";
+} from "../../../apis/get_feedback";
+import { Table, TableHead } from "../../../components/table";
 
 type Props = {
   cookie: string;
   error: string | null;
   outgoing_requests: GetOutgoingFeedbackResponse[];
+  incoming_requests: GetIncomingFeedbackResponse[];
   username: string;
   clientServer: string;
 };
@@ -34,6 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     cookie: "",
     error: null,
     outgoing_requests: [],
+    incoming_requests: [],
     username: "",
   };
 
@@ -73,12 +70,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props.username = userResp.username;
   }
 
-  const resp = await GetOutgoingFeedback(server, props.cookie);
-  if (resp instanceof Error) {
-    props.error = resp.message;
+  const outgoingResp = await GetOutgoingFeedback(server, props.cookie);
+  if (outgoingResp instanceof Error) {
+    props.error = outgoingResp.message;
     return { props };
   }
-  props.outgoing_requests = resp;
+  props.outgoing_requests = outgoingResp;
+
+  const incomingResp = await GetIncomingFeedback(server, props.cookie);
+  if (incomingResp instanceof Error) {
+    props.error = incomingResp.message;
+    return { props };
+  }
+  props.incoming_requests = incomingResp;
 
   return { props };
 };
@@ -88,6 +92,7 @@ export default function Index({
   cookie,
   username,
   outgoing_requests,
+  incoming_requests,
   error,
 }: Props) {
   if (error) {
@@ -125,67 +130,50 @@ export default function Index({
           <div>
             Feedback on your outfits that you've requested from other users.
           </div>
-
-          <div className="overflow-x-auto shadow-md rounded-lg max-h-table my-4">
-            <table className="w-full text-xs md:text-sm text-left overflow-x-scroll">
-              <thead className="text-xs uppercase bg-custom-tan sticky top-0">
-                <tr>
-                  <th scope="col" className="p-2">
-                    Request Date
-                  </th>
-                  <th scope="col" className="p-2">
-                    Sent To
-                  </th>
-                  <th scope="col" className="p-2">
-                    Outfit
-                  </th>
-                  <th scope="col" className="p-2">
-                    Questions
-                  </th>
-                  <th scope="col" className="p-2">
-                    Response
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {outgoing_requests.map((request) => (
-                  <tr
-                    className="p-2 border-b-2 bg-white max-h-8 overflow-hidden"
-                    key={request.request_id}
-                  >
-                    <td className="p-2 w-40">{request.request_date}</td>
-                    <td className="p-2">{request.to_username}</td>
-                    <td className="p-2">
-                      <>
-                        <img
-                          className="object-cover w-fit h-24"
-                          src={request.outfit.picture_url}
-                        />
-
-                        {request.outfit.title}
-                      </>
-                    </td>
-                    <td className="p-2 w-96">
-                      <div className="max-h-28 overflow-y-scroll">
-                        {request.question_responses.map((question) => (
-                          <>
-                            {question.question}
-                            <br />
-                          </>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="p-2">(no response)</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {outgoing_requests.length === 0 && (
+          {outgoing_requests.length === 0 ? (
             <h1 className="text-slate-300 h-48">
               Empty - No outgoing requests yet
             </h1>
+          ) : (
+            <Table width="w-fit">
+              <>
+                <TableHead
+                  columns={["Request Date", "Sent To", "Outfit", "Response"]}
+                />
+                <tbody>
+                  {outgoing_requests.map((request) => (
+                    <tr
+                      className="p-2 border-b-2 bg-white max-h-8 overflow-hidden"
+                      key={request.request_id}
+                    >
+                      <td className="p-2 w-36">{request.request_date}</td>
+                      <td className="p-2 w-36">
+                        <a href={`/closet/${request.to_username}`}>
+                          {request.to_username}
+                        </a>
+                      </td>
+                      <td className="p-2 md:w-72">
+                        <div className="flex gap-2 items-center overflow-scroll">
+                          <img
+                            className="object-cover w-fit h-24"
+                            src={request.outfit.picture_url}
+                          />
+
+                          {request.outfit.title}
+                        </div>
+                      </td>
+                      <td className="p-2 md:w-36">
+                        <a href="">
+                          pending
+                          <br />
+                          (view)
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </>
+            </Table>
           )}
         </section>
 
@@ -193,11 +181,51 @@ export default function Index({
           <h1>Incoming Requests 📥</h1>
           <div>Users who have requested your feedback on their outfits.</div>
 
-          <div className="my-4">
+          {incoming_requests.length === 0 ? (
             <h1 className="text-slate-300 h-48">
               Empty - No incoming requests yet
             </h1>
-          </div>
+          ) : (
+            <Table width="w-fit">
+              <>
+                <TableHead
+                  columns={["Request Date", "From", "Outfit", "Your Response"]}
+                />
+                <tbody>
+                  {incoming_requests.map((request) => (
+                    <tr
+                      className="p-2 border-b-2 bg-white max-h-8 overflow-hidden"
+                      key={request.request_id}
+                    >
+                      <td className="p-2 w-36">{"some date"}</td>
+                      <td className="p-2 w-36">
+                        <a href={`/closet/${request.from_username}`}>
+                          {request.from_username}
+                        </a>
+                      </td>
+                      <td className="p-2 md:w-72">
+                        <div className="flex gap-2 items-center overflow-scroll">
+                          <img
+                            className="object-cover w-fit h-24"
+                            src={request.outfit.picture_url}
+                          />
+
+                          {request.outfit.title}
+                        </div>
+                      </td>
+                      <td className="p-2 md:w-36">
+                        <a href="">
+                          pending
+                          <br />
+                          (view)
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </>
+            </Table>
+          )}
         </section>
       </main>
       <Footer />

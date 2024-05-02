@@ -1046,6 +1046,36 @@ func (h Handler) PutOutfitItem() echo.HandlerFunc {
 	}
 }
 
+func (h Handler) GetIncomingFeedback() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		feedbackResponses, err := getFeedbackResponsesByUser(ctx.Request().Context(), h.Gcs.Bucket, userId)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		resp, err := toGetIncomingFeedbackResponse(ctx.Request().Context(), h.Gcs.Bucket, feedbackResponses, h.UserIndices.IdUsername)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		return ctx.JSON(http.StatusOK, resp)
+	}
+}
+
 func (h Handler) GetOutgoingFeedback() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		cookie, err := getCookie(ctx.Request())
@@ -1122,7 +1152,7 @@ func (h Handler) PostFeedbackRequest() echo.HandlerFunc {
 		requests = append(requests, *feedbackReq)
 
 		// create feedback response
-		responses, err := getFeedbackResponseByUser(ctx.Request().Context(), h.Gcs.Bucket, toUserId)
+		responses, err := getFeedbackResponsesByUser(ctx.Request().Context(), h.Gcs.Bucket, toUserId)
 		if err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)

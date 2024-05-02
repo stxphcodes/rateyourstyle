@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"strings"
 
@@ -15,6 +16,14 @@ type GetOutgoingFeedbackResponse struct {
 	ToUsername        string              `json:"to_username"`
 	Outfit            *Outfit             `json:"outfit"`
 	QuestionResponses []*QuestionResponse `json:"question_responses"`
+}
+
+type GetIncomingFeedbackResponse struct {
+	RequestId    string  `json:"request_id"`
+	FromUsername string  `json:"from_username"`
+	Outfit       *Outfit `json:"outfit"`
+	Accepted     bool    `json:"accepted"`
+	ResponseDate string  `json:"response_date"`
 }
 
 type GetFeedbackRequest struct {
@@ -116,13 +125,56 @@ func toGetOutgoingFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle
 	return responses, nil
 }
 
+func toGetIncomingFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle, responses []FeedbackResponse, idToUsername map[string]string) ([]GetIncomingFeedbackResponse, error) {
+	incomingResponses := []GetIncomingFeedbackResponse{}
+
+	for _, resp := range responses {
+		bytes, err := readObjectBytes(ctx, bucket, "data/outfits/"+resp.OutfitId+".json")
+		if err != nil {
+			return nil, err
+		}
+
+		var outfit Outfit
+		if err := json.Unmarshal(bytes, &outfit); err != nil {
+			return nil, err
+		}
+
+		fromUsername, ok := idToUsername[resp.FromUserId]
+		if !ok {
+			return nil, fmt.Errorf("user not found ", resp.FromUserId)
+		}
+
+		// bytes, err = readObjectBytes(ctx, bucket, joinPaths(feedbackContentDir, request.RequestId))
+		// if err != nil {
+		// 	return nil, err
+		// }
+
+		// var content FeedbackContent
+		// if err := json.Unmarshal(bytes, &content); err != nil {
+		// 	return nil, err
+		// }
+
+		incomingResp := GetIncomingFeedbackResponse{
+			RequestId:    resp.RequestId,
+			Outfit:       &outfit,
+			FromUsername: fromUsername,
+			Accepted:     resp.Accepted,
+			ResponseDate: resp.ResponseDate,
+		}
+
+		incomingResponses = append(incomingResponses, incomingResp)
+	}
+
+	return incomingResponses, nil
+}
+
 func getFeedbackRequestsByUser(ctx context.Context, bucket *gcs.BucketHandle, userId string) ([]FeedbackRequest, error) {
 	obj := bucket.Object(joinPaths(feedbackRequestsDir, userId))
 	reader, err := obj.NewReader(ctx)
 	if err != nil {
 		// doesn't exist, just return default one.
 		if strings.Contains(err.Error(), "exist") {
-			return []FeedbackRequest{}, nil
+			return nil, nil
 		}
 
 		return nil, err
@@ -142,7 +194,7 @@ func getFeedbackRequestsByUser(ctx context.Context, bucket *gcs.BucketHandle, us
 	return data, nil
 }
 
-func getFeedbackResponseByUser(ctx context.Context, bucket *gcs.BucketHandle, userId string) ([]FeedbackResponse, error) {
+func getFeedbackResponsesByUser(ctx context.Context, bucket *gcs.BucketHandle, userId string) ([]FeedbackResponse, error) {
 	obj := bucket.Object(joinPaths(feedbackResponsesDir, userId))
 	reader, err := obj.NewReader(ctx)
 	if err != nil {
