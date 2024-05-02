@@ -9,7 +9,7 @@ import (
 	gcs "cloud.google.com/go/storage"
 )
 
-type GetFeedbackResponse struct {
+type GetOutgoingFeedbackResponse struct {
 	RequestId         string              `json:"request_id"`
 	RequestDate       string              `json:"request_date"`
 	ToUsername        string              `json:"to_username"`
@@ -73,8 +73,8 @@ func uniqueRequest(requests []FeedbackRequest, toUserId, outfitId string) bool {
 	return true
 }
 
-func toGetFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle, requests []FeedbackRequest, idToUsername map[string]string) ([]GetFeedbackResponse, error) {
-	responses := []GetFeedbackResponse{}
+func toGetOutgoingFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle, requests []FeedbackRequest, idToUsername map[string]string) ([]GetOutgoingFeedbackResponse, error) {
+	responses := []GetOutgoingFeedbackResponse{}
 
 	for _, request := range requests {
 		bytes, err := readObjectBytes(ctx, bucket, "data/outfits/"+request.OutfitId+".json")
@@ -102,7 +102,7 @@ func toGetFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle, reques
 			continue
 		}
 
-		resp := GetFeedbackResponse{
+		resp := GetOutgoingFeedbackResponse{
 			RequestId:         request.RequestId,
 			Outfit:            &outfit,
 			RequestDate:       request.RequestDate,
@@ -111,7 +111,6 @@ func toGetFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle, reques
 		}
 
 		responses = append(responses, resp)
-
 	}
 
 	return responses, nil

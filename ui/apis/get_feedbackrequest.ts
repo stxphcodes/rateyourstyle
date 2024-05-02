@@ -1,6 +1,6 @@
 import { Outfit } from "./get_outfits"
 
-export type GetFeedbackResponse = {
+export type GetOutgoingFeedbackResponse = {
     request_id: string 
     request_date: string 
     to_username: string 
@@ -15,13 +15,11 @@ export type QuestionResponse = {
 }
 
 
-export async function GetFeedbackRequest(
+export async function GetOutgoingFeedback(
   server: string,
   cookie: string,
- 
-): Promise<GetFeedbackResponse[] | Error> {
- // let error: Error | null = null
-  let resp: GetFeedbackResponse[] | Error = []
+): Promise<GetOutgoingFeedbackResponse[] | Error> {
+  let resp: GetOutgoingFeedbackResponse[] | Error = []
 
   await fetch(`${server}/api/feedback-request`, {
       method: "GET",

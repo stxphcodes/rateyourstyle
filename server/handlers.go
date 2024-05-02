@@ -1046,7 +1046,7 @@ func (h Handler) PutOutfitItem() echo.HandlerFunc {
 	}
 }
 
-func (h Handler) GetFeedbackRequest() echo.HandlerFunc {
+func (h Handler) GetOutgoingFeedback() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		cookie, err := getCookie(ctx.Request())
 		if err != nil {
@@ -1066,14 +1066,13 @@ func (h Handler) GetFeedbackRequest() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		resp, err := toGetFeedbackResponse(ctx.Request().Context(), h.Gcs.Bucket, requests, h.UserIndices.IdUsername)
+		resp, err := toGetOutgoingFeedbackResponse(ctx.Request().Context(), h.Gcs.Bucket, requests, h.UserIndices.IdUsername)
 		if err != nil {
 			log.Println("error converting to resp for " + userId)
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
 		return ctx.JSON(http.StatusOK, resp)
-
 	}
 }
 

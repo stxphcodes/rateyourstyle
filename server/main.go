@@ -109,7 +109,7 @@ func run() error {
 
 	mux.GET("/api/cookie", handler.GetCookie())
 
-	mux.GET("/api/feedback-request", handler.GetFeedbackRequest())
+	mux.GET("/api/outgoing-feedback", handler.GetOutgoingFeedback())
 
 	mux.GET("/api/outfit/:outfitid", handler.GetOutfit())
 

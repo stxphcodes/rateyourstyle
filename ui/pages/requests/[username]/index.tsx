@@ -16,14 +16,14 @@ import { Footer } from "../../../components/footer";
 import { UserProfileForm } from "../../../components/forms/user-profile";
 import { UserGeneralForm } from "../../../components/forms/user-general";
 import {
-  GetFeedbackRequest,
-  GetFeedbackResponse,
+  GetOutgoingFeedback,
+  GetOutgoingFeedbackResponse,
 } from "../../../apis/get_feedbackrequest";
 
 type Props = {
   cookie: string;
   error: string | null;
-  outgoing_requests: GetFeedbackResponse[];
+  outgoing_requests: GetOutgoingFeedbackResponse[];
   username: string;
   clientServer: string;
 };
@@ -73,7 +73,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props.username = userResp.username;
   }
 
-  const resp = await GetFeedbackRequest(server, props.cookie);
+  const resp = await GetOutgoingFeedback(server, props.cookie);
   if (resp instanceof Error) {
     props.error = resp.message;
     return { props };
