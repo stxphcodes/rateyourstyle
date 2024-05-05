@@ -1046,6 +1046,48 @@ func (h Handler) PutOutfitItem() echo.HandlerFunc {
 	}
 }
 
+func (h Handler) GetFeedback() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		fmt.Println("LINE 1051")
+		requestId := ctx.Param("feedbackid")
+		if requestId == "" {
+			log.Println("request id missing")
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		feedbackResp, err := getFeedbackResponse(ctx.Request().Context(), h.Gcs.Bucket, requestId)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		// check that user is a part of this request
+		if userId != feedbackResp.ToUserId && userId != feedbackResp.FromUserId {
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		resp, err := toGetFeedbackResponse(ctx.Request().Context(), h.Gcs.Bucket, feedbackResp, h.UserIndices.IdUsername)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		return ctx.JSON(http.StatusOK, resp)
+	}
+}
+
 func (h Handler) GetIncomingFeedback() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		cookie, err := getCookie(ctx.Request())
@@ -1060,13 +1102,13 @@ func (h Handler) GetIncomingFeedback() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusForbidden)
 		}
 
-		feedbackResponses, err := getFeedbackResponsesByUser(ctx.Request().Context(), h.Gcs.Bucket, userId)
+		incomingRequests, err := getIncomingFeedbackByUser(ctx.Request().Context(), h.Gcs.Bucket, userId)
 		if err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		resp, err := toGetIncomingFeedbackResponse(ctx.Request().Context(), h.Gcs.Bucket, feedbackResponses, h.UserIndices.IdUsername)
+		resp, err := toGetFeedbackRequestsResponse(ctx.Request().Context(), h.Gcs.Bucket, incomingRequests, h.UserIndices.IdUsername)
 		if err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
@@ -1090,13 +1132,13 @@ func (h Handler) GetOutgoingFeedback() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusForbidden)
 		}
 
-		requests, err := getFeedbackRequestsByUser(ctx.Request().Context(), h.Gcs.Bucket, userId)
+		outgoingRequests, err := getOutgoingFeedbackByUser(ctx.Request().Context(), h.Gcs.Bucket, userId)
 		if err != nil {
 			log.Println("error getting requests for " + userId)
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		resp, err := toGetOutgoingFeedbackResponse(ctx.Request().Context(), h.Gcs.Bucket, requests, h.UserIndices.IdUsername)
+		resp, err := toGetFeedbackRequestsResponse(ctx.Request().Context(), h.Gcs.Bucket, outgoingRequests, h.UserIndices.IdUsername)
 		if err != nil {
 			log.Println("error converting to resp for " + userId)
 			return ctx.NoContent(http.StatusInternalServerError)
@@ -1120,7 +1162,7 @@ func (h Handler) PostFeedbackRequest() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusForbidden)
 		}
 
-		var data GetFeedbackRequest
+		var data PostFeedbackRequest
 		if err := ctx.Bind(&data); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
@@ -1137,44 +1179,44 @@ func (h Handler) PostFeedbackRequest() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusNotFound)
 		}
 
-		// create feedback request
-		requests, err := getFeedbackRequestsByUser(ctx.Request().Context(), h.Gcs.Bucket, fromUserId)
+		// create outgoing feedback request
+		outgoingRequests, err := getOutgoingFeedbackByUser(ctx.Request().Context(), h.Gcs.Bucket, fromUserId)
 		if err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
 		feedbackReq := toFeedbackRequest(&data, fromUserId, toUserId)
-		if !uniqueRequest(requests, toUserId, feedbackReq.OutfitId) {
+		if !uniqueRequest(outgoingRequests, toUserId, feedbackReq.OutfitId) {
 			fmt.Println("already requestsed")
-			return ctx.NoContent(http.StatusBadRequest)
+			return ctx.NoContent(http.StatusPreconditionFailed)
 		}
-		requests = append(requests, *feedbackReq)
 
-		// create feedback response
-		responses, err := getFeedbackResponsesByUser(ctx.Request().Context(), h.Gcs.Bucket, toUserId)
+		outgoingRequests = append(outgoingRequests, *feedbackReq)
+
+		// create incoming feedback request
+		incomingRequests, err := getIncomingFeedbackByUser(ctx.Request().Context(), h.Gcs.Bucket, toUserId)
 		if err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
-		feedbackResp := toFeedbackResponse(feedbackReq)
-		responses = append(responses, *feedbackResp)
+		incomingRequests = append(incomingRequests, *feedbackReq)
 
 		// create feedback content
-		feedbackContent := toFeedbackContent(feedbackReq, data.Questions)
+		feedbackResponse := toFeedbackResponse(feedbackReq, data.Questions)
 
-		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackRequestsDir, fromUserId), requests); err != nil {
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackOutgoingDir, fromUserId), outgoingRequests); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 
 		}
 
-		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackResponsesDir, toUserId), responses); err != nil {
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackIncomingDir, toUserId), incomingRequests); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackContentDir, feedbackReq.RequestId), feedbackContent); err != nil {
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackResponsesDir, feedbackReq.RequestId), feedbackResponse); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}

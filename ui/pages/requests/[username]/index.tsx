@@ -9,17 +9,16 @@ import { ClosetTable } from "../../../components/closet/table";
 import { Footer } from "../../../components/footer";
 import {
   GetIncomingFeedback,
-  GetIncomingFeedbackResponse,
+  GetOutfitFeedbackResponse,
   GetOutgoingFeedback,
-  GetOutgoingFeedbackResponse,
 } from "../../../apis/get_feedback";
 import { Table, TableHead } from "../../../components/table";
 
 type Props = {
   cookie: string;
   error: string | null;
-  outgoing_requests: GetOutgoingFeedbackResponse[];
-  incoming_requests: GetIncomingFeedbackResponse[];
+  outgoing_requests: GetOutfitFeedbackResponse[];
+  incoming_requests: GetOutfitFeedbackResponse[];
   username: string;
   clientServer: string;
 };
@@ -163,11 +162,18 @@ export default function Index({
                         </div>
                       </td>
                       <td className="p-2 md:w-36">
-                        <a href="">
-                          pending
+                        <button
+                          className="font-bold hover:text-custom-lime"
+                          onClick={() => {
+                            let url = window.location.href;
+                            url += `?feedback=${request.request_id}`;
+                            window.location.href = url;
+                          }}
+                        >
+                          {getStatus(request.accepted, request.response_date)}
                           <br />
                           (view)
-                        </a>
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -214,11 +220,18 @@ export default function Index({
                         </div>
                       </td>
                       <td className="p-2 md:w-36">
-                        <a href="">
-                          pending
+                        <button
+                          className="font-bold hover:text-custom-lime"
+                          onClick={() => {
+                            let url = window.location.href;
+                            url += `?feedback=${request.request_id}`;
+                            window.location.href = url;
+                          }}
+                        >
+                          {getStatus(request.accepted, request.response_date)}
                           <br />
                           (view)
-                        </a>
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -231,4 +244,20 @@ export default function Index({
       <Footer />
     </>
   );
+}
+
+function getStatus(accepted: boolean, responseDate: string): string {
+  if (!accepted && !responseDate) {
+    return "pending";
+  }
+
+  if (!accepted && responseDate) {
+    return "declined";
+  }
+
+  if (!responseDate) {
+    return "accepted";
+  }
+
+  return "responded";
 }

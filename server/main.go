@@ -113,6 +113,8 @@ func run() error {
 
 	mux.GET("/api/incoming-feedback", handler.GetIncomingFeedback())
 
+	mux.GET("/api/feedback/:feedbackid", handler.GetFeedback())
+
 	mux.GET("/api/outfit/:outfitid", handler.GetOutfit())
 
 	mux.GET("/api/outfits", handler.GetOutfits())

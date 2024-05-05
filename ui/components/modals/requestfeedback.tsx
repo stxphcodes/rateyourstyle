@@ -93,7 +93,7 @@ export function RequestFeedbackModal(props: {
       return;
     }
 
-    let q = questions.filter((question) => question);
+    let q = questionsSelected.filter((question) => question);
     let addQ = additionalQuestions.filter((question) => question);
 
     let req: FeedbackRequest = {

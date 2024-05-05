@@ -30,6 +30,11 @@ input:focus, textarea:focus {
   outline: none;
 }
 
+textarea:disabled {
+  background-color: rgb(226 232 240);
+  border: none;
+}
+
 
 body {
   font-family: 'custom-font';
@@ -105,7 +110,6 @@ a:hover {
   color: white;
   background-color: black;
 }
-
 
 .requiredLabel {
   color: #fa7be1;

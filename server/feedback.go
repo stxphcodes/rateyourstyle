@@ -10,50 +10,52 @@ import (
 	gcs "cloud.google.com/go/storage"
 )
 
-type GetOutgoingFeedbackResponse struct {
-	RequestId         string              `json:"request_id"`
-	RequestDate       string              `json:"request_date"`
-	ToUsername        string              `json:"to_username"`
-	Outfit            *Outfit             `json:"outfit"`
-	QuestionResponses []*QuestionResponse `json:"question_responses"`
-}
-
-type GetIncomingFeedbackResponse struct {
+type GetFeedbackRequestsResponse struct {
 	RequestId    string  `json:"request_id"`
+	RequestDate  string  `json:"request_date"`
+	ToUsername   string  `json:"to_username"`
 	FromUsername string  `json:"from_username"`
 	Outfit       *Outfit `json:"outfit"`
 	Accepted     bool    `json:"accepted"`
 	ResponseDate string  `json:"response_date"`
 }
 
-type GetFeedbackRequest struct {
-	ToUsername     string   `json:"to_username"`
-	OutfitId       string   `json:"outfit_id"`
-	ExpirationDate string   `json:"expiration_date"`
-	Questions      []string `json:"questions"`
+type GetFeedbackResponse struct {
+	RequestId         string              `json:"request_id"`
+	FromUsername      string              `json:"from_username"`
+	ToUsername        string              `json:"to_username"`
+	RequestDate       string              `json:"request_date"`
+	Accepted          bool                `json:"accepted"`
+	ResponseDate      string              `json:"response_date"`
+	QuestionResponses []*QuestionResponse `json:"question_responses"`
+	LastEdited        string              `json:"last_edited"`
+
+	Outfit *OutfitResponse `json:"outfit"`
+}
+
+type PostFeedbackRequest struct {
+	ToUsername string   `json:"to_username"`
+	OutfitId   string   `json:"outfit_id"`
+	Questions  []string `json:"questions"`
 }
 
 type FeedbackRequest struct {
-	RequestId      string `json:"request_id"`
-	RequestType    string `json:"request_type"`
-	RequestDate    string `json:"request_date"`
-	OutfitId       string `json:"outfit_id"`
-	FromUserId     string `json:"from_userid"`
-	ToUserId       string `json:"to_userid"`
-	ExpirationDate string `json:"expiration_date"`
+	RequestId   string `json:"request_id"`
+	FromUserId  string `json:"from_userid"`
+	ToUserId    string `json:"to_userid"`
+	OutfitId    string `json:"outfit_id"`
+	RequestDate string `json:"request_date"`
 }
 
 type FeedbackResponse struct {
-	RequestId    string `json:"request_id"`
-	FromUserId   string `json:"from_userid"`
-	ToUserId     string `json:"to_userid"`
-	OutfitId     string `json:"outfit_id"`
-	Accepted     bool   `json:"accepted"`
-	ResponseDate string `json:"response_date"`
-}
+	RequestId   string `json:"request_id"`
+	FromUserId  string `json:"from_userid"`
+	ToUserId    string `json:"to_userid"`
+	OutfitId    string `json:"outfit_id"`
+	RequestDate string `json:"request_date"`
 
-type FeedbackContent struct {
-	RequestId         string              `json:"request_id"`
+	Accepted          bool                `json:"accepted"`
+	ResponseDate      string              `json:"response_date"`
 	QuestionResponses []*QuestionResponse `json:"question_responses"`
 	LastEdited        string              `json:"last_edited"`
 }
@@ -65,9 +67,9 @@ type QuestionResponse struct {
 }
 
 const (
-	feedbackRequestsDir  = "data/feedback/requests"
+	feedbackOutgoingDir  = "data/feedback/outgoing"
+	feedbackIncomingDir  = "data/feedback/incoming"
 	feedbackResponsesDir = "data/feedback/responses"
-	feedbackContentDir   = "data/feedback/content"
 )
 
 func uniqueRequest(requests []FeedbackRequest, toUserId, outfitId string) bool {
@@ -82,8 +84,39 @@ func uniqueRequest(requests []FeedbackRequest, toUserId, outfitId string) bool {
 	return true
 }
 
-func toGetOutgoingFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle, requests []FeedbackRequest, idToUsername map[string]string) ([]GetOutgoingFeedbackResponse, error) {
-	responses := []GetOutgoingFeedbackResponse{}
+func toGetFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle, response *FeedbackResponse, idToUsername map[string]string) (*GetFeedbackResponse, error) {
+	outfit, err := getOutfit(ctx, bucket, idToUsername, response.OutfitId)
+	if err != nil {
+		return nil, err
+	}
+
+	toUsername, ok := idToUsername[response.ToUserId]
+	if !ok {
+		return nil, fmt.Errorf("user not found ", response.ToUserId)
+	}
+
+	fromUsername, ok := idToUsername[response.FromUserId]
+	if !ok {
+		return nil, fmt.Errorf("user not found ", response.FromUserId)
+	}
+
+	resp := GetFeedbackResponse{
+		RequestId:         response.RequestId,
+		ToUsername:        toUsername,
+		FromUsername:      fromUsername,
+		RequestDate:       response.RequestDate,
+		Accepted:          response.Accepted,
+		ResponseDate:      response.ResponseDate,
+		QuestionResponses: response.QuestionResponses,
+		LastEdited:        response.LastEdited,
+		Outfit:            outfit,
+	}
+
+	return &resp, nil
+}
+
+func toGetFeedbackRequestsResponse(ctx context.Context, bucket *gcs.BucketHandle, requests []FeedbackRequest, idToUsername map[string]string) ([]GetFeedbackRequestsResponse, error) {
+	responses := []GetFeedbackRequestsResponse{}
 
 	for _, request := range requests {
 		bytes, err := readObjectBytes(ctx, bucket, "data/outfits/"+request.OutfitId+".json")
@@ -96,13 +129,13 @@ func toGetOutgoingFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle
 			return nil, err
 		}
 
-		bytes, err = readObjectBytes(ctx, bucket, joinPaths(feedbackContentDir, request.RequestId))
+		bytes, err = readObjectBytes(ctx, bucket, joinPaths(feedbackResponsesDir, request.RequestId))
 		if err != nil {
 			return nil, err
 		}
 
-		var content FeedbackContent
-		if err := json.Unmarshal(bytes, &content); err != nil {
+		var feedbackResp FeedbackResponse
+		if err := json.Unmarshal(bytes, &feedbackResp); err != nil {
 			return nil, err
 		}
 
@@ -111,12 +144,19 @@ func toGetOutgoingFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle
 			continue
 		}
 
-		resp := GetOutgoingFeedbackResponse{
-			RequestId:         request.RequestId,
-			Outfit:            &outfit,
-			RequestDate:       request.RequestDate,
-			ToUsername:        toUsername,
-			QuestionResponses: content.QuestionResponses,
+		fromUsername, ok := idToUsername[request.FromUserId]
+		if !ok {
+			continue
+		}
+
+		resp := GetFeedbackRequestsResponse{
+			RequestId:    request.RequestId,
+			ToUsername:   toUsername,
+			FromUsername: fromUsername,
+			RequestDate:  request.RequestDate,
+			Outfit:       &outfit,
+			Accepted:     feedbackResp.Accepted,
+			ResponseDate: feedbackResp.ResponseDate,
 		}
 
 		responses = append(responses, resp)
@@ -125,56 +165,27 @@ func toGetOutgoingFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle
 	return responses, nil
 }
 
-func toGetIncomingFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle, responses []FeedbackResponse, idToUsername map[string]string) ([]GetIncomingFeedbackResponse, error) {
-	incomingResponses := []GetIncomingFeedbackResponse{}
-
-	for _, resp := range responses {
-		bytes, err := readObjectBytes(ctx, bucket, "data/outfits/"+resp.OutfitId+".json")
-		if err != nil {
-			return nil, err
-		}
-
-		var outfit Outfit
-		if err := json.Unmarshal(bytes, &outfit); err != nil {
-			return nil, err
-		}
-
-		fromUsername, ok := idToUsername[resp.FromUserId]
-		if !ok {
-			return nil, fmt.Errorf("user not found ", resp.FromUserId)
-		}
-
-		// bytes, err = readObjectBytes(ctx, bucket, joinPaths(feedbackContentDir, request.RequestId))
-		// if err != nil {
-		// 	return nil, err
-		// }
-
-		// var content FeedbackContent
-		// if err := json.Unmarshal(bytes, &content); err != nil {
-		// 	return nil, err
-		// }
-
-		incomingResp := GetIncomingFeedbackResponse{
-			RequestId:    resp.RequestId,
-			Outfit:       &outfit,
-			FromUsername: fromUsername,
-			Accepted:     resp.Accepted,
-			ResponseDate: resp.ResponseDate,
-		}
-
-		incomingResponses = append(incomingResponses, incomingResp)
+func getFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle, requestId string) (*FeedbackResponse, error) {
+	bytes, err := readObjectBytes(ctx, bucket, joinPaths(feedbackResponsesDir, requestId))
+	if err != nil {
+		return nil, err
 	}
 
-	return incomingResponses, nil
+	var data FeedbackResponse
+	if err := json.Unmarshal(bytes, &data); err != nil {
+		return nil, err
+	}
+
+	return &data, nil
 }
 
-func getFeedbackRequestsByUser(ctx context.Context, bucket *gcs.BucketHandle, userId string) ([]FeedbackRequest, error) {
-	obj := bucket.Object(joinPaths(feedbackRequestsDir, userId))
+func getOutgoingFeedbackByUser(ctx context.Context, bucket *gcs.BucketHandle, userId string) ([]FeedbackRequest, error) {
+	obj := bucket.Object(joinPaths(feedbackOutgoingDir, userId))
 	reader, err := obj.NewReader(ctx)
 	if err != nil {
 		// doesn't exist, just return default one.
 		if strings.Contains(err.Error(), "exist") {
-			return nil, nil
+			return []FeedbackRequest{}, nil
 		}
 
 		return nil, err
@@ -194,13 +205,13 @@ func getFeedbackRequestsByUser(ctx context.Context, bucket *gcs.BucketHandle, us
 	return data, nil
 }
 
-func getFeedbackResponsesByUser(ctx context.Context, bucket *gcs.BucketHandle, userId string) ([]FeedbackResponse, error) {
-	obj := bucket.Object(joinPaths(feedbackResponsesDir, userId))
+func getIncomingFeedbackByUser(ctx context.Context, bucket *gcs.BucketHandle, userId string) ([]FeedbackRequest, error) {
+	obj := bucket.Object(joinPaths(feedbackIncomingDir, userId))
 	reader, err := obj.NewReader(ctx)
 	if err != nil {
 		// doesn't exist, just return default one.
 		if strings.Contains(err.Error(), "exist") {
-			return []FeedbackResponse{}, nil
+			return []FeedbackRequest{}, nil
 		}
 
 		return nil, err
@@ -212,7 +223,7 @@ func getFeedbackResponsesByUser(ctx context.Context, bucket *gcs.BucketHandle, u
 		return nil, err
 	}
 
-	var data []FeedbackResponse
+	var data []FeedbackRequest
 	if err := json.Unmarshal(bytes, &data); err != nil {
 		return nil, err
 	}
@@ -220,30 +231,17 @@ func getFeedbackResponsesByUser(ctx context.Context, bucket *gcs.BucketHandle, u
 	return data, nil
 }
 
-func toFeedbackRequest(req *GetFeedbackRequest, fromUser, toUser string) *FeedbackRequest {
+func toFeedbackRequest(req *PostFeedbackRequest, fromUser, toUser string) *FeedbackRequest {
 	return &FeedbackRequest{
-		RequestId:      uuid(),
-		RequestDate:    timeNow(),
-		RequestType:    "outfit",
-		OutfitId:       req.OutfitId,
-		FromUserId:     fromUser,
-		ToUserId:       toUser,
-		ExpirationDate: req.ExpirationDate,
+		RequestId:   uuid(),
+		RequestDate: timeNow(),
+		OutfitId:    req.OutfitId,
+		FromUserId:  fromUser,
+		ToUserId:    toUser,
 	}
 }
 
-func toFeedbackResponse(req *FeedbackRequest) *FeedbackResponse {
-	return &FeedbackResponse{
-		RequestId:    req.RequestId,
-		FromUserId:   req.FromUserId,
-		ToUserId:     req.ToUserId,
-		OutfitId:     req.OutfitId,
-		Accepted:     false,
-		ResponseDate: "",
-	}
-}
-
-func toFeedbackContent(req *FeedbackRequest, questions []string) *FeedbackContent {
+func toFeedbackResponse(req *FeedbackRequest, questions []string) *FeedbackResponse {
 	questionResponses := []*QuestionResponse{}
 	for _, q := range questions {
 		qr := &QuestionResponse{
@@ -255,8 +253,15 @@ func toFeedbackContent(req *FeedbackRequest, questions []string) *FeedbackConten
 		questionResponses = append(questionResponses, qr)
 	}
 
-	return &FeedbackContent{
-		RequestId:         req.RequestId,
+	return &FeedbackResponse{
+		RequestId:   req.RequestId,
+		FromUserId:  req.FromUserId,
+		ToUserId:    req.ToUserId,
+		OutfitId:    req.OutfitId,
+		RequestDate: req.RequestDate,
+
+		Accepted:          false,
+		ResponseDate:      "",
 		QuestionResponses: questionResponses,
 		LastEdited:        "",
 	}

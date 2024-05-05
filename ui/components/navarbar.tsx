@@ -12,6 +12,12 @@ import { NotificationFilledIcon } from "./icons/notification-filled";
 import { CreateAccount } from "./modals/createaccount";
 import { SignIn } from "./modals/signin";
 import { OutfitModal } from "./modals/outfit";
+import {
+  GetOutgoingFeedback,
+  GetOutfitFeedbackResponse,
+  GetFeedback,
+} from "../apis/get_feedback";
+import { OutfitFeedbackModal } from "./modals/outfitfeedback";
 
 // check if browser allows cookies to be set
 function cookieEnabled() {
@@ -52,6 +58,10 @@ export function Navbar(props: {
   const [displayMobileMenu, setDisplayMobileMenu] = useState(false);
 
   const [outfit, setOutfit] = useState<Outfit | null>(null);
+
+  const [feedback, setFeedback] = useState<GetOutfitFeedbackResponse | null>(
+    null
+  );
 
   const checkMobileScreenWidth = (window: any) => {
     if (window.innerWidth <= 600) {
@@ -111,10 +121,26 @@ export function Navbar(props: {
       }
     }
 
-    let outfit = router.query.outfit;
+    async function getfeedback(id: string, cookie: string) {
+      const resp = await GetFeedback(props.clientServer, cookie, id);
+      if (!(resp instanceof Error)) {
+        setFeedback(resp);
+      }
+    }
 
+    let outfit = router.query.outfit;
     if (outfit && outfit.length > 0 && typeof outfit === "string") {
       getoutfit(outfit);
+    }
+
+    let feedback = router.query.feedback;
+    if (
+      props.cookie &&
+      feedback &&
+      feedback.length > 0 &&
+      typeof feedback === "string"
+    ) {
+      getfeedback(feedback, props.cookie);
     }
   }, [router]);
 
@@ -226,6 +252,19 @@ export function Navbar(props: {
           data={outfit}
           asUser={false}
           userRating={null}
+        />
+      )}
+
+      {feedback && feedback.outfit && (
+        <OutfitFeedbackModal
+          clientServer={props.clientServer}
+          cookie={props.cookie}
+          handleClose={() => {
+            let url = window.location.origin + window.location.pathname;
+            window.location.href = url;
+          }}
+          data={feedback}
+          asRequestor={feedback.from_username === user}
         />
       )}
     </>
