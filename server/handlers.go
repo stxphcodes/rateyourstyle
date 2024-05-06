@@ -1193,7 +1193,75 @@ func (h Handler) PostFeedbackAcceptance() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		notif, err := feedbackAcceptedToNotification(ctx.Request().Context(), h.Gcs.Bucket, feedbackResp, h.UserIndices.IdUsername)
+		notif, err := feedbackResponseToNotification(ctx.Request().Context(), h.Gcs.Bucket, feedbackResp, h.UserIndices.IdUsername)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusCreated)
+		}
+
+		if err := createNotification(ctx.Request().Context(), h.Gcs.Bucket, notif); err != nil {
+			log.Println("error creating notification " + err.Error())
+			return ctx.NoContent(http.StatusCreated)
+		}
+
+		return ctx.NoContent(http.StatusOK)
+	}
+}
+
+func (h Handler) PostFeedbackResponse() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		fmt.Println("were in line 1213")
+		requestId := ctx.Param("feedbackid")
+		if requestId == "" {
+			log.Println("request id missing")
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		feedbackResp, err := getFeedbackResponse(ctx.Request().Context(), h.Gcs.Bucket, requestId)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		if feedbackResp.ToUserId != userId {
+			log.Println("only requestee is allowed to post feedback response")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		var data map[string]string
+		if err := ctx.Bind(&data); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		for index, questionResponse := range feedbackResp.QuestionResponses {
+			response, ok := data[questionResponse.QuestionId]
+			if !ok {
+				continue
+			}
+
+			feedbackResp.QuestionResponses[index].Response = response
+		}
+		feedbackResp.ResponseDate = timeNow()
+
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackResponsesDir, feedbackResp.RequestId), feedbackResp); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		notif, err := feedbackResponseToNotification(ctx.Request().Context(), h.Gcs.Bucket, feedbackResp, h.UserIndices.IdUsername)
 		if err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusCreated)

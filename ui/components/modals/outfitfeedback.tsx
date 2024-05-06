@@ -3,17 +3,21 @@ import { useState, useEffect } from "react";
 import { OutfitItemList } from "../outfitcard";
 import { GetOutfitFeedbackResponse } from "../../apis/get_feedback";
 import { getFeedbackRequestStatus } from "../feedback";
-import { PostFeedbackAcceptance } from "../../apis/post_feedbackrequest";
+import {
+  PostFeedbackAcceptance,
+  PostFeedbackResponse,
+} from "../../apis/post_feedbackrequest";
 
 export function OutfitFeedbackModal(props: {
   clientServer: string;
   cookie?: string;
   handleClose: any;
   data: GetOutfitFeedbackResponse;
-  asRequestor: boolean;
+  currentUsername: string;
 }) {
   const status = getFeedbackRequestStatus(
     props.data.accepted,
+    props.data.acceptance_date,
     props.data.response_date
   );
 
@@ -23,20 +27,51 @@ export function OutfitFeedbackModal(props: {
     props.data.question_responses
   );
 
+  const [validationErr, setValidationErr] = useState(false);
+
   const handleResponseChange = (e: any, questionId: string) => {
-    let index = questionResponses?.findIndex(
-      (item) => item.question_id === questionId
-    );
-
-    if (index && index >= 0) {
+    if (!questionResponses) {
+      return;
     }
-    let filtered = questionResponses?.filter(
-      (item) => item.question_id === questionId
-    );
 
-    if (filtered) {
-      let item = filtered[0];
-      item.response = e.target.value();
+    setValidationErr(false);
+
+    let arr = [...questionResponses];
+    let index = arr?.findIndex((item) => item.question_id === questionId);
+
+    if (index >= 0) {
+      arr[index].response = e.target.value;
+    }
+
+    setQuestionResponses(arr);
+  };
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    let emptyResponse = false;
+    questionResponses?.forEach((item) => {
+      if (!item.response) {
+        emptyResponse = true;
+      }
+    });
+
+    if (emptyResponse) {
+      setValidationErr(true);
+      return;
+    }
+
+    if (props.cookie && questionResponses) {
+      const resp = await PostFeedbackResponse(
+        props.clientServer,
+        props.cookie,
+        props.data.request_id,
+        questionResponses
+      );
+
+      if (!resp) {
+        window.location.replace(location.pathname);
+      }
     }
   };
 
@@ -97,8 +132,8 @@ export function OutfitFeedbackModal(props: {
             {props.data.to_username} on {props.data.request_date}.
           </h4>
 
-          {props.data.question_responses &&
-            props.data.question_responses.map((item, index) => (
+          {questionResponses &&
+            questionResponses.map((item, index) => (
               <div key={item.question_id} className="my-4">
                 <div>
                   {index + 1}. {item.question}
@@ -109,41 +144,50 @@ export function OutfitFeedbackModal(props: {
                     rows={3}
                     className="w-5/6"
                     disabled={edit === false}
+                    onChange={(e) => handleResponseChange(e, item.question_id)}
+                    value={item.response}
                   />
                 )}
               </div>
             ))}
 
-          {status === "pending" && !props.asRequestor && (
-            <AcceptRequestForm
-              clientServer={props.clientServer}
-              cookie={props.cookie}
-              data={props.data}
-            />
-          )}
+          {status === "pending" &&
+            props.currentUsername === props.data.to_username && (
+              <AcceptRequestForm
+                clientServer={props.clientServer}
+                cookie={props.cookie}
+                data={props.data}
+              />
+            )}
 
-          {status !== "pending" && !props.asRequestor && (
-            <div className="flex gap-2">
-              <button
-                className="primaryButton"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setEdit(!edit);
-                }}
-              >
-                edit response
-              </button>
-              <button
-                className="bg-gradient rounded p-2 "
-                onClick={(e) => {
-                  e.preventDefault();
-                  // setEdit(!edit);
-                }}
-              >
-                submit
-              </button>
-            </div>
-          )}
+          {status !== "pending" &&
+            status !== "declined" &&
+            props.data.to_username === props.currentUsername && (
+              <>
+                <div className="flex gap-2">
+                  <button
+                    className="primaryButton"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setEdit(!edit);
+                    }}
+                  >
+                    edit response
+                  </button>
+                  <button
+                    className="bg-gradient rounded p-2 "
+                    onClick={handleSubmit}
+                  >
+                    submit
+                  </button>
+                </div>
+                {validationErr && (
+                  <div className="bg-custom-pink p-2 rounded my-2 w-fit">
+                    Error: All questions must contain responses.
+                  </div>
+                )}
+              </>
+            )}
         </div>
       </div>
     </Modal>

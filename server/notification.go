@@ -122,7 +122,7 @@ func feedbackRequestToNotification(ctx context.Context, bucket *gcs.BucketHandle
 	return &n, nil
 }
 
-func feedbackAcceptedToNotification(ctx context.Context, bucket *gcs.BucketHandle, resp *FeedbackResponse, userIdUsername map[string]string) (*Notification, error) {
+func feedbackResponseToNotification(ctx context.Context, bucket *gcs.BucketHandle, resp *FeedbackResponse, userIdUsername map[string]string) (*Notification, error) {
 	outfit, err := getOutfitNoResponse(ctx, bucket, resp.OutfitId)
 	if err != nil {
 		return nil, err
@@ -130,19 +130,29 @@ func feedbackAcceptedToNotification(ctx context.Context, bucket *gcs.BucketHandl
 
 	forUsername, ok := userIdUsername[resp.FromUserId]
 	if !ok {
-		return nil, fmt.Errorf("user id not found ", resp.FromUserId)
+		return nil, fmt.Errorf("user id not found %s", resp.FromUserId)
 	}
 
-	acceptorUsername, ok := userIdUsername[resp.ToUserId]
+	responderUsername, ok := userIdUsername[resp.ToUserId]
 	if !ok {
-		return nil, fmt.Errorf("user id not found ", resp.ToUserId)
+		return nil, fmt.Errorf("user id not found %s", resp.ToUserId)
 	}
 
 	msg := ""
-	if resp.Accepted {
-		msg = fmt.Sprintf("%s accepted your outfit feedback request for: %s", acceptorUsername, outfit.Title)
-	} else {
-		msg = fmt.Sprintf("%s declined your outfit feedback request for: %s", acceptorUsername, outfit.Title)
+	date := ""
+	if resp.AcceptanceDate != "" && resp.ResponseDate == "" {
+		if resp.Accepted {
+			msg = fmt.Sprintf("%s accepted your outfit feedback request for: %s", responderUsername, outfit.Title)
+		} else {
+			msg = fmt.Sprintf("%s declined your outfit feedback request for: %s", responderUsername, outfit.Title)
+		}
+
+		date = resp.AcceptanceDate
+	}
+
+	if resp.AcceptanceDate != "" && resp.ResponseDate != "" {
+		msg = fmt.Sprintf("%s gave feedback on your outfit: %s", responderUsername, outfit.Title)
+		date = resp.ResponseDate
 	}
 
 	n := Notification{
@@ -151,9 +161,9 @@ func feedbackAcceptedToNotification(ctx context.Context, bucket *gcs.BucketHandl
 		ForUsername:    forUsername,
 		ForOutfitId:    resp.OutfitId,
 		ForOutfitTitle: outfit.Title,
-		FromUserId:     acceptorUsername,
+		FromUserId:     responderUsername,
 		FromUsername:   resp.ToUserId,
-		Date:           resp.AcceptanceDate,
+		Date:           date,
 		Message:        msg,
 		Seen:           false,
 		SeenAt:         "",

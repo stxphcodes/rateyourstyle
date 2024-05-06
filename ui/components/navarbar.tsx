@@ -264,7 +264,7 @@ export function Navbar(props: {
             window.location.href = url;
           }}
           data={feedback}
-          asRequestor={feedback.from_username === user}
+          currentUsername={user}
         />
       )}
     </>

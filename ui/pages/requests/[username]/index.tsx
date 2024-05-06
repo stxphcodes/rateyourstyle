@@ -173,6 +173,7 @@ export default function Index({
                         >
                           {getFeedbackRequestStatus(
                             request.accepted,
+                            request.acceptance_date,
                             request.response_date
                           )}
                           <br />
@@ -234,6 +235,7 @@ export default function Index({
                         >
                           {getFeedbackRequestStatus(
                             request.accepted,
+                            request.acceptance_date,
                             request.response_date
                           )}
                           <br />

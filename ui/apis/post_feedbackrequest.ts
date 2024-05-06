@@ -1,3 +1,4 @@
+import { QuestionResponse } from "./get_feedback"
 export type FeedbackRequest = {
     to_username: string 
     outfit_id: string 
@@ -51,6 +52,35 @@ export async function PostFeedbackAcceptance(
             "content-type": "application/json",
             "rys-login": cookie
         },
+    }).then((response) => {
+        if (!response.ok) {
+            throw new Error("response not ok");
+        }
+    }).catch((err: Error) => {
+        error = err
+    });
+  
+    return error
+  }
+
+
+  export async function PostFeedbackResponse(
+    server: string,
+    cookie: string,
+    requestId: string,
+    questionResponses: QuestionResponse[],
+  ): Promise<Error | null> {
+    let error: Error | null = null;
+
+    let toSend = questionResponses.reduce((o, item) => Object.assign(o, {[item.question_id]: item.response}), {});  
+ 
+    await fetch( `${server}/api/feedback-response/${requestId}`, {
+        method: "POST",
+        headers: {
+            "content-type": "application/json",
+            "rys-login": cookie
+        },
+        body: JSON.stringify(toSend),
     }).then((response) => {
         if (!response.ok) {
             throw new Error("response not ok");
