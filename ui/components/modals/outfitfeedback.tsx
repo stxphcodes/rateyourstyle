@@ -1,10 +1,9 @@
 import { Modal } from ".";
-import { Outfit } from "../../apis/get_outfits";
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { OutfitItemList } from "../outfitcard";
-import { RatingDiv } from "../outfitcard";
 import { GetOutfitFeedbackResponse } from "../../apis/get_feedback";
+import { getFeedbackRequestStatus } from "../feedback";
+import { PostFeedbackAcceptance } from "../../apis/post_feedbackrequest";
 
 export function OutfitFeedbackModal(props: {
   clientServer: string;
@@ -13,6 +12,11 @@ export function OutfitFeedbackModal(props: {
   data: GetOutfitFeedbackResponse;
   asRequestor: boolean;
 }) {
+  const status = getFeedbackRequestStatus(
+    props.data.accepted,
+    props.data.response_date
+  );
+
   const [edit, setEdit] = useState(false);
 
   const [questionResponses, setQuestionResponses] = useState(
@@ -43,7 +47,7 @@ export function OutfitFeedbackModal(props: {
       wideScreen={true}
       noPadding={true}
     >
-      <>
+      <div>
         <div className="md:flex md:gapx-2 md:align-start md:flex-row w-full">
           <div className="basis-1/2">
             <img
@@ -100,15 +104,25 @@ export function OutfitFeedbackModal(props: {
                   {index + 1}. {item.question}
                 </div>
 
-                <textarea
-                  rows={3}
-                  className="w-5/6"
-                  disabled={edit === false}
-                />
+                {status !== "pending" && status !== "declined" && (
+                  <textarea
+                    rows={3}
+                    className="w-5/6"
+                    disabled={edit === false}
+                  />
+                )}
               </div>
             ))}
 
-          {!props.asRequestor && (
+          {status === "pending" && !props.asRequestor && (
+            <AcceptRequestForm
+              clientServer={props.clientServer}
+              cookie={props.cookie}
+              data={props.data}
+            />
+          )}
+
+          {status !== "pending" && !props.asRequestor && (
             <div className="flex gap-2">
               <button
                 className="primaryButton"
@@ -131,11 +145,70 @@ export function OutfitFeedbackModal(props: {
             </div>
           )}
         </div>
-      </>
+      </div>
     </Modal>
   );
 }
 
-function EditResponses() {
-  return <div></div>;
+function AcceptRequestForm(props: {
+  clientServer: string;
+  cookie?: string;
+  data: GetOutfitFeedbackResponse;
+}) {
+  const [error, setError] = useState<boolean>(false);
+
+  const handleClick = async (e: any) => {
+    e.preventDefault();
+
+    let accept = false;
+    if (e.target.id === "accept") {
+      accept = true;
+    }
+
+    if (props.cookie) {
+      const resp = await PostFeedbackAcceptance(
+        props.clientServer,
+        props.cookie,
+        props.data.request_id,
+        accept
+      );
+
+      if (resp instanceof Error) {
+        setError(true);
+      } else {
+        window.location.reload();
+      }
+    }
+  };
+
+  return (
+    <div className="shadow-lg rounded px-4 py-2 bg-gradient w-fit">
+      {error ? (
+        <>
+          <h2>Uh oh</h2>
+          <div>
+            Sorry, there was an error processing your request. <br /> Please
+            refresh the page and try again or contact sitesbystephanie@gmail.com
+            if the issue persists.
+          </div>
+        </>
+      ) : (
+        <>
+          <h2>Would you like to accept their request?</h2>
+          <div className="flex gap-2 my-4">
+            <button className="primaryButton" id="accept" onClick={handleClick}>
+              Accept
+            </button>
+            <button
+              className="bg-custom-pink p-2 rounded"
+              id="decline"
+              onClick={handleClick}
+            >
+              Decline
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
 }

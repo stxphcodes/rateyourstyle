@@ -11,13 +11,14 @@ import (
 )
 
 type GetFeedbackRequestsResponse struct {
-	RequestId    string  `json:"request_id"`
-	RequestDate  string  `json:"request_date"`
-	ToUsername   string  `json:"to_username"`
-	FromUsername string  `json:"from_username"`
-	Outfit       *Outfit `json:"outfit"`
-	Accepted     bool    `json:"accepted"`
-	ResponseDate string  `json:"response_date"`
+	RequestId      string  `json:"request_id"`
+	RequestDate    string  `json:"request_date"`
+	ToUsername     string  `json:"to_username"`
+	FromUsername   string  `json:"from_username"`
+	Outfit         *Outfit `json:"outfit"`
+	Accepted       bool    `json:"accepted"`
+	AcceptanceDate string  `json:"acceptance_date"`
+	ResponseDate   string  `json:"response_date"`
 }
 
 type GetFeedbackResponse struct {
@@ -26,6 +27,7 @@ type GetFeedbackResponse struct {
 	ToUsername        string              `json:"to_username"`
 	RequestDate       string              `json:"request_date"`
 	Accepted          bool                `json:"accepted"`
+	AcceptanceDate    string              `json:"acceptance_date"`
 	ResponseDate      string              `json:"response_date"`
 	QuestionResponses []*QuestionResponse `json:"question_responses"`
 	LastEdited        string              `json:"last_edited"`
@@ -55,9 +57,9 @@ type FeedbackResponse struct {
 	RequestDate string `json:"request_date"`
 
 	Accepted          bool                `json:"accepted"`
+	AcceptanceDate    string              `json:"acceptance_date"`
 	ResponseDate      string              `json:"response_date"`
 	QuestionResponses []*QuestionResponse `json:"question_responses"`
-	LastEdited        string              `json:"last_edited"`
 }
 
 type QuestionResponse struct {
@@ -106,9 +108,9 @@ func toGetFeedbackResponse(ctx context.Context, bucket *gcs.BucketHandle, respon
 		FromUsername:      fromUsername,
 		RequestDate:       response.RequestDate,
 		Accepted:          response.Accepted,
+		AcceptanceDate:    response.AcceptanceDate,
 		ResponseDate:      response.ResponseDate,
 		QuestionResponses: response.QuestionResponses,
-		LastEdited:        response.LastEdited,
 		Outfit:            outfit,
 	}
 
@@ -150,13 +152,14 @@ func toGetFeedbackRequestsResponse(ctx context.Context, bucket *gcs.BucketHandle
 		}
 
 		resp := GetFeedbackRequestsResponse{
-			RequestId:    request.RequestId,
-			ToUsername:   toUsername,
-			FromUsername: fromUsername,
-			RequestDate:  request.RequestDate,
-			Outfit:       &outfit,
-			Accepted:     feedbackResp.Accepted,
-			ResponseDate: feedbackResp.ResponseDate,
+			RequestId:      request.RequestId,
+			ToUsername:     toUsername,
+			FromUsername:   fromUsername,
+			RequestDate:    request.RequestDate,
+			Outfit:         &outfit,
+			Accepted:       feedbackResp.Accepted,
+			AcceptanceDate: feedbackResp.AcceptanceDate,
+			ResponseDate:   feedbackResp.ResponseDate,
 		}
 
 		responses = append(responses, resp)
@@ -261,8 +264,8 @@ func toFeedbackResponse(req *FeedbackRequest, questions []string) *FeedbackRespo
 		RequestDate: req.RequestDate,
 
 		Accepted:          false,
+		AcceptanceDate:    "",
 		ResponseDate:      "",
 		QuestionResponses: questionResponses,
-		LastEdited:        "",
 	}
 }

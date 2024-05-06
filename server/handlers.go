@@ -1048,7 +1048,6 @@ func (h Handler) PutOutfitItem() echo.HandlerFunc {
 
 func (h Handler) GetFeedback() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		fmt.Println("LINE 1051")
 		requestId := ctx.Param("feedbackid")
 		if requestId == "" {
 			log.Println("request id missing")
@@ -1145,6 +1144,50 @@ func (h Handler) GetOutgoingFeedback() echo.HandlerFunc {
 		}
 
 		return ctx.JSON(http.StatusOK, resp)
+	}
+}
+
+func (h Handler) PostFeedbackAcceptance() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		acceptStr := ctx.QueryParam("accept")
+		if acceptStr == "" {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		requestId := ctx.Param("feedbackid")
+		if requestId == "" {
+			log.Println("request id missing")
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		feedbackResp, err := getFeedbackResponse(ctx.Request().Context(), h.Gcs.Bucket, requestId)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		if feedbackResp.ToUserId != userId {
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		feedbackResp.AcceptanceDate = timeNow()
+		if acceptStr == "true" {
+			feedbackResp.Accepted = true
+		}
+
+		return writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackResponsesDir, feedbackResp.RequestId), feedbackResp)
 	}
 }
 

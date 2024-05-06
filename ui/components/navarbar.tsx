@@ -146,7 +146,7 @@ export function Navbar(props: {
 
   return (
     <>
-      <div className="mb-20 shadow-sm px-4 md:px-8 py-2  top-0 w-screen  bg-white fixed z-50 text-xs uppercase">
+      <nav className="mb-20 shadow-sm px-4 md:px-8 py-2  top-0 w-screen  bg-white fixed z-50 text-xs uppercase">
         <div className="flex items-center gap-2 justify-between">
           {useMobileMenu ? (
             <div
@@ -204,7 +204,7 @@ export function Navbar(props: {
             </Link>
           </div>
         )}
-      </div>
+      </nav>
       {displayMobileMenu && (
         <div
           className="bg-white shadow-xl border-t-2 border-background rounded w-fit z-50 px-4 pt-4 pb-8 h-full fixed top-8 left-0 flex flex-col gap-4 text-md uppercase"

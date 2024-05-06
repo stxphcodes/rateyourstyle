@@ -30,3 +30,34 @@ export async function PostFeedbackRequest(
 
   return error
 }
+
+export async function PostFeedbackAcceptance(
+    server: string,
+    cookie: string,
+    requestId: string,
+   accept: boolean,
+  ): Promise<Error | null> {
+    let error: Error | null = null;
+    let url = `${server}/api/feedback-acceptance/${requestId}?accept=`
+    if (accept) {
+        url = url+"true"
+    } else {
+        url = url+"false"
+    }
+  
+    await fetch(url, {
+        method: "POST",
+        headers: {
+            "content-type": "application/json",
+            "rys-login": cookie
+        },
+    }).then((response) => {
+        if (!response.ok) {
+            throw new Error("response not ok");
+        }
+    }).catch((err: Error) => {
+        error = err
+    });
+  
+    return error
+  }

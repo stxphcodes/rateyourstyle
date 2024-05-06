@@ -161,6 +161,8 @@ func run() error {
 
 	mux.POST("/api/feedback-request", handler.PostFeedbackRequest())
 
+	mux.POST("/api/feedback-acceptance/:feedbackid", handler.PostFeedbackAcceptance())
+
 	mux.PUT("/api/outfit-item", handler.PutOutfitItem())
 
 	return mux.Start(cfg.HttpAddr)

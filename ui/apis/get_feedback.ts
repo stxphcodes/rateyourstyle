@@ -8,6 +8,7 @@ export type GetOutfitFeedbackResponse = {
   from_username: string
   outfit: Outfit
   accepted: boolean 
+  acceptance_date: string
   response_date: string
 
   question_responses?: QuestionResponse[]
@@ -26,6 +27,7 @@ export async function GetFeedback(server: string, cookie: string, id: string):  
     to_username:"",
     from_username: "",
     accepted: false, 
+    acceptance_date: "",
     response_date: "",
     outfit: {
       id: "",

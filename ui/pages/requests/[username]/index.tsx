@@ -13,6 +13,7 @@ import {
   GetOutgoingFeedback,
 } from "../../../apis/get_feedback";
 import { Table, TableHead } from "../../../components/table";
+import { getFeedbackRequestStatus } from "../../../components/feedback";
 
 type Props = {
   cookie: string;
@@ -170,7 +171,10 @@ export default function Index({
                             window.location.href = url;
                           }}
                         >
-                          {getStatus(request.accepted, request.response_date)}
+                          {getFeedbackRequestStatus(
+                            request.accepted,
+                            request.response_date
+                          )}
                           <br />
                           (view)
                         </button>
@@ -228,7 +232,10 @@ export default function Index({
                             window.location.href = url;
                           }}
                         >
-                          {getStatus(request.accepted, request.response_date)}
+                          {getFeedbackRequestStatus(
+                            request.accepted,
+                            request.response_date
+                          )}
                           <br />
                           (view)
                         </button>
@@ -244,20 +251,4 @@ export default function Index({
       <Footer />
     </>
   );
-}
-
-function getStatus(accepted: boolean, responseDate: string): string {
-  if (!accepted && !responseDate) {
-    return "pending";
-  }
-
-  if (!accepted && responseDate) {
-    return "declined";
-  }
-
-  if (!responseDate) {
-    return "accepted";
-  }
-
-  return "responded";
 }
