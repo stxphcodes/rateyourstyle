@@ -274,6 +274,7 @@ export function Navbar(props: {
 function NotificationMenu(props: {
   clientServer: string;
   cookie: string;
+  username: string;
   handleClose: any;
   notifications: Notification[];
 }) {
@@ -304,9 +305,13 @@ function NotificationMenu(props: {
           <button
             className="p-3 hover:bg-custom-tan text-left overflow-clip shrink-0"
             onClick={() => {
-              let url = window.location.href;
-              url += `?outfit=${n.for_outfit_id}`;
-              window.location.href = url;
+              if (n.message.includes("feedback")) {
+                window.location.pathname = `/requests/${props.username}`;
+              } else {
+                let url = window.location.href;
+                url += `?outfit=${n.for_outfit_id}`;
+                window.location.href = url;
+              }
             }}
             key={n.id}
           >
@@ -430,6 +435,7 @@ function UserAndNotification(props: {
           notifications={notifs}
           clientServer={props.clientServer}
           cookie={props.cookie}
+          username={props.username}
         />
       )}
       {displayUserMenu && (
