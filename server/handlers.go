@@ -1179,6 +1179,7 @@ func (h Handler) PostFeedbackAcceptance() echo.HandlerFunc {
 		}
 
 		if feedbackResp.ToUserId != userId {
+			log.Println("only requestee is allowed to accept requests")
 			return ctx.NoContent(http.StatusForbidden)
 		}
 
@@ -1187,7 +1188,23 @@ func (h Handler) PostFeedbackAcceptance() echo.HandlerFunc {
 			feedbackResp.Accepted = true
 		}
 
-		return writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackResponsesDir, feedbackResp.RequestId), feedbackResp)
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackResponsesDir, feedbackResp.RequestId), feedbackResp); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		notif, err := feedbackAcceptedToNotification(ctx.Request().Context(), h.Gcs.Bucket, feedbackResp, h.UserIndices.IdUsername)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusCreated)
+		}
+
+		if err := createNotification(ctx.Request().Context(), h.Gcs.Bucket, notif); err != nil {
+			log.Println("error creating notification " + err.Error())
+			return ctx.NoContent(http.StatusCreated)
+		}
+
+		return ctx.NoContent(http.StatusOK)
 	}
 }
 

@@ -122,6 +122,46 @@ func feedbackRequestToNotification(ctx context.Context, bucket *gcs.BucketHandle
 	return &n, nil
 }
 
+func feedbackAcceptedToNotification(ctx context.Context, bucket *gcs.BucketHandle, resp *FeedbackResponse, userIdUsername map[string]string) (*Notification, error) {
+	outfit, err := getOutfitNoResponse(ctx, bucket, resp.OutfitId)
+	if err != nil {
+		return nil, err
+	}
+
+	forUsername, ok := userIdUsername[resp.FromUserId]
+	if !ok {
+		return nil, fmt.Errorf("user id not found ", resp.FromUserId)
+	}
+
+	acceptorUsername, ok := userIdUsername[resp.ToUserId]
+	if !ok {
+		return nil, fmt.Errorf("user id not found ", resp.ToUserId)
+	}
+
+	msg := ""
+	if resp.Accepted {
+		msg = fmt.Sprintf("%s accepted your outfit feedback request for: %s", acceptorUsername, outfit.Title)
+	} else {
+		msg = fmt.Sprintf("%s declined your outfit feedback request for: %s", acceptorUsername, outfit.Title)
+	}
+
+	n := Notification{
+		Id:             uuid(),
+		ForUserId:      resp.FromUserId,
+		ForUsername:    forUsername,
+		ForOutfitId:    resp.OutfitId,
+		ForOutfitTitle: outfit.Title,
+		FromUserId:     acceptorUsername,
+		FromUsername:   resp.ToUserId,
+		Date:           resp.AcceptanceDate,
+		Message:        msg,
+		Seen:           false,
+		SeenAt:         "",
+	}
+
+	return &n, nil
+}
+
 func ratingToNotification(ctx context.Context, bucket *gcs.BucketHandle, r *Rating, userIdUsername map[string]string) (*Notification, error) {
 	if r.Date == "" || r.OutfitId == "" || r.UserId == "" || r.Username == "" {
 		return nil, fmt.Errorf("Rating missing required fields to create notification")
