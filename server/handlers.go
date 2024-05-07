@@ -1364,6 +1364,8 @@ func (h Handler) PostFeedbackRequest() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusCreated)
 		}
 
+		h.NotificationIndices.UserHasNotifications[notif.ForUserId] = true
+
 		return ctx.NoContent(http.StatusCreated)
 	}
 }
