@@ -29,6 +29,8 @@ export function OutfitFeedbackModal(props: {
 
   const [missingResponses, setMissingResponses] = useState(false);
 
+  const [submissionErr, setSubmissionErr] = useState(false);
+
   const handleResponseChange = (e: any, questionId: string) => {
     if (!questionResponses) {
       return;
@@ -71,6 +73,12 @@ export function OutfitFeedbackModal(props: {
 
       if (!resp) {
         window.location.replace(location.pathname);
+        return;
+      }
+
+      if (resp instanceof Error) {
+        setSubmissionErr(true);
+        return;
       }
     }
   };
@@ -145,6 +153,13 @@ export function OutfitFeedbackModal(props: {
                 {missingResponses && (
                   <div className="bg-custom-pink p-2 rounded my-2 w-fit">
                     All questions must contain responses in order to submit.
+                  </div>
+                )}
+                {submissionErr && (
+                  <div className="bg-custom-pink p-2 rounded my-2 w-fit">
+                    Sorry, there was an issue processing your submission. Please
+                    refresh the page and try again, or email
+                    sitesbystephanie@gmail.com if the issue persists.
                   </div>
                 )}
               </>
