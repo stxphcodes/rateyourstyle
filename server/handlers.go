@@ -1204,13 +1204,14 @@ func (h Handler) PostFeedbackAcceptance() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusCreated)
 		}
 
+		h.NotificationIndices.UserHasNotifications[notif.ForUserId] = true
+
 		return ctx.NoContent(http.StatusOK)
 	}
 }
 
 func (h Handler) PostFeedbackResponse() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		fmt.Println("were in line 1213")
 		requestId := ctx.Param("feedbackid")
 		if requestId == "" {
 			log.Println("request id missing")
@@ -1272,7 +1273,9 @@ func (h Handler) PostFeedbackResponse() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusCreated)
 		}
 
-		return ctx.NoContent(http.StatusOK)
+		h.NotificationIndices.UserHasNotifications[notif.ForUserId] = true
+
+		return ctx.NoContent(http.StatusCreated)
 	}
 }
 
