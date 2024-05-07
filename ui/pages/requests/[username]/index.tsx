@@ -1,11 +1,8 @@
 import { GetServerSideProps } from "next";
-import Link from "next/link";
-import { useState, useMemo } from "react";
 
-import { GetUser, User } from "../../../apis/get_user";
+import { GetUser } from "../../../apis/get_user";
 import { Navbar } from "../../../components/navarbar";
 import { GetServerURL } from "../../../apis/get_server";
-import { ClosetTable } from "../../../components/closet/table";
 import { Footer } from "../../../components/footer";
 import {
   GetIncomingFeedback,
@@ -135,10 +132,16 @@ export default function Index({
               Empty - No outgoing requests yet
             </h1>
           ) : (
-            <Table width="w-fit">
+            <Table width="md:w-fit">
               <>
                 <TableHead
-                  columns={["Request Date", "Sent To", "Outfit", "Response"]}
+                  columns={[
+                    "Request Date",
+                    "Sent To",
+                    "Outfit",
+                    "Response",
+                    "Response Date",
+                  ]}
                 />
                 <tbody>
                   {outgoing_requests.map((request) => (
@@ -146,7 +149,9 @@ export default function Index({
                       className="p-2 border-b-2 bg-white max-h-8 overflow-hidden"
                       key={request.request_id}
                     >
-                      <td className="p-2 w-36">{request.request_date}</td>
+                      <td className="p-2 w-36">
+                        {request.request_date.split("T")[0]}
+                      </td>
                       <td className="p-2 w-36">
                         <a href={`/closet/${request.to_username}`}>
                           {request.to_username}
@@ -180,6 +185,13 @@ export default function Index({
                           (view)
                         </button>
                       </td>
+                      <td className="p-2">
+                        {request.response_date
+                          ? request.response_date.split("T")[0]
+                          : request.acceptance_date
+                          ? request.acceptance_date.split("T")[0]
+                          : ""}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -197,10 +209,16 @@ export default function Index({
               Empty - No incoming requests yet
             </h1>
           ) : (
-            <Table width="w-fit">
+            <Table width="md:w-fit">
               <>
                 <TableHead
-                  columns={["Request Date", "From", "Outfit", "Your Response"]}
+                  columns={[
+                    "Request Date",
+                    "From",
+                    "Outfit",
+                    "Your Response",
+                    "Response Date",
+                  ]}
                 />
                 <tbody>
                   {incoming_requests.map((request) => (
@@ -208,7 +226,9 @@ export default function Index({
                       className="p-2 border-b-2 bg-white max-h-8 overflow-hidden"
                       key={request.request_id}
                     >
-                      <td className="p-2 w-36">{"some date"}</td>
+                      <td className="p-2 w-36">
+                        {request.request_date.split("T")[0]}
+                      </td>
                       <td className="p-2 w-36">
                         <a href={`/closet/${request.from_username}`}>
                           {request.from_username}
@@ -241,6 +261,14 @@ export default function Index({
                           <br />
                           (view)
                         </button>
+                      </td>
+                      <td className="p-2">
+                        {" "}
+                        {request.response_date
+                          ? request.response_date.split("T")[0]
+                          : request.acceptance_date
+                          ? request.acceptance_date.split("T")[0]
+                          : ""}
                       </td>
                     </tr>
                   ))}

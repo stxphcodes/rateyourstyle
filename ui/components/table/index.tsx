@@ -3,7 +3,7 @@ export function Table(props: { children: JSX.Element; width?: string }) {
     <div
       className={`${
         props.width ? props.width : ""
-      } overflow-x-auto shadow-md rounded-lg max-h-table my-4`}
+      } overflow-x-scroll shadow-md rounded-lg max-h-table my-4`}
     >
       <table className="w-full text-xs md:text-sm text-left overflow-x-scroll">
         {props.children}

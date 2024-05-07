@@ -9,7 +9,7 @@ import { GetUser, User, UserProfile } from "../apis/get_user";
 import { Footer } from "../components/footer";
 import { AccountPromptModal } from "../components/modals/accountPrompt";
 import { Navbar } from "../components/navarbar";
-import { OutfitCard } from "../components/outfitcard";
+import { OutfitCard } from "../components/outfit/card";
 import { PageMetadata } from "./_app";
 import Searchbar from "../components/searchbar";
 

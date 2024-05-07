@@ -37,6 +37,8 @@ export function RequestFeedbackModal(props: {
 
   const [submissionState, setSubmissionState] = useState<string>("");
 
+  const [missingQuestions, setMissingQuestions] = useState(false);
+
   useEffect(() => {
     async function getData() {
       const resp = await GetOutfitsByUser(props.clientServer, props.cookie);
@@ -65,6 +67,7 @@ export function RequestFeedbackModal(props: {
       newQuestions.splice(index, 1);
     }
 
+    setMissingQuestions(false);
     setQuestionsSelected(newQuestions);
   };
 
@@ -84,6 +87,7 @@ export function RequestFeedbackModal(props: {
   const handleQuestionInput = (text: string, index: number) => {
     additionalQuestions[index] = text;
     setAdditionalQuestions([...additionalQuestions]);
+    setMissingQuestions(false);
   };
 
   const handleSubmit = async (e: any) => {
@@ -95,6 +99,12 @@ export function RequestFeedbackModal(props: {
 
     let q = questionsSelected.filter((question) => question);
     let addQ = additionalQuestions.filter((question) => question);
+    let questions = [...q, ...addQ];
+
+    if (!questions.length) {
+      setMissingQuestions(true);
+      return;
+    }
 
     let req: FeedbackRequest = {
       to_username: props.closetName,
@@ -204,12 +214,19 @@ export function RequestFeedbackModal(props: {
         )}
 
         {showForm && !submissionState && (
-          <button
-            className="bg-gradient w-full md:w-1/2 rounded p-2 my-4"
-            onClick={handleSubmit}
-          >
-            submit
-          </button>
+          <>
+            <button
+              className="bg-gradient w-full md:w-1/2 rounded p-2 my-4"
+              onClick={handleSubmit}
+            >
+              submit
+            </button>
+            {missingQuestions && (
+              <div className="w-fit p-2 bg-custom-pink text-white">
+                **At least one question is required for submission.**
+              </div>
+            )}
+          </>
         )}
       </>
     </Modal>

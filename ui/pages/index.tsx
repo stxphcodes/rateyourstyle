@@ -10,7 +10,7 @@ import {
 } from "../apis/get_outfits";
 import { Footer } from "../components/footer";
 import { Navbar } from "../components/navarbar";
-import { OutfitCard } from "../components/outfitcard";
+import { OutfitCard } from "../components/outfit/card";
 import { GetServerURL } from "../apis/get_server";
 import { PageMetadata } from "./_app";
 import { CircleCheckIcon } from "../components/icons/circle-check";

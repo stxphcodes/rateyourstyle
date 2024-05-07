@@ -2,7 +2,7 @@ import { SortingArrowsIcon } from "../icons/sorting-arrows";
 import { OutfitItem, Outfit, GetOutfit } from "../../apis/get_outfits";
 import { useEffect, useState } from "react";
 import { Rating } from "../../apis/get_ratings";
-import { OutfitCard } from "../outfitcard";
+import { OutfitCard } from "../outfit/card";
 import { PutOutfitItem } from "../../apis/put_outfititem";
 import { Modal } from "../modals";
 import { EyeDropper, OnChangeEyedrop } from "react-eyedrop";

@@ -111,6 +111,18 @@ a:hover {
   background-color: black;
 }
 
+.pinkButton {
+  background-color: #fa7be1;
+  padding: 0 4px;
+  border: 2px solid;
+  border-radius: 4px;
+  border-color: #fa7be1;
+}
+
+.pinkButton:hover {
+  background-color: white;
+}
+
 .requiredLabel {
   color: #fa7be1;
 }

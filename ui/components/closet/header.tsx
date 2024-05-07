@@ -1,5 +1,6 @@
 import { User } from "../../apis/get_user";
 import { useMemo, useEffect, useState } from "react";
+
 export function ClosetHeader(props: {
   closetName: string;
   outfitCount: number;
