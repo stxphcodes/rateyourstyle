@@ -164,12 +164,14 @@ function StatusTag(props: { username: string; status: string }) {
           props.status === "declined" ? "text-custom-pink" : "text-custom-lime"
         }`}
       >
-        {(props.status === "declined" || props.status === "responded") &&
-          `${props.username} ${props.status}`}
-        {props.status === "accepted" &&
-          `${props.username} ${props.status}, waiting response`}
         {props.status === "pending" &&
-          `${props.status} acceptance from ${props.username}`}
+          `${props.status} acceptance from ${props.username}.`}
+        {props.status === "declined" &&
+          `${props.username} ${props.status} giving feedback.`}
+        {props.status === "accepted" &&
+          `${props.username} ${props.status}, awaiting feedback.`}
+
+        {props.status === "complete" && `${props.username} completed feedback.`}
       </div>
     </div>
   );

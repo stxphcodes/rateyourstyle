@@ -15,5 +15,5 @@ export function getFeedbackRequestStatus(
     return "accepted";
   }
 
-  return "responded";
+  return "complete";
 }
