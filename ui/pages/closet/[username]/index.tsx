@@ -221,7 +221,6 @@ export default function Index({
           cookie={cookie}
           handleClose={() => {
             setSubmitOutfitClicked(false);
-            // location.reload();
           }}
           closetName={closetName}
         />

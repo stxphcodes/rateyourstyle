@@ -126,6 +126,19 @@ export function RequestFeedbackModal(props: {
     }
   };
 
+  if (!props.cookie) {
+    return (
+      <Modal handleClose={props.handleClose} wideScreen={true}>
+        <>
+          <h1 className="mb-8">
+            Request Outfit Feedback from {props.closetName}
+          </h1>
+          You must be signed into an account to access this feature.
+        </>
+      </Modal>
+    );
+  }
+
   return (
     <Modal handleClose={props.handleClose} wideScreen={true} fullHeight={true}>
       <>
