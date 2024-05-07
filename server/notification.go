@@ -114,7 +114,7 @@ func feedbackRequestToNotification(ctx context.Context, bucket *gcs.BucketHandle
 		FromUserId:     req.FromUserId,
 		FromUsername:   fromUsername,
 		Date:           req.RequestDate,
-		Message:        fmt.Sprintf("%s requested your review on their outfit: %s", fromUsername, outfit.Title),
+		Message:        fmt.Sprintf("%s requested your feedback on their outfit: %s", fromUsername, outfit.Title),
 		Seen:           false,
 		SeenAt:         "",
 	}
