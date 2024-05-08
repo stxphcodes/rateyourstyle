@@ -170,7 +170,7 @@ export function RequestFeedbackModal(props: {
         {!showForm && !submissionState && (
           <>
             <div className="mb-4">
-              Please select one outfit you'd like to get feedback on.
+              Please select one outfit you&apos;d like to get feedback on.
             </div>
             <OutfitSelection
               clientServer={props.clientServer}
@@ -213,7 +213,7 @@ export function RequestFeedbackModal(props: {
             <div className="my-6">
               The following questions will be sent to {props.closetName} along
               with your selected outfit. <br />
-              Please un-select any question(s) you don't want feedback on.
+              Please un-select any question(s) you don&apos;t want feedback on.
             </div>
             <RequestForm
               questionsSelected={questionsSelected}
@@ -297,7 +297,7 @@ function RequestForm(props: {
   return (
     <form>
       {questions.map((question, index) => (
-        <div className="flex gap-x-2 items-center mb-2">
+        <div className="flex gap-x-2 items-center mb-2" key={`q-${index}`}>
           <input
             type="checkbox"
             checked={props.questionsSelected.includes(question)}
@@ -309,7 +309,7 @@ function RequestForm(props: {
       ))}
 
       <div className="">
-        <label>Other questions you'd like to ask:</label>
+        <label>Other questions you&apos;d like to ask:</label>
         <button
           className="primaryButton text-xs"
           onClick={props.addAdditionalQuestion}
@@ -318,7 +318,7 @@ function RequestForm(props: {
         </button>
 
         {props.additionalQuestions.map((q, index) => (
-          <div className="flex gap-2 my-3">
+          <div className="flex gap-2 my-3" key={`question-${index}`}>
             <input
               type="text"
               className="w-1/2"

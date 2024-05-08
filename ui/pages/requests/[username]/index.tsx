@@ -1,5 +1,5 @@
 import { GetServerSideProps } from "next";
-
+import { useState } from "react";
 import { GetUser } from "../../../apis/get_user";
 import { Navbar } from "../../../components/navarbar";
 import { GetServerURL } from "../../../apis/get_server";
@@ -92,6 +92,8 @@ export default function Index({
   incoming_requests,
   error,
 }: Props) {
+  const [releaseNotes, setReleaseNotes] = useState(false);
+
   if (error) {
     if (error == "forbidden") {
       return (
@@ -122,10 +124,39 @@ export default function Index({
     <>
       <Navbar clientServer={clientServer} cookie={cookie} username={username} />
       <main className="mt-12 sm:mt-20 px-4 md:px-8">
+        <section className="mb-12  flex justify-center">
+          <button
+            className="bg-custom-lime p-2 rounded w-3/4 font-bold text-xs"
+            onClick={(e) => {
+              e.preventDefault();
+              setReleaseNotes(!releaseNotes);
+            }}
+          >
+            This feature was released on May 7 2024. Click here to read the
+            release notes.
+            <div
+              className={`${
+                releaseNotes ? "block" : "hidden"
+              } font-normal mt-2`}
+            >
+              We envision the request outfit feedback feature to be a core
+              functionality of Rate Your Style that will set it apart from other
+              marketplaces. The idea is that users can seek specific outfit
+              feedback from professional stylists, or anyone they believe can
+              give good fashion advice.
+              <br /> <br />
+              That being said, this feature is in beta and I apologize if you
+              experience any bugs. Feel free to email sitesbystephanie@gmail.com
+              with any thoughts or concerns.
+            </div>
+          </button>
+        </section>
+
         <section className="mb-12">
           <h1>Outgoing Requests 📤</h1>
           <div>
-            Feedback on your outfits that you've requested from other users.
+            Feedback on your outfits that you&apos;ve requested from other
+            users.
           </div>
           {outgoing_requests.length === 0 ? (
             <h1 className="text-slate-300 h-48">
