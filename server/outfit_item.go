@@ -10,6 +10,8 @@ import (
 	gcs "cloud.google.com/go/storage"
 )
 
+const outfitItemsDir = "data/outfit-items"
+
 func getOutfitItemsFromOutfit(ctx context.Context, bucket *gcs.BucketHandle, outfitIds []string) ([]*OutfitItem, error) {
 	items := []*OutfitItem{}
 	for _, itemId := range outfitIds {

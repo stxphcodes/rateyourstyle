@@ -12,6 +12,12 @@ import { NotificationFilledIcon } from "./icons/notification-filled";
 import { CreateAccount } from "./modals/createaccount";
 import { SignIn } from "./modals/signin";
 import { OutfitModal } from "./modals/outfit";
+import {
+  GetOutgoingFeedback,
+  GetOutfitFeedbackResponse,
+  GetFeedback,
+} from "../apis/get_feedback";
+import { OutfitFeedbackModal } from "./modals/outfitfeedback";
 
 // check if browser allows cookies to be set
 function cookieEnabled() {
@@ -52,6 +58,10 @@ export function Navbar(props: {
   const [displayMobileMenu, setDisplayMobileMenu] = useState(false);
 
   const [outfit, setOutfit] = useState<Outfit | null>(null);
+
+  const [feedback, setFeedback] = useState<GetOutfitFeedbackResponse | null>(
+    null
+  );
 
   const checkMobileScreenWidth = (window: any) => {
     if (window.innerWidth <= 600) {
@@ -111,16 +121,32 @@ export function Navbar(props: {
       }
     }
 
-    let outfit = router.query.outfit;
+    async function getfeedback(id: string, cookie: string) {
+      const resp = await GetFeedback(props.clientServer, cookie, id);
+      if (!(resp instanceof Error)) {
+        setFeedback(resp);
+      }
+    }
 
+    let outfit = router.query.outfit;
     if (outfit && outfit.length > 0 && typeof outfit === "string") {
       getoutfit(outfit);
+    }
+
+    let feedback = router.query.feedback;
+    if (
+      props.cookie &&
+      feedback &&
+      feedback.length > 0 &&
+      typeof feedback === "string"
+    ) {
+      getfeedback(feedback, props.cookie);
     }
   }, [router]);
 
   return (
     <>
-      <div className="mb-20 shadow-sm px-4 md:px-8 py-2  top-0 w-screen  bg-white fixed z-50 text-xs uppercase">
+      <nav className="mb-20 shadow-sm px-4 md:px-8 py-2  top-0 w-screen  bg-white fixed z-50 text-xs uppercase">
         <div className="flex items-center gap-2 justify-between">
           {useMobileMenu ? (
             <div
@@ -178,7 +204,7 @@ export function Navbar(props: {
             </Link>
           </div>
         )}
-      </div>
+      </nav>
       {displayMobileMenu && (
         <div
           className="bg-white shadow-xl border-t-2 border-background rounded w-fit z-50 px-4 pt-4 pb-8 h-full fixed top-8 left-0 flex flex-col gap-4 text-md uppercase"
@@ -228,6 +254,19 @@ export function Navbar(props: {
           userRating={null}
         />
       )}
+
+      {feedback && feedback.outfit && (
+        <OutfitFeedbackModal
+          clientServer={props.clientServer}
+          cookie={props.cookie}
+          handleClose={() => {
+            let url = window.location.origin + window.location.pathname;
+            window.location.href = url;
+          }}
+          data={feedback}
+          currentUsername={user}
+        />
+      )}
     </>
   );
 }
@@ -235,6 +274,7 @@ export function Navbar(props: {
 function NotificationMenu(props: {
   clientServer: string;
   cookie: string;
+  username: string;
   handleClose: any;
   notifications: Notification[];
 }) {
@@ -265,9 +305,13 @@ function NotificationMenu(props: {
           <button
             className="p-3 hover:bg-custom-tan text-left overflow-clip shrink-0"
             onClick={() => {
-              let url = window.location.href;
-              url += `?outfit=${n.for_outfit_id}`;
-              window.location.href = url;
+              if (n.message.includes("feedback")) {
+                window.location.pathname = `/requests/${props.username}`;
+              } else {
+                let url = window.location.href;
+                url += `?outfit=${n.for_outfit_id}`;
+                window.location.href = url;
+              }
             }}
             key={n.id}
           >
@@ -306,6 +350,13 @@ function UserMenu(props: { username: string; handleClose: any }) {
           Account
         </button>
       </Link>
+
+      <Link href={`/requests/${props.username}`} passHref={true}>
+        <button className="px-8 py-2  hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase">
+          Requests
+        </button>
+      </Link>
+
       <button
         className="px-8 py-2  hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase"
         onClick={() => {
@@ -384,6 +435,7 @@ function UserAndNotification(props: {
           notifications={notifs}
           clientServer={props.clientServer}
           cookie={props.cookie}
+          username={props.username}
         />
       )}
       {displayUserMenu && (

@@ -2,7 +2,7 @@ import { SortingArrowsIcon } from "../icons/sorting-arrows";
 import { OutfitItem, Outfit, GetOutfit } from "../../apis/get_outfits";
 import { useEffect, useState } from "react";
 import { Rating } from "../../apis/get_ratings";
-import { OutfitCard } from "../outfitcard";
+import { OutfitCard } from "../outfit/card";
 import { PutOutfitItem } from "../../apis/put_outfititem";
 import { Modal } from "../modals";
 import { EyeDropper, OnChangeEyedrop } from "react-eyedrop";
@@ -10,6 +10,7 @@ import { EyedropperButton } from "../color/eyedropper-button";
 import { ntc } from "../color/ntc";
 import { ColorDiv } from "../color/color-div";
 import { ClosetGraphs } from "./graphs";
+import { Table } from "../table";
 
 export function ClosetTable(props: {
   outfits: Outfit[];
@@ -220,8 +221,8 @@ export function ClosetTable(props: {
                 outfits that contain them.
               </h6>
             }
-            <div className="overflow-x-auto shadow-md rounded-lg max-h-table">
-              <table className="w-full text-xs md:text-sm text-left overflow-x-scroll">
+            <Table>
+              <>
                 <thead className="text-xs uppercase bg-custom-tan sticky top-0">
                   <tr>
                     <th scope="col" className="p-2">
@@ -560,7 +561,7 @@ export function ClosetTable(props: {
                         )}
                       </td>
                       <td className="p-2 ">{item.rating}</td>
-                      <td className="p-2 w-52 normal-case">
+                      <td className="p-2 normal-case">
                         {itemEdit && itemEdit.id == item.id ? (
                           <textarea
                             rows={6}
@@ -577,13 +578,13 @@ export function ClosetTable(props: {
                     </tr>
                   ))}
                 </tbody>
-              </table>
-              {itemEditError && (
-                <Modal handleClose={() => setItemEditError("")}>
-                  <div>{itemEditError}</div>
-                </Modal>
-              )}
-            </div>
+                {itemEditError && (
+                  <Modal handleClose={() => setItemEditError("")}>
+                    <div>{itemEditError}</div>
+                  </Modal>
+                )}
+              </>
+            </Table>
           </>
         )}
       </div>

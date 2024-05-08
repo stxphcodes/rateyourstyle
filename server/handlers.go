@@ -9,7 +9,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 
 	gcs "cloud.google.com/go/storage"
 	"github.com/labstack/echo"
@@ -24,106 +23,7 @@ type Handler struct {
 	UserIndices         *UserIndices
 	OutfitIndices       *OutfitIndices
 	RatingIndices       *RatingIndices
-	BusinessIndices     *BusinessIndices
 	NotificationIndices *NotificationIndices
-}
-
-func (h Handler) GetBusinessUsernames() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		businesses := []string{}
-
-		for id := range h.BusinessIndices.Businesses {
-			username, ok := h.UserIndices.IdUsername[id]
-			if ok {
-				businesses = append(businesses, username)
-			}
-		}
-
-		return ctx.JSON(http.StatusOK, businesses)
-	}
-}
-
-func (h Handler) GetBusinessOutfits() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		businessId := ""
-		businessRequested := ctx.QueryParam("business")
-		if businessRequested != "" {
-			for id, username := range h.UserIndices.IdUsername {
-				if username == businessRequested {
-					businessId = id
-				}
-			}
-		} else {
-			cookie, err := getCookie(ctx.Request())
-			if err != nil {
-				log.Println("error retrieving cookie")
-				return ctx.NoContent(http.StatusForbidden)
-			}
-
-			userId, ok := h.UserIndices.CookieId[cookie]
-			if !ok {
-				log.Println("user id not found for cookie " + cookie)
-				return ctx.NoContent(http.StatusForbidden)
-			}
-
-			businessId = userId
-		}
-
-		_, ok := h.BusinessIndices.Businesses[businessId]
-		if !ok {
-			log.Println("user id not business profile " + businessId)
-			return ctx.NoContent(http.StatusFailedDependency)
-		}
-
-		outfits, err := getBusinessOutfits(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, businessId)
-		if err != nil {
-			// object doesn't exist
-			if !strings.Contains(err.Error(), "exist") {
-				log.Println(err.Error())
-				return ctx.NoContent(http.StatusInternalServerError)
-			}
-
-			return ctx.JSON(http.StatusOK, outfits)
-		}
-
-		return ctx.JSON(http.StatusOK, outfits)
-	}
-}
-
-func (h Handler) GetBusinessProfile() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		businessId := ""
-		businessRequested := ctx.QueryParam("business")
-		if businessRequested != "" {
-			for id, username := range h.UserIndices.IdUsername {
-				if username == businessRequested {
-					businessId = id
-				}
-			}
-		} else {
-			cookie, err := getCookie(ctx.Request())
-			if err != nil {
-				log.Println("error retrieving cookie")
-				return ctx.NoContent(http.StatusForbidden)
-			}
-
-			userId, ok := h.UserIndices.CookieId[cookie]
-			if !ok {
-				log.Println("user id not found for cookie " + cookie)
-				return ctx.NoContent(http.StatusForbidden)
-			}
-
-			businessId = userId
-		}
-
-		business, ok := h.BusinessIndices.Businesses[businessId]
-		if !ok {
-			log.Println("user id not business profile " + businessId)
-			return ctx.NoContent(http.StatusFailedDependency)
-		}
-
-		return ctx.JSON(http.StatusOK, business)
-	}
 }
 
 func (h Handler) GetCookie() echo.HandlerFunc {
@@ -141,13 +41,8 @@ func (h Handler) GetCookie() echo.HandlerFunc {
 		}
 
 		// write new user to original file
-		obj := h.Gcs.Bucket.Object("data/users/users.json")
-		writer := obj.NewWriter(ctx.Request().Context())
-		defer writer.Close()
-
 		users = append(users, user)
-		if err := json.NewEncoder(writer).Encode(users); err != nil {
-			log.Println(err.Error())
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, "data/users/users.json", users); err != nil {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
@@ -168,7 +63,7 @@ func (h Handler) GetOutfit() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 
-		outfit, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfitId)
+		outfit, err := getOutfit(ctx.Request().Context(), h.Gcs.Bucket, h.UserIndices.IdUsername, outfitId)
 		if err != nil {
 			log.Println("error getting outfit ", err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
@@ -187,7 +82,7 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 		count := len(h.OutfitIndices.PublicOutfits)
 		if countStr != "" {
 			countInt, err := strconv.Atoi(countStr)
-			// make sure there's enough outfits to fulfill the count count query param
+			// make sure there's enough outfits to fulfill the count query param
 			if count > countInt && err == nil {
 				count = countInt
 			}
@@ -202,7 +97,7 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 		outfitsc := make(chan *OutfitResponse)
 		for outfit := range h.OutfitIndices.PublicOutfits {
 			go func(outfit string) {
-				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
+				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
 				if err != nil {
 					errc <- err
 				}
@@ -258,7 +153,7 @@ func (h Handler) GetPublicOutfitsByUser() echo.HandlerFunc {
 		done := make(chan struct{})
 		for _, outfit := range outfitIds {
 			go func(outfit string) {
-				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
+				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
 				if err != nil {
 					errc <- err
 					return
@@ -316,7 +211,7 @@ func (h Handler) GetOutfitsByUser() echo.HandlerFunc {
 
 		for _, outfit := range outfitIds {
 			go func(outfit string) {
-				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
+				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
 				if err != nil {
 					errc <- err
 					return
@@ -352,7 +247,7 @@ func (h Handler) GetRatingsByOutfit() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 
-		ratings, err := getRatingsByOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, "data/ratings/"+outfitId+".json")
+		ratings, err := getRatingsByOutfit(ctx.Request().Context(), h.Gcs.Bucket, "data/ratings/"+outfitId+".json")
 		if err != nil {
 			log.Println("error getting ratings for outfit " + outfitId)
 			return ctx.NoContent(http.StatusInternalServerError)
@@ -450,15 +345,12 @@ func (h *Handler) GetNotifications() echo.HandlerFunc {
 			for index, notification := range notifications {
 				if !notification.Seen {
 					notifications[index].Seen = true
-					notifications[index].SeenAt = time.Now().Format("2006-01-02")
+					notifications[index].SeenAt = timeNow()
 				}
 			}
 
-			obj := h.Gcs.Bucket.Object(joinPaths(notificationsDir, userId))
-			writer := obj.NewWriter(ctx.Request().Context())
-			defer writer.Close()
-
-			if err := json.NewEncoder(writer).Encode(notifications); err != nil {
+			// update notification seen in file
+			if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(notificationsDir, userId), notifications); err != nil {
 				log.Println(err.Error())
 				return ctx.NoContent(http.StatusInternalServerError)
 			}
@@ -581,19 +473,12 @@ func (h Handler) PostClosetRequest() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 
-		current_time := time.Now()
-		now := fmt.Sprintf("%d-%02d-%02dT%02d-%02d-%02d",
-			current_time.Year(), current_time.Month(), current_time.Day(),
-			current_time.Hour(), current_time.Minute(), current_time.Second())
-
+		now := timeNow()
 		data["user_id"] = userId
 		data["date_created"] = now
 
-		obj := h.Gcs.Bucket.Object("data/requests/" + now + ".json")
-		writer := obj.NewWriter(ctx.Request().Context())
-		defer writer.Close()
-
-		if err := json.NewEncoder(writer).Encode(data); err != nil {
+		path := "data/requests/" + now + ".json"
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, path, data); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
@@ -705,7 +590,7 @@ func (h Handler) PostOutfit() echo.HandlerFunc {
 		}
 
 		data.UserId = userId
-		data.Date = time.Now().Format("2006-01-02")
+		data.Date = timeNow()
 
 		itemIds, err := createItemsFromOutfit(ctx.Request().Context(), h.Gcs.Bucket, &data)
 		if err != nil {
@@ -716,17 +601,10 @@ func (h Handler) PostOutfit() echo.HandlerFunc {
 		data.Items = nil
 
 		path := filepath.Join("data", "outfits", data.Id+".json")
-		obj := h.Gcs.Bucket.Object(path)
-
-		writer := obj.NewWriter(ctx.Request().Context())
-		defer writer.Close()
-
-		if err := json.NewEncoder(writer).Encode(data); err != nil {
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, path, data); err != nil {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
-
-		writer.Close()
 
 		// update indices
 		h.OutfitIndices.OutfitUser[data.Id] = data.UserId
@@ -759,7 +637,7 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 		data.UserId = userId
-		data.Date = time.Now().Format("2006-01-02")
+		data.Date = timeNow()
 		fromUsername, ok := h.UserIndices.IdUsername[userId]
 		if !ok {
 			fromUsername = "anonymous"
@@ -772,7 +650,7 @@ func (h *Handler) PostRating() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusInternalServerError)
 		}
 
-		n, err := ratingToNotification(&data, ctx.Request().Context(), h.Gcs.Bucket, h.UserIndices.IdUsername)
+		n, err := ratingToNotification(ctx.Request().Context(), h.Gcs.Bucket, &data, h.UserIndices.IdUsername)
 		if err != nil {
 			log.Println("error transforming rating to notification " + err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
@@ -814,7 +692,7 @@ func (h *Handler) GetReplies() echo.HandlerFunc {
 		}
 
 		path := "data/replies/" + outfitId + "/" + userId + ".json"
-		replies, err := getReplies(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, path)
+		replies, err := getReplies(ctx.Request().Context(), h.Gcs.Bucket, path)
 		if err != nil {
 			log.Println("error getting replies " + err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
@@ -854,10 +732,10 @@ func (h *Handler) PostReply() echo.HandlerFunc {
 
 		data.UserId = userId
 		data.Id = uuid()
-		data.Date = time.Now().Format("2006-01-02") + "T" + time.Now().Format("15:04:05")
+		data.Date = timeNow()
 		data.Username = username
 
-		replies, err := createReply(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, data)
+		replies, err := createReply(ctx.Request().Context(), h.Gcs.Bucket, data)
 		if err != nil {
 			log.Println("Error creating reply: ", err.Error())
 			return ctx.NoContent(http.StatusInternalServerError)
@@ -943,7 +821,7 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 			User: &data,
 			UserProfiles: []*UserProfile{
 				{
-					Date:        time.Now().Format("2006-01-02"),
+					Date:        timeNow(),
 					Department:  "",
 					AgeRange:    "",
 					WeightRange: "",
@@ -1010,7 +888,7 @@ func (h *Handler) PostBusinessOutfit() echo.HandlerFunc {
 				OutfitId:    data.OutfitId,
 				ItemIds:     data.ItemIds,
 				Approved:    true,
-				DateCreated: time.Now().Format("2006-01-02"),
+				DateCreated: timeNow(),
 			}
 
 			if err := createBusinessOutfit(ctx.Request().Context(), h.Gcs.Client, h.Gcs.Bucket, businessOutfit); err != nil {
@@ -1018,89 +896,6 @@ func (h *Handler) PostBusinessOutfit() echo.HandlerFunc {
 				return ctx.NoContent(http.StatusInternalServerError)
 			}
 		}
-
-		return ctx.NoContent(http.StatusCreated)
-	}
-}
-
-func (h *Handler) PostNotificationsSeen() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		cookie, err := getCookie(ctx.Request())
-		if err != nil {
-			log.Println("error retrieving cookie")
-			return ctx.NoContent(http.StatusForbidden)
-		}
-
-		userId, ok := h.UserIndices.CookieId[cookie]
-		if !ok {
-			log.Println("user id not found based on cookie " + cookie)
-			return ctx.NoContent(http.StatusForbidden)
-		}
-
-		var data []string
-		if err := ctx.Bind(&data); err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusBadRequest)
-		}
-
-		n, err := getNotifications(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(notificationsDir, userId))
-		if err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
-		}
-
-		for index, notification := range n {
-			if !notification.Seen {
-				n[index].Seen = true
-				n[index].SeenAt = time.Now().Format("2006-01-02")
-			}
-		}
-
-		obj := h.Gcs.Bucket.Object(joinPaths(notificationsDir, userId))
-		writer := obj.NewWriter(ctx.Request().Context())
-		defer writer.Close()
-
-		if err := json.NewEncoder(writer).Encode(n); err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
-		}
-
-		// update indices
-		h.NotificationIndices.UserHasNotifications[userId] = false
-
-		return ctx.NoContent(http.StatusCreated)
-	}
-}
-
-func (h *Handler) PostBusinessProfile() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		cookie, err := getCookie(ctx.Request())
-		if err != nil {
-			log.Println("error retrieving cookie")
-			return ctx.NoContent(http.StatusForbidden)
-		}
-
-		userId, ok := h.UserIndices.CookieId[cookie]
-		if !ok {
-			log.Println("user id not found based on cookie " + cookie)
-			return ctx.NoContent(http.StatusForbidden)
-		}
-
-		var data BusinessProfile
-		if err := ctx.Bind(&data); err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusBadRequest)
-		}
-		data.DateCreated = time.Now().Format("2006-01-02")
-		data.UserId = userId
-
-		if err := createBusinessProfile(ctx.Request().Context(), h.Gcs.Bucket, &data); err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
-		}
-
-		// update indexes
-		h.BusinessIndices.Businesses[data.UserId] = &data
 
 		return ctx.NoContent(http.StatusCreated)
 	}
@@ -1137,7 +932,7 @@ func (h *Handler) PostUserProfile() echo.HandlerFunc {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusBadRequest)
 		}
-		data.Date = time.Now().Format("2006-01-02")
+		data.Date = timeNow()
 
 		f.User = user
 		f.UserProfiles = append(f.UserProfiles, &data)
@@ -1182,7 +977,7 @@ func (h *Handler) PostUserGeneral() echo.HandlerFunc {
 			log.Println(err.Error())
 			return ctx.NoContent(http.StatusBadRequest)
 		}
-		data.Date = time.Now().Format("2006-01-02")
+		data.Date = timeNow()
 
 		f.User = user
 		f.UserGeneral = &data
@@ -1224,9 +1019,7 @@ func (h Handler) PutOutfitItem() echo.HandlerFunc {
 			return ctx.NoContent(http.StatusForbidden)
 		}
 
-		path := filepath.Join("data", "outfit-items", data.Id+".json")
-		obj := h.Gcs.Bucket.Object(path)
-
+		obj := h.Gcs.Bucket.Object(joinPaths(outfitItemsDir, data.Id))
 		_, err = obj.Attrs(ctx.Request().Context())
 		if err != nil {
 			if strings.Contains(err.Error(), "exist") {
@@ -1248,6 +1041,330 @@ func (h Handler) PutOutfitItem() echo.HandlerFunc {
 		}
 
 		writer.Close()
+
+		return ctx.NoContent(http.StatusCreated)
+	}
+}
+
+func (h Handler) GetFeedback() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		requestId := ctx.Param("feedbackid")
+		if requestId == "" {
+			log.Println("request id missing")
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		feedbackResp, err := getFeedbackResponse(ctx.Request().Context(), h.Gcs.Bucket, requestId)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		// check that user is a part of this request
+		if userId != feedbackResp.ToUserId && userId != feedbackResp.FromUserId {
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		resp, err := toGetFeedbackResponse(ctx.Request().Context(), h.Gcs.Bucket, feedbackResp, h.UserIndices.IdUsername)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		return ctx.JSON(http.StatusOK, resp)
+	}
+}
+
+func (h Handler) GetIncomingFeedback() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		incomingRequests, err := getIncomingFeedbackByUser(ctx.Request().Context(), h.Gcs.Bucket, userId)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		resp, err := toGetFeedbackRequestsResponse(ctx.Request().Context(), h.Gcs.Bucket, incomingRequests, h.UserIndices.IdUsername)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		return ctx.JSON(http.StatusOK, resp)
+	}
+}
+
+func (h Handler) GetOutgoingFeedback() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		outgoingRequests, err := getOutgoingFeedbackByUser(ctx.Request().Context(), h.Gcs.Bucket, userId)
+		if err != nil {
+			log.Println("error getting requests for " + userId)
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		resp, err := toGetFeedbackRequestsResponse(ctx.Request().Context(), h.Gcs.Bucket, outgoingRequests, h.UserIndices.IdUsername)
+		if err != nil {
+			log.Println("error converting to resp for " + userId)
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		return ctx.JSON(http.StatusOK, resp)
+	}
+}
+
+func (h Handler) PostFeedbackAcceptance() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		acceptStr := ctx.QueryParam("accept")
+		if acceptStr == "" {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		requestId := ctx.Param("feedbackid")
+		if requestId == "" {
+			log.Println("request id missing")
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		feedbackResp, err := getFeedbackResponse(ctx.Request().Context(), h.Gcs.Bucket, requestId)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		if feedbackResp.ToUserId != userId {
+			log.Println("only requestee is allowed to accept requests")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		feedbackResp.AcceptanceDate = timeNow()
+		if acceptStr == "true" {
+			feedbackResp.Accepted = true
+		}
+
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackResponsesDir, feedbackResp.RequestId), feedbackResp); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		notif, err := feedbackResponseToNotification(ctx.Request().Context(), h.Gcs.Bucket, feedbackResp, h.UserIndices.IdUsername)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusCreated)
+		}
+
+		if err := createNotification(ctx.Request().Context(), h.Gcs.Bucket, notif); err != nil {
+			log.Println("error creating notification " + err.Error())
+			return ctx.NoContent(http.StatusCreated)
+		}
+
+		h.NotificationIndices.UserHasNotifications[notif.ForUserId] = true
+
+		return ctx.NoContent(http.StatusOK)
+	}
+}
+
+func (h Handler) PostFeedbackResponse() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		requestId := ctx.Param("feedbackid")
+		if requestId == "" {
+			log.Println("request id missing")
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		feedbackResp, err := getFeedbackResponse(ctx.Request().Context(), h.Gcs.Bucket, requestId)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		if feedbackResp.ToUserId != userId {
+			log.Println("only requestee is allowed to post feedback response")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		var data map[string]string
+		if err := ctx.Bind(&data); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		for index, questionResponse := range feedbackResp.QuestionResponses {
+			response, ok := data[questionResponse.QuestionId]
+			if !ok {
+				continue
+			}
+
+			feedbackResp.QuestionResponses[index].Response = response
+		}
+		feedbackResp.ResponseDate = timeNow()
+
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackResponsesDir, feedbackResp.RequestId), feedbackResp); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		notif, err := feedbackResponseToNotification(ctx.Request().Context(), h.Gcs.Bucket, feedbackResp, h.UserIndices.IdUsername)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusCreated)
+		}
+
+		if err := createNotification(ctx.Request().Context(), h.Gcs.Bucket, notif); err != nil {
+			log.Println("error creating notification " + err.Error())
+			return ctx.NoContent(http.StatusCreated)
+		}
+
+		h.NotificationIndices.UserHasNotifications[notif.ForUserId] = true
+
+		return ctx.NoContent(http.StatusCreated)
+	}
+}
+
+func (h Handler) PostFeedbackRequest() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		fromUserId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		var data PostFeedbackRequest
+		if err := ctx.Bind(&data); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		toUserId := ""
+		for id, username := range h.UserIndices.IdUsername {
+			if (username) == data.ToUsername {
+				toUserId = id
+			}
+		}
+		if toUserId == "" {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusNotFound)
+		}
+
+		// create outgoing feedback request
+		outgoingRequests, err := getOutgoingFeedbackByUser(ctx.Request().Context(), h.Gcs.Bucket, fromUserId)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		feedbackReq := toFeedbackRequest(&data, fromUserId, toUserId)
+		if !uniqueRequest(outgoingRequests, toUserId, feedbackReq.OutfitId) {
+			fmt.Println("already requestsed")
+			return ctx.NoContent(http.StatusPreconditionFailed)
+		}
+
+		outgoingRequests = append(outgoingRequests, *feedbackReq)
+
+		// create incoming feedback request
+		incomingRequests, err := getIncomingFeedbackByUser(ctx.Request().Context(), h.Gcs.Bucket, toUserId)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+		incomingRequests = append(incomingRequests, *feedbackReq)
+
+		// create feedback content
+		feedbackResponse := toFeedbackResponse(feedbackReq, data.Questions)
+
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackOutgoingDir, fromUserId), outgoingRequests); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+
+		}
+
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackIncomingDir, toUserId), incomingRequests); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		if err := writeObject(ctx.Request().Context(), h.Gcs.Bucket, joinPaths(feedbackResponsesDir, feedbackReq.RequestId), feedbackResponse); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		// create notification
+		notif, err := feedbackRequestToNotification(ctx.Request().Context(), h.Gcs.Bucket, feedbackReq, h.UserIndices.IdUsername)
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusCreated)
+		}
+
+		if err := createNotification(ctx.Request().Context(), h.Gcs.Bucket, notif); err != nil {
+			log.Println("error creating notification " + err.Error())
+			return ctx.NoContent(http.StatusCreated)
+		}
+
+		h.NotificationIndices.UserHasNotifications[notif.ForUserId] = true
 
 		return ctx.NoContent(http.StatusCreated)
 	}

@@ -159,7 +159,7 @@ func getBusinessOutfits(ctx context.Context, client *gcs.Client, bucket *gcs.Buc
 
 	var response []*OutfitResponse
 	for _, businessOutfit := range data {
-		outfit, err := getOutfit(ctx, client, bucket, userIdUsername, businessOutfit.OutfitId)
+		outfit, err := getOutfit(ctx, bucket, userIdUsername, businessOutfit.OutfitId)
 		if err != nil {
 			return nil, err
 		}

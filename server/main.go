@@ -107,17 +107,17 @@ func run() error {
 		return ctx.JSON(200, a)
 	})
 
-	mux.GET("/api/business-profile", handler.GetBusinessProfile())
-
-	mux.GET("/api/businesses", handler.GetBusinessUsernames())
-
 	mux.GET("/api/cookie", handler.GetCookie())
+
+	mux.GET("/api/outgoing-feedback", handler.GetOutgoingFeedback())
+
+	mux.GET("/api/incoming-feedback", handler.GetIncomingFeedback())
+
+	mux.GET("/api/feedback/:feedbackid", handler.GetFeedback())
 
 	mux.GET("/api/outfit/:outfitid", handler.GetOutfit())
 
 	mux.GET("/api/outfits", handler.GetOutfits())
-
-	mux.GET("/api/business-outfits", handler.GetBusinessOutfits())
 
 	mux.GET("/api/ratings", handler.GetRatingsByUser())
 
@@ -155,13 +155,15 @@ func run() error {
 
 	mux.POST("/api/user-general", handler.PostUserGeneral())
 
-	mux.POST("/api/business-profile", handler.PostBusinessProfile())
-
 	mux.POST("/api/business-outfits", handler.PostBusinessOutfit())
 
 	mux.POST("/api/closet-request", handler.PostClosetRequest())
 
-	mux.POST("/api/notifications-seen", handler.PostNotificationsSeen())
+	mux.POST("/api/feedback-request", handler.PostFeedbackRequest())
+
+	mux.POST("/api/feedback-acceptance/:feedbackid", handler.PostFeedbackAcceptance())
+
+	mux.POST("/api/feedback-response/:feedbackid", handler.PostFeedbackResponse())
 
 	mux.PUT("/api/outfit-item", handler.PutOutfitItem())
 
@@ -170,11 +172,11 @@ func run() error {
 
 func validateConfig(cfg *Config) error {
 	if cfg.GCS.CredsPath == "" {
-		return fmt.Errorf("Missing gcs creds path")
+		return fmt.Errorf("missing gcs creds path")
 	}
 
 	if cfg.GCS.BucketName == "" {
-		return fmt.Errorf("Missing gcs bucket name")
+		return fmt.Errorf("missing gcs bucket name")
 	}
 
 	return nil
@@ -202,12 +204,6 @@ func initiateIndices(ctx context.Context, h *Handler) error {
 	}
 	fmt.Println("created rating indices")
 
-	businessIndices, err := createBusinessIndices(ctx, h.Gcs.Client, h.Gcs.Bucket)
-	if err != nil {
-		return err
-	}
-	fmt.Println("created business indices")
-
 	notificationIndices, err := createNotificationIndices(ctx, h.Gcs.Bucket)
 	if err != nil {
 		return err
@@ -217,7 +213,6 @@ func initiateIndices(ctx context.Context, h *Handler) error {
 	h.UserIndices = userIndices
 	h.OutfitIndices = outfitIndices
 	h.RatingIndices = ratingIndices
-	h.BusinessIndices = businessIndices
 	h.NotificationIndices = notificationIndices
 
 	return nil

@@ -9,7 +9,7 @@ export function Modal(props: {
   return (
     <>
       <div
-        className={`fixed top-0 z-50 w-screen h-screen ${
+        className={`fixed top-0 z-50  w-screen h-full ${
           !props.noBackground && "bg-black bg-opacity-50"
         }`}
       ></div>

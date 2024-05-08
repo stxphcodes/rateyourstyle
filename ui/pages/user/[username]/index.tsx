@@ -5,7 +5,6 @@ import { useState, useMemo } from "react";
 import {
   GetOutfitsByUser,
   Outfit,
-  GetBusinessOutfits,
   OutfitItem,
 } from "../../../apis/get_outfits";
 import { GetRatings, Rating } from "../../../apis/get_ratings";
@@ -14,11 +13,6 @@ import { Navbar } from "../../../components/navarbar";
 import { GetServerURL } from "../../../apis/get_server";
 import { ClosetTable } from "../../../components/closet/table";
 import { Footer } from "../../../components/footer";
-import {
-  BusinessProfile,
-  GetBusinessProfile,
-} from "../../../apis/get_businessprofile";
-import { BusinessAccount } from "../../../components/modals/businessaccount";
 import { UserProfileForm } from "../../../components/forms/user-profile";
 import { UserGeneralForm } from "../../../components/forms/user-general";
 
@@ -29,7 +23,6 @@ type Props = {
   outfits: Outfit[] | null;
   userRatings: Rating[] | null;
   clientServer: string;
-  businessProfile: BusinessProfile | null;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -55,7 +48,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     error: null,
     outfits: null,
     userRatings: null,
-    businessProfile: null,
   };
 
   const clientServer = GetServerURL(true);
@@ -98,11 +90,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       return { props };
     }
     props.userRatings = ratingResp;
-
-    const businessProfileResp = await GetBusinessProfile(server, cookie);
-    if (!(businessProfileResp instanceof Error)) {
-      props.businessProfile = businessProfileResp;
-    }
   }
 
   const resp = await GetOutfitsByUser(server, props.cookie);
@@ -111,18 +98,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props };
   }
   props.outfits = resp;
-
-  if (props.businessProfile) {
-    const businessOutfitsResp = await GetBusinessOutfits(server, props.cookie);
-    if (businessOutfitsResp instanceof Error) {
-      props.error = businessOutfitsResp.message;
-      return { props };
-    }
-
-    if (businessOutfitsResp && businessOutfitsResp.length > 0) {
-      props.outfits.push(...businessOutfitsResp);
-    }
-  }
 
   // sort outfits by date
   props.outfits.sort((a, b) => (a.date < b.date ? 1 : -1));
@@ -149,8 +124,6 @@ export default function Index({
   userRatings,
   error,
 }: Props) {
-  const [switchToBusinessAccount, setSwitchToBusinessAccount] = useState(false);
-
   const outfitItemToIds: Map<string, string[]> = useMemo(() => {
     if (!outfits) {
       return new Map<string, string[]>();
@@ -318,13 +291,6 @@ export default function Index({
           </>
         )}
       </main>
-      {switchToBusinessAccount && (
-        <BusinessAccount
-          clientServer={clientServer}
-          cookie={cookie}
-          handleClose={() => setSwitchToBusinessAccount(false)}
-        />
-      )}
       <Footer />
     </>
   );

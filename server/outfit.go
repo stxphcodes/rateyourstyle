@@ -83,7 +83,7 @@ func getOutfitNoResponse(ctx context.Context, bucket *gcs.BucketHandle, id strin
 	return &o, nil
 }
 
-func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle, userIdUsername map[string]string, id string) (*OutfitResponse, error) {
+func getOutfit(ctx context.Context, bucket *gcs.BucketHandle, userIdUsername map[string]string, id string) (*OutfitResponse, error) {
 	path := "data/outfits/" + id + ".json"
 	obj := bucket.Object(path)
 	reader, err := obj.NewReader(ctx)
@@ -142,7 +142,7 @@ func getOutfit(ctx context.Context, client *gcs.Client, bucket *gcs.BucketHandle
 	}
 
 	// get ratings
-	ratings, err := getRatingsByOutfit(ctx, client, bucket, "data/ratings/"+o.Id+".json")
+	ratings, err := getRatingsByOutfit(ctx, bucket, "data/ratings/"+o.Id+".json")
 	if err == nil {
 		resp.RatingCount = len(ratings)
 		resp.RatingAverage = average(ratings)
