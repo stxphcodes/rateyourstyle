@@ -124,7 +124,7 @@ export default function Index({
     <>
       <Navbar clientServer={clientServer} cookie={cookie} username={username} />
       <main className="mt-12 sm:mt-20 px-4 md:px-8">
-        <section className="mb-12  flex justify-center">
+        <section className="mb-6 md:mb-10 flex justify-center">
           <button
             className="bg-custom-lime p-2 rounded w-3/4 font-bold text-xs"
             onClick={(e) => {
