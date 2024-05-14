@@ -16,6 +16,18 @@ services:
       - "./mnt/app"
       - "--gcs.creds=/secrets/localdev_sa.json"
       - "--campaigns.path=/mnt/campaigns.json"
+  server-image:
+    build:
+      context: ./server-image
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./secrets/:/secrets
+    command:
+      # sh -c "tail -f /dev/null"
+      - "./app"
+      - "--gcs.creds=/secrets/localdev_sa.json"
   ui:
     build:
       context: ./ui
@@ -28,6 +40,7 @@ services:
       # comment out NODE_ENV to test prod build.
       NODE_ENV: development
       NEXT_PUBLIC_SERVER_URL: http://host.docker.internal:8000
+      NEXT_PUBLIC_IMAGE_SERVER_URL: http://host.docker.internal:8002
 
     # comment from here
     volumes:
@@ -39,3 +52,4 @@ services:
     #command: "npm start"
     depends_on:
       - server
+      - server-image
