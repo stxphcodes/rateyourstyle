@@ -516,54 +516,54 @@ func (h Handler) PostSignIn() echo.HandlerFunc {
 	}
 }
 
-func (h Handler) PostImage() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		cookie, err := getCookie(ctx.Request())
-		if err != nil {
-			log.Println("error retrieving cookie")
-			return ctx.NoContent(http.StatusForbidden)
-		}
+// func (h Handler) PostImage() echo.HandlerFunc {
+// 	return func(ctx echo.Context) error {
+// 		cookie, err := getCookie(ctx.Request())
+// 		if err != nil {
+// 			log.Println("error retrieving cookie")
+// 			return ctx.NoContent(http.StatusForbidden)
+// 		}
 
-		userId, ok := h.UserIndices.CookieId[cookie]
-		if !ok {
-			log.Println("user id not found based on cookie " + cookie)
-			return ctx.NoContent(http.StatusForbidden)
-		}
+// 		userId, ok := h.UserIndices.CookieId[cookie]
+// 		if !ok {
+// 			log.Println("user id not found based on cookie " + cookie)
+// 			return ctx.NoContent(http.StatusForbidden)
+// 		}
 
-		file, err := ctx.FormFile("file")
-		if err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
-		}
+// 		file, err := ctx.FormFile("file")
+// 		if err != nil {
+// 			log.Println(err.Error())
+// 			return ctx.NoContent(http.StatusInternalServerError)
+// 		}
 
-		ext := strings.ToLower(filepath.Ext(file.Filename))
-		if ext != ".jpeg" && ext != ".jpg" && ext != ".png" {
-			return ctx.NoContent(http.StatusBadRequest)
-		}
+// 		ext := strings.ToLower(filepath.Ext(file.Filename))
+// 		if ext != ".jpeg" && ext != ".jpg" && ext != ".png" {
+// 			return ctx.NoContent(http.StatusBadRequest)
+// 		}
 
-		filename := uuid()
-		fullpath := filepath.Join("imgs", "outfits", userId, filename+ext)
-		resizedPath := filepath.Join("imgs", "outfits", userId, filename+"-w600"+ext)
+// 		filename := uuid()
+// 		fullpath := filepath.Join("imgs", "outfits", userId, filename+ext)
+// 		resizedPath := filepath.Join("imgs", "outfits", userId, filename+"-w600"+ext)
 
-		if err := createImage(ctx.Request().Context(), h.Gcs.Bucket, file, fullpath); err != nil {
-			log.Println("error creating img ", err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
-		}
+// 		if err := createImage(ctx.Request().Context(), h.Gcs.Bucket, file, fullpath); err != nil {
+// 			log.Println("error creating img ", err.Error())
+// 			return ctx.NoContent(http.StatusInternalServerError)
+// 		}
 
-		if err := createResizeImage(ctx.Request().Context(), h.Gcs.Bucket, fullpath, resizedPath); err != nil {
-			log.Println("error creating resized img ", err.Error())
-		}
+// 		if err := createResizeImage(ctx.Request().Context(), h.Gcs.Bucket, fullpath, resizedPath); err != nil {
+// 			log.Println("error creating resized img ", err.Error())
+// 		}
 
-		attr, err := h.Gcs.Bucket.Attrs(ctx.Request().Context())
-		if err != nil {
-			log.Println(err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
-		}
+// 		attr, err := h.Gcs.Bucket.Attrs(ctx.Request().Context())
+// 		if err != nil {
+// 			log.Println(err.Error())
+// 			return ctx.NoContent(http.StatusInternalServerError)
+// 		}
 
-		url := "https://storage.googleapis.com/" + attr.Name + "/" + fullpath
-		return ctx.String(http.StatusCreated, url)
-	}
-}
+// 		url := "https://storage.googleapis.com/" + attr.Name + "/" + fullpath
+// 		return ctx.String(http.StatusCreated, url)
+// 	}
+// }
 
 func (h Handler) PostOutfit() echo.HandlerFunc {
 	return func(ctx echo.Context) error {

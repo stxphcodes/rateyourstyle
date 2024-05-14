@@ -139,7 +139,7 @@ func run() error {
 
 	mux.GET("/api/notifications", handler.GetNotifications())
 
-	mux.POST("/api/image", handler.PostImage())
+	// mux.POST("/api/image", handler.PostImage())
 
 	mux.POST("/api/outfit", handler.PostOutfit())
 
