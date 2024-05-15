@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"io"
 	"log"
+	"net/url"
 	"path/filepath"
+	"strings"
 	"time"
 
 	gcs "cloud.google.com/go/storage"
@@ -65,4 +67,27 @@ func writeObject(ctx context.Context, bucket *gcs.BucketHandle, path string, dat
 	defer writer.Close()
 
 	return json.NewEncoder(writer).Encode(data)
+}
+
+func getResizedImageURL(ctx context.Context, bucket *gcs.BucketHandle, originalPhotoURL string) (string, error) {
+	pictureURL, err := url.Parse(originalPhotoURL)
+	if err != nil {
+		return "", err
+	}
+
+	urlSplit := strings.Split(pictureURL.Path, "/")
+	pictureName := urlSplit[len(urlSplit)-1]
+	pictureNameSplit := strings.Split(pictureName, ".")
+	resizePictureName := pictureNameSplit[0] + "-w600." + pictureNameSplit[1]
+
+	resizedImageURL := strings.Replace(originalPhotoURL, pictureName, resizePictureName, 1)
+
+	obj := bucket.Object("imgs/outfits/" + urlSplit[len(urlSplit)-2] + "/" + resizePictureName)
+
+	_, err = obj.Attrs(ctx)
+	if err == nil {
+		return resizedImageURL, nil
+	}
+
+	return "", err
 }
