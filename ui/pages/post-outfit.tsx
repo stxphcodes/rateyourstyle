@@ -10,7 +10,7 @@ import { PostOutfit } from "../apis/post_outfit";
 import { Footer } from "../components/footer";
 import { Modal, XButton } from "../components/modals";
 import { Navbar } from "../components/navarbar";
-import { GetServerURL } from "../apis/get_server";
+import { GetImageServerURL, GetServerURL } from "../apis/get_server";
 import { PageMetadata } from "./_app";
 import { AccountPromptModal } from "../components/modals/accountPrompt";
 import { EyedropperButton } from "../components/color/eyedropper-button";
@@ -21,6 +21,7 @@ type Props = {
   cookie: string;
   error: string | null;
   clientServer: string;
+  imageServer: string;
   previousOutfitItems: OutfitItem[];
   metadata: PageMetadata;
 };
@@ -46,6 +47,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     cookie: "",
     error: null,
     clientServer: "",
+    imageServer: "",
     previousOutfitItems: [],
     metadata: {
       title: "Post Outfit",
@@ -104,6 +106,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   props.clientServer = clientServer;
 
+  let imageServer = GetImageServerURL();
+  if (imageServer instanceof Error) {
+    props.error = imageServer.message;
+    return { props };
+  }
+  props.imageServer = imageServer;
+
   return { props };
 };
 
@@ -136,6 +145,7 @@ function PostOutfitPage({
   campaigns,
   cookie,
   clientServer,
+  imageServer,
   previousOutfitItems,
   error,
 }: Props) {
@@ -149,11 +159,6 @@ function PostOutfitPage({
   const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([
     defaultOutfitItem(),
   ]);
-
-  let server = GetServerURL(true);
-  if (server instanceof Error) {
-    server = "";
-  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -326,7 +331,7 @@ function PostOutfitPage({
 
   useEffect(() => {
     async function upload(formData: any) {
-      const resp = await PostImage(clientServer, formData, cookie);
+      const resp = await PostImage(imageServer, formData, cookie);
       if (resp instanceof Error) {
         setFileError(resp.message);
         return;
@@ -341,7 +346,7 @@ function PostOutfitPage({
 
       upload(formData);
     }
-  }, [server, cookie, file]);
+  }, [cookie, file]);
 
   if (error) {
     return <div>error {error} </div>;
