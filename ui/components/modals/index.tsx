@@ -10,17 +10,12 @@ export function Modal(props: {
 }) {
   // disable scroll for page behind the modal
   useEffect(() => {
-    // if (
-    //   window.location.pathname !== "/discover" &&
-    //   window.location.pathname !== "/post-outfit"
-    // ) {
     document.body.style.overflow = "hidden";
-    // }
-
     return () => {
       document.body.style.overflow = "unset";
     };
   }, []);
+
   return (
     <>
       <div
