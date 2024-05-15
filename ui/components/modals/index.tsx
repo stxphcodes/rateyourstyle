@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 export function Modal(props: {
   children: JSX.Element;
   handleClose: any;
@@ -6,6 +8,19 @@ export function Modal(props: {
   noPadding?: boolean;
   noBackground?: boolean;
 }) {
+  // disable scroll for page behind the modal
+  useEffect(() => {
+    // if (
+    //   window.location.pathname !== "/discover" &&
+    //   window.location.pathname !== "/post-outfit"
+    // ) {
+    document.body.style.overflow = "hidden";
+    // }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
   return (
     <>
       <div
