@@ -343,25 +343,25 @@ function UserMenu(props: { username: string; handleClose: any }) {
       ref={menuRef}
     >
       <Link href={`/user/${props.username}`} passHref={true}>
-        <button className="px-8 py-2  hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase">
+        <button className="px-6 py-2 hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase">
           Account
         </button>
       </Link>
 
       <Link href={`/closet/${props.username}`} passHref={true}>
-        <button className="px-8 py-2  hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase">
+        <button className="px-6 py-2 hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase">
           Closet
         </button>
       </Link>
 
       <Link href={`/requests/${props.username}`} passHref={true}>
-        <button className="px-8 py-2  hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase">
+        <button className="px-6 py-2 hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase">
           Requests
         </button>
       </Link>
 
       <button
-        className="px-8 py-2  hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase"
+        className="px-6 py-2 hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase"
         onClick={() => {
           // delete cookie
           document.cookie = "rys-login=;expires=Thu, 01 Jan 1970 00:00:01 GMT";
