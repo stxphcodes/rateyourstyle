@@ -12,11 +12,7 @@ import { NotificationFilledIcon } from "./icons/notification-filled";
 import { CreateAccount } from "./modals/createaccount";
 import { SignIn } from "./modals/signin";
 import { OutfitModal } from "./modals/outfit";
-import {
-  GetOutgoingFeedback,
-  GetOutfitFeedbackResponse,
-  GetFeedback,
-} from "../apis/get_feedback";
+import { GetOutfitFeedbackResponse, GetFeedback } from "../apis/get_feedback";
 import { OutfitFeedbackModal } from "./modals/outfitfeedback";
 
 // check if browser allows cookies to be set
@@ -40,6 +36,7 @@ export function Navbar(props: {
   const router = useRouter();
 
   const mobileMenuRef = useRef<any>();
+
   const mobileMenuButtonRef = useRef<any>();
 
   const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
@@ -82,6 +79,11 @@ export function Navbar(props: {
     }
   };
 
+  const handleModalClose = () => {
+    let url = window.location.origin + window.location.pathname;
+    window.location.href = url;
+  };
+
   useEffect(() => {
     async function getusernotif() {
       if (props.cookie) {
@@ -103,6 +105,7 @@ export function Navbar(props: {
     getusernotif();
 
     checkMobileScreenWidth(window);
+
     window.addEventListener("resize", () => {
       checkMobileScreenWidth(window);
     });
@@ -245,10 +248,7 @@ export function Navbar(props: {
         <OutfitModal
           clientServer={props.clientServer}
           cookie={props.cookie}
-          handleClose={() => {
-            let url = window.location.origin + window.location.pathname;
-            window.location.href = url;
-          }}
+          handleClose={handleModalClose}
           data={outfit}
           asUser={false}
           userRating={null}
@@ -259,10 +259,7 @@ export function Navbar(props: {
         <OutfitFeedbackModal
           clientServer={props.clientServer}
           cookie={props.cookie}
-          handleClose={() => {
-            let url = window.location.origin + window.location.pathname;
-            window.location.href = url;
-          }}
+          handleClose={handleModalClose}
           data={feedback}
           currentUsername={user}
         />
@@ -346,19 +343,25 @@ function UserMenu(props: { username: string; handleClose: any }) {
       ref={menuRef}
     >
       <Link href={`/user/${props.username}`} passHref={true}>
-        <button className="px-8 py-2  hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase">
+        <button className="px-6 py-2 hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase">
           Account
         </button>
       </Link>
 
+      <Link href={`/closet/${props.username}`} passHref={true}>
+        <button className="px-6 py-2 hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase">
+          Closet
+        </button>
+      </Link>
+
       <Link href={`/requests/${props.username}`} passHref={true}>
-        <button className="px-8 py-2  hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase">
+        <button className="px-6 py-2 hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase">
           Requests
         </button>
       </Link>
 
       <button
-        className="px-8 py-2  hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase"
+        className="px-6 py-2 hover:bg-custom-tan text-left overflow-clip shrink-0 text-xs uppercase"
         onClick={() => {
           // delete cookie
           document.cookie = "rys-login=;expires=Thu, 01 Jan 1970 00:00:01 GMT";

@@ -254,12 +254,12 @@ function OutfitSelection(props: {
   handleOutfitClick: any;
 }) {
   return (
-    <div className="flex gap-4 flex-wrap">
+    <div className="flex flex-wrap gap-4 justify-between">
       {props.userOutfits &&
         props.userOutfits.map((outfit) => {
           return (
             <div
-              className={`w-48 shadow-md break-words 
+              className={`w-44 shadow-md break-words 
             ${
               outfit.id === props?.outfitSelected?.id
                 ? "border-4 border-custom-pink"

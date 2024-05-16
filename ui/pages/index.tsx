@@ -102,7 +102,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     metadata: {
       title: "",
       description:
-        "Rate Your Style i  a styling marketplace that connects people seeking fashion advice to personal stylists. Use Rate Your Style to get outfit feedback and style advice, and to find fashion outfit inspo.",
+        "Rate Your Style is a styling marketplace that connects people seeking fashion advice to personal stylists. Use Rate Your Style to get outfit feedback and style advice, and to find fashion outfit inspo.",
     },
   };
 
@@ -145,10 +145,12 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
     let id = setInterval(() => {
       if (outfits) {
         let num = Math.floor(Math.random() * outfits.length);
-        setHeroSectionOutfit(outfits[num]);
-
         let num2 = Math.floor(Math.random() * outfits.length);
-        setHeroSectionOutfit2(outfits[num2]);
+
+        if (num !== num2) {
+          setHeroSectionOutfit(outfits[num]);
+          setHeroSectionOutfit2(outfits[num2]);
+        }
       }
     }, 3000);
 
