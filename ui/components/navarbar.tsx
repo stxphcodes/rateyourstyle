@@ -194,16 +194,16 @@ export function Navbar(props: {
 
         {!useMobileMenu && (
           <div className="">
+            <Link href="/how-it-works" passHref={true}>
+              How It Works
+            </Link>
+            <span className="mx-1">|</span>
             <Link href="/discover" passHref={true}>
               <a className="">Discover</a>
             </Link>
             <span className="mx-1">|</span>
             <Link href="/post-outfit" passHref={true}>
               Post Outfit
-            </Link>
-            <span className="mx-1">|</span>
-            <Link href="/request-closet" passHref={true}>
-              Request Closet
             </Link>
           </div>
         )}
@@ -217,16 +217,16 @@ export function Navbar(props: {
             <a className="">Home</a>
           </Link>
 
+          <Link href="/how-it-works" passHref={true}>
+            How It Works
+          </Link>
+
           <Link href="/discover" passHref={true}>
             <a className="">Discover</a>
           </Link>
 
           <Link href="/post-outfit" passHref={true}>
             Post Outfit
-          </Link>
-
-          <Link href="/request-closet" passHref={true}>
-            Request Closet
           </Link>
         </div>
       )}
