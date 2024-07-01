@@ -52,7 +52,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { props };
   }
   props.closetName = closetName;
-  props.metadata.title = closetName + " closet";
+  props.metadata.title = closetName + "'s closet";
   props.metadata.description = "outfits by " + closetName;
 
   let server = GetServerURL();
