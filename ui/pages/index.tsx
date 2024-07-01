@@ -27,64 +27,6 @@ const fashionEnthusiastList = [
   "Get style advice from real people or pay to get styling advice from a professional stylist",
 ];
 
-const howItWorks = [
-  {
-    picture_url: "/screenshot-closet.png",
-    title: "1. Upload your outfits",
-    description: "Create an account and start posting your favorite outfits!",
-    bgcolor: "custom-lime",
-    content: (
-      <div>
-        Create an account and start posting your favorite outfits! Your outfits
-        will populate your closet page.
-        <br />
-        <br />
-        See an{" "}
-        <Link href="/closet/stxphcodes" passHref={true}>
-          <a className="hover:text-custom-pink">example closet here</a>
-        </Link>
-        .
-      </div>
-    ),
-  },
-  {
-    picture_url: "/screenshot-requestfeedback.png",
-    title: "2. Get outfit feedback",
-    content: (
-      <div>
-        The Rate Your Style community will rate and review your outfits.
-        <br />
-        <br />
-        (Coming Soon)
-        <br /> There are professional stylists on Rate Your Style. If you&apos;d
-        like their specific outfit feedback, you can send a request to them
-        directly.
-      </div>
-    ),
-    bgcolor: "custom-pink",
-  },
-  {
-    picture_url: "/screenshot-review.png",
-    title: "3. Give outfit feedback",
-    content: (
-      <div>
-        Use the{" "}
-        <Link href="/discover" passHref={true}>
-          <a className="hover:text-custom-pink">Discover page</a>
-        </Link>{" "}
-        to find fashion inspo, and to rate & review other users&apos; outfits.
-        <br />
-        <br />
-        (Coming Soon)
-        <br />
-        If other users like your style, they can request feedback from you. You
-        can charge a styling fee if you&apos;d like.
-      </div>
-    ),
-    bgcolor: "custom-lime",
-  },
-];
-
 type Props = {
   cookie: string;
   clientServer: string;
@@ -102,7 +44,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     metadata: {
       title: "",
       description:
-        "Rate Your Style is a styling marketplace that connects people seeking fashion advice to personal stylists. Use Rate Your Style to get outfit feedback and style advice, and to find fashion outfit inspo.",
+        "Rate Your Style is a fashion community to support people in finding their personal style. Use Rate Your Style to get outfit feedback and style advice, and to find fashion outfit inspo. You can also connect with professional stylists on Rate Your Style.",
     },
   };
 
@@ -141,6 +83,8 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
     outfits ? outfits[1] : null
   );
 
+  const [readMore, setReadMore] = useState(false);
+
   useEffect(() => {
     let id = setInterval(() => {
       if (outfits) {
@@ -166,10 +110,12 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
       <Navbar clientServer={clientServer} cookie={cookie} />
       <main className="">
         <section className="p-4 md:p-8 bg-gradient mt-8">
-          <h1 className="text-4xl text-center py-8">
-            Welcome to Rate Your Style, <br />
-            An Innovative Styling Marketplace
+          <h1 className="text-4xl text-center pt-8">
+            Welcome to Rate Your Style
           </h1>
+          <h2 className="text-center uppercase pb-8  m-auto">
+            a fashion community to support you in finding your personal style 🫶
+          </h2>
 
           <div className="sm:w-3/4 m-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-4">
@@ -241,27 +187,72 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
               </ul>
             </div>
           </div>
+          <div className="flex justify-center my-4">
+            <Link href="/how-it-works" passHref={true}>
+              <a className="uppercase bg-custom-lime py-2 px-16 rounded hover:bg-custom-pink">
+                <h2>How it works</h2>
+              </a>
+            </Link>
+          </div>
         </section>
 
-        <section>
-          <h1 className="px-4 md:px-8 py-8 bg-custom-tan">How It Works</h1>
-          <div className="grid grid-cols-1 sm:grid-cols-3 ">
-            {howItWorks.map((item, index) => (
-              <div
-                className={`p-8 whitespace-pre-line bg-${item.bgcolor}`}
-                key={`how-it-works-step-${index}`}
-              >
-                <h2>{item.title}</h2>
-                <div className="flex gap-2 items-start mt-4">
-                  {item.content}
-                  <img
-                    alt={`how-it-works-img-${index}`}
-                    src={item.picture_url}
-                    className="w-1/2 border-4 border-black"
-                  ></img>
-                </div>
-              </div>
-            ))}
+        <section className="bg-custom-tan">
+          <div className="grid sm:grid-cols-2 gap-2">
+            <div className="col-span-1 px-4 md:px-8 py-4 text-balance">
+              <h1 className="pb-2 animate-typing overflow-hidden whitespace-nowrap">
+                Hello World!
+              </h1>
+              Growing up, one of my favorite past times was shopping and
+              dressing up with my mom. We would spend our weekends pillaging the
+              sale section of department stores, looking for deals on pieces
+              that we felt beautiful in.
+              <br />
+              {readMore && (
+                <>
+                  <br />
+                  Somewhere in between those blissful, weekend shopping trips as
+                  a kid, and the tumultous years of adolscence when my self
+                  awareness heightened and my self confidence dropped, I stopped
+                  enjoying shopping, and I struggled to feel good in anything
+                  that I wore.
+                  <br />
+                  <br />
+                  This continued for most of my early twenties. I remember
+                  visiting home during the holidays, and turning down my
+                  mom&apos;s invitations to go shopping, which I knew were also
+                  invitations to bond and reconnect.
+                  <br />
+                  <br />
+                  It wasn&apos;t until my mid twenties, when I started to
+                  understand and accept who I was, that I rediscovered my love
+                  for shopping and putting together outfits. Around that time, I
+                  also learned about personal style, and I found that defining
+                  my personal style helped make shopping less overwhelming, and
+                  made getting ready everyday easier and fun again. <br />{" "}
+                  <br />
+                  So as a software engineer, I wanted to try creating a platform
+                  that helps other people in their journey to find their
+                  personal style too. Everyone deserves to feel good in what
+                  they wear, and who they are. I hope that Rate Your Style can
+                  help you achieve that.
+                  <br />
+                  <br />
+                  With love, <br />
+                  Steph
+                </>
+              )}
+              <br />
+              <a onClick={() => setReadMore(!readMore)}>
+                Read {readMore ? "less" : "more"}
+              </a>
+            </div>
+
+            <div>
+              <img
+                src="./mom-and-me.jpeg"
+                className="w-full h-full object-contain"
+              />
+            </div>
           </div>
         </section>
 

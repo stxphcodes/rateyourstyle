@@ -1,8 +1,8 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
+import "../styles/globals.css";
+import type { AppProps } from "next/app";
 import Head from "next/head";
-import { useRouter } from 'next/router'
-import Script from 'next/script';
+import { useRouter } from "next/router";
+import Script from "next/script";
 
 export type PageMetadata = {
   title: string;
@@ -10,7 +10,7 @@ export type PageMetadata = {
 };
 
 function MyApp({ Component, pageProps }: AppProps<any>) {
-  // See this github issue on how using router helps with 
+  // See this github issue on how using router helps with
   // page reloading issue
   // https://github.com/vercel/next.js/discussions/22512#discussioncomment-1779505
   const router = useRouter();
@@ -19,7 +19,9 @@ function MyApp({ Component, pageProps }: AppProps<any>) {
   return (
     <>
       <Head>
-        <title>{metadata && metadata.title ? metadata.title + " - Rate Your Style" : "RateYourStyle"}</title>
+        <title>
+          {metadata && metadata.title ? metadata.title : "Rate Your Style"}
+        </title>
         <link rel="icon" type="image/x-icon" href="/favicon.ico"></link>
         <meta
           name="description"
@@ -49,11 +51,10 @@ function MyApp({ Component, pageProps }: AppProps<any>) {
         `}
           </Script>
         </>
-      )
-      }
+      )}
       <Component {...pageProps} key={router.asPath} />
     </>
-  )
+  );
 }
 
-export default MyApp
+export default MyApp;
