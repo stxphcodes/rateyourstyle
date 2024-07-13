@@ -1,0 +1,22 @@
+
+<!doctype html>
+<html>
+<head>
+    <title>RateYourStyle Verification</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"> <!-- load bulma css -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> <!-- load fontawesome -->
+    <style>
+        body        { padding-top:70px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="jumbotron text-center text-success">
+        <h1><span class="fa fa-lock"></span>Hi {{ .Username }},</h1>
+        <p>Than you for signing up on RateYourStyle.com. To complete the sign up process, please click the button below.</p>
+        <button onClick="">Verify</button>
+       <h3>{{ .Code }}</h3>
+    </div>
+</div>
+</body>
+</html> 

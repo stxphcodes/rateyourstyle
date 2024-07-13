@@ -19,13 +19,13 @@ label {
 
 input, textarea {
   padding: 8px;
-  border: 1.5px solid black;
+  border: 1px solid black;
   color: grey;
   border-radius: 5px;
 }
 
 input:focus, textarea:focus {
-  border: 2px solid #cdbda8;
+  border: 1px solid #d8e303;
   color: black;
   outline: none;
 }
