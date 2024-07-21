@@ -33,7 +33,7 @@ services:
   server-auth:
     build:
       context: ./server-auth
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - "8003:8003"
     volumes:
