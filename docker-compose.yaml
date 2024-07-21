@@ -43,8 +43,8 @@ services:
       - "--gcs.creds=/secrets/localdev_sa.json"
       - "--email=rateyourstyle@gmail.com"
       - "--email.password=/secrets/email_password2"
-      - "--google.client=590493578686-9lg9pbidq80ub77ma3qijqbnm5mk3dh8.apps.googleusercontent.com" 
-      - "--google.secret=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"
+      # - "--google.client=590493578686-9lg9pbidq80ub77ma3qijqbnm5mk3dh8.apps.googleusercontent.com" 
+      # - "--google.secret=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"
       
   ui:
     build:

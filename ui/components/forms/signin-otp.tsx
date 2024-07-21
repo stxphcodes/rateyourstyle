@@ -5,9 +5,17 @@ import { PrimaryButton } from "../Buttons/primary";
 import { GetOTP } from "../../apis/get_otp";
 import LoadingGIF from "../icons/loader-gif";
 
-export function OTPForm(props: { authServer: string }) {
-  const [usernameOrEmail, setUsernameOrEmail] = useState("");
-  const [sentEmail, setSentEmail] = useState(false);
+export function OTPForm(props: {
+  authServer: string;
+  sentEmail?: boolean;
+  email?: string;
+}) {
+  const [usernameOrEmail, setUsernameOrEmail] = useState(
+    props.email ? props.email : ""
+  );
+  const [sentEmail, setSentEmail] = useState(
+    props.sentEmail ? props.sentEmail : false
+  );
   const [loading, setLoading] = useState(false);
   const [otp, setOTP] = useState("");
 
@@ -26,6 +34,7 @@ export function OTPForm(props: { authServer: string }) {
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null);
     if (event.target.id == "usernameOrEmail") {
       let value = event.target.value;
       setUsernameOrEmail(value.toLowerCase());
@@ -58,7 +67,9 @@ export function OTPForm(props: { authServer: string }) {
       <form>
         <div className="mb-4">
           <label className="" htmlFor="usernameOrEmail">
-            Please enter your account username or email.
+            {sentEmail
+              ? "Your account username or email"
+              : "Please enter your account username or email"}
           </label>
           <input
             className="w-full"
@@ -69,6 +80,7 @@ export function OTPForm(props: { authServer: string }) {
             autoCapitalize="off"
             autoCorrect="off"
             disabled={sentEmail}
+            value={usernameOrEmail}
           ></input>
         </div>
         {sentEmail && (
@@ -92,9 +104,13 @@ export function OTPForm(props: { authServer: string }) {
           {loading ? (
             <LoadingGIF />
           ) : !sentEmail ? (
-            <PrimaryButton onClick={sendEmail}>Next</PrimaryButton>
+            <PrimaryButton onClick={sendEmail} isSubmit={true}>
+              Next
+            </PrimaryButton>
           ) : (
-            <PrimaryButton onClick={handleSignin}>Sign in</PrimaryButton>
+            <PrimaryButton isSubmit={true} onClick={handleSignin}>
+              Sign in
+            </PrimaryButton>
           )}
         </div>
       </form>

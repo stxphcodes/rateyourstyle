@@ -11,7 +11,6 @@ import (
 
 	gcs "cloud.google.com/go/storage"
 	"github.com/labstack/echo"
-	"golang.org/x/oauth2"
 )
 
 var otps = make(map[string]time.Time)
@@ -28,10 +27,13 @@ func generateOTP() string {
 	return string(buffer)
 }
 
-func HandleOTPSignin(oauth *oauth2.Config, bucket *gcs.BucketHandle, smtpClient *SmtpClient, domain string) echo.HandlerFunc {
+func HandleGetOTP(bucket *gcs.BucketHandle, smtpClient *SmtpClient, emailTemplate, emailSubject string) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		usernameOrEmail := ctx.QueryParam("user")
-		if usernameOrEmail == "" {
+		url := ctx.Request().URL
+		q := url.RawQuery
+
+		usernameOrEmail := strings.TrimPrefix(q, "user=")
+		if usernameOrEmail == q {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 
@@ -44,9 +46,7 @@ func HandleOTPSignin(oauth *oauth2.Config, bucket *gcs.BucketHandle, smtpClient 
 		for _, user := range users {
 			if strings.EqualFold(user.Email, usernameOrEmail) || strings.EqualFold(user.Username, usernameOrEmail) {
 				otp := generateOTP()
-				param := fmt.Sprintf("user=%s&otp=%s", usernameOrEmail, otp)
-				// url := fmt.Sprintf("http://localhost:8003/auth/otp/signin/callback?%s", param)
-
+				param := fmt.Sprintf("email=%s&otp=%s", user.Email, otp)
 				otps[param] = time.Now().Add(time.Minute * 5)
 
 				data := struct {
@@ -57,8 +57,7 @@ func HandleOTPSignin(oauth *oauth2.Config, bucket *gcs.BucketHandle, smtpClient 
 					OTP:      otp,
 				}
 
-				return sendEmail(smtpClient, "templates/signin-otp.html", "RateYourStyle Sign In", user.Email, data)
-
+				return sendEmail(smtpClient, emailTemplate, emailSubject, user.Email, data)
 			}
 		}
 
@@ -66,7 +65,13 @@ func HandleOTPSignin(oauth *oauth2.Config, bucket *gcs.BucketHandle, smtpClient 
 	}
 }
 
-func HandlePostOTPSignin(bucket *gcs.BucketHandle) echo.HandlerFunc {
+func HandleGetOTPs() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		return ctx.JSON(http.StatusOK, otps)
+	}
+}
+
+func HandlePostOTP(bucket *gcs.BucketHandle) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		var m map[string]string
 		if err := json.NewDecoder(ctx.Request().Body).Decode(&m); err != nil {
@@ -84,7 +89,7 @@ func HandlePostOTPSignin(bucket *gcs.BucketHandle) echo.HandlerFunc {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 
-		key := fmt.Sprintf("user=%s&otp=%s", user, otp)
+		key := fmt.Sprintf("email=%s&otp=%s", user, otp)
 		expiry, ok := otps[key]
 		if !ok {
 			return ctx.NoContent(http.StatusNotFound)
@@ -102,9 +107,14 @@ func HandlePostOTPSignin(bucket *gcs.BucketHandle) echo.HandlerFunc {
 		}
 
 		cookie := ""
-		for _, u := range users {
+		for index, u := range users {
 			if strings.EqualFold(u.Username, user) || strings.EqualFold(u.Email, user) {
 				cookie = u.Cookie
+				if !u.Verified {
+					users[index].Verified = true
+					updateUserVerification(ctx.Request().Context(), bucket, users)
+				}
+				break
 			}
 		}
 

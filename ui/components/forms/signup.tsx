@@ -1,8 +1,12 @@
 import { useState } from "react";
 
+import { OTPForm } from "./signin-otp";
 import { PostUser } from "../../apis/post_user";
 import { PrimaryButton } from "../Buttons/primary";
+import { GetSignupVerification } from "../../apis/get_signupverification";
+import LoadingGIF from "../icons/loader-gif";
 
+const ErrMissingFields = "Missing required fields.";
 const ErrUsernameShort =
   "Username is too short. Please create a username greater than 3 characters.";
 const ErrUsernameLong =
@@ -12,17 +16,18 @@ const ErrPasswordShort =
   "Password is too short. Please select a more secure password.";
 const ErrTermsChecked = "Please read and agree to the Terms of Use.";
 
-export function CreateAccount(props: { clientServer: string }) {
+const SignupForm = (props: { clientServer: string; authServer: string }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [termsChecked, setTermsChecked] = useState(false);
-  const [validationError, setValidationError] = useState<string>(
-    "missing required fields"
-  );
+  const [validationError, setValidationError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+  const [sentVerification, setSentVerification] = useState(false);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValidationError("");
     setError(null);
     if (event.target.id == "username") {
@@ -37,10 +42,15 @@ export function CreateAccount(props: { clientServer: string }) {
     if (event.target.id == "email") {
       setEmail(event.target.value);
     }
-  }
+  };
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!username || !email || !password) {
+      setValidationError(ErrMissingFields);
+      return;
+    }
 
     if (username.length < 3) {
       setValidationError(ErrUsernameShort);
@@ -68,112 +78,135 @@ export function CreateAccount(props: { clientServer: string }) {
     }
 
     setValidationError("");
-
+    setIsLoading(true);
     const resp = await PostUser(props.clientServer, username, email, password);
     if (resp instanceof Error) {
+      setIsLoading(false);
       setError(resp.message);
       return;
     }
 
-    document.cookie = resp;
-    location.reload();
-    return;
-  }
+    const resp2 = await GetSignupVerification(props.authServer, email);
+    if (resp2 instanceof Error) {
+      setIsLoading(false);
+      setError(resp2.message);
+      return;
+    }
 
-  if (error && !error.includes("taken")) {
-    return (
-      <div>
-        <h3>Uh oh. Looks like we encountered a server issue on our end.</h3>
-        If the issue persists, pleae email sitesbystephanie @gmail.com
-      </div>
-    );
-  }
+    setIsLoading(false);
+    setSentVerification(true);
+    // document.cookie = resp2;
+    // location.reload();
+    return;
+  };
 
   return (
     <>
-      <form className="" onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="Email">Email</label>
-          <input
-            className="w-full"
-            id="email"
-            type="text"
-            placeholder="Email"
-            onChange={handleInputChange}
-            value={email}
-            autoCapitalize="off"
-          />
-          <label htmlFor="Email" className="requiredLabel">
-            Required
-          </label>
-        </div>
-        <div className="mb-4">
-          <label className="" htmlFor="username">
-            Username
-          </label>
-          <input
-            className="w-full"
-            id="username"
-            type="text"
-            placeholder="Username"
-            onChange={handleInputChange}
-            value={username}
-            autoCapitalize="off"
-            autoCorrect="off"
-          />
-          <label htmlFor="Email" className="requiredLabel">
-            Required
-          </label>
-        </div>
-        <div className="mb-6">
-          <label className="" htmlFor="password">
-            Password
-          </label>
-          <input
-            className="w-full"
-            id="password"
-            type="password"
-            placeholder="******************"
-            onChange={handleInputChange}
-            value={password}
-            autoCapitalize="off"
-          />
-          <label htmlFor="Email" className="requiredLabel">
-            Required
-          </label>
-        </div>
-        <div className="flex gap-2 items-start mb-6">
-          <input
-            type="checkbox"
-            checked={termsChecked}
-            onChange={() => {
-              setValidationError("");
-              setTermsChecked(!termsChecked);
-            }}
-          />
-          <label>
-            I agree to Rate Your Style's cookie policy. Rate Your Style uses
-            cookies to maintain your login session. The cookie is only used for
-            the purpose of saving your login details.
-          </label>
-        </div>
-
-        <div className="flex items-center justify-between ">
-          <PrimaryButton isSubmit={true} disabled={validationError !== ""}>
-            Create Account
-          </PrimaryButton>
-        </div>
-
-        {validationError && !validationError.includes("missing") && (
-          <div className="my-2 text-red-500 font-bold">{validationError}</div>
-        )}
-
-        {error && error.includes("taken") && (
-          <div className="my-2 text-red-500 font-bold">
-            {error}. please choose another.
+      <form className="">
+        {sentVerification ? (
+          <div className="mb-6">
+            <OTPForm
+              authServer={props.authServer}
+              sentEmail={true}
+              email={email}
+            />
           </div>
+        ) : (
+          <>
+            <div className="mb-4">
+              <label htmlFor="Email">Email</label>
+              <input
+                className="w-full"
+                id="email"
+                type="text"
+                placeholder="Email"
+                onChange={handleInputChange}
+                value={email}
+                autoCapitalize="off"
+              />
+              <label htmlFor="Email" className="requiredLabel">
+                Required
+              </label>
+            </div>
+            <div className="mb-4">
+              <label className="" htmlFor="username">
+                Username
+              </label>
+              <input
+                className="w-full"
+                id="username"
+                type="text"
+                placeholder="Username"
+                onChange={handleInputChange}
+                value={username}
+                autoCapitalize="off"
+                autoCorrect="off"
+              />
+              <label htmlFor="Email" className="requiredLabel">
+                Required
+              </label>
+            </div>
+            <div className="mb-6">
+              <label className="" htmlFor="password">
+                Password
+              </label>
+              <input
+                className="w-full"
+                id="password"
+                type="password"
+                placeholder="******************"
+                onChange={handleInputChange}
+                value={password}
+                autoCapitalize="off"
+              />
+              <label htmlFor="Email" className="requiredLabel">
+                Required
+              </label>
+            </div>
+            <div className="flex gap-2 items-start mb-6">
+              <input
+                type="checkbox"
+                checked={termsChecked}
+                onChange={() => {
+                  setValidationError("");
+                  setTermsChecked(!termsChecked);
+                }}
+              />
+              <label>
+                I agree to Rate Your Style's cookie policy. Rate Your Style uses
+                cookies to maintain your login session. The cookie is only used
+                for the purpose of saving your login details.
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between ">
+              {isLoading ? (
+                <LoadingGIF />
+              ) : (
+                <PrimaryButton
+                  isSubmit={true}
+                  disabled={validationError !== ""}
+                  onClick={handleSubmit}
+                >
+                  Create Account
+                </PrimaryButton>
+              )}
+            </div>
+
+            {validationError && (
+              <div className="my-2 text-red-500 font-bold">
+                {validationError}
+              </div>
+            )}
+
+            {error && (
+              <div className="my-2 text-red-500 font-bold">{error}</div>
+            )}
+          </>
         )}
       </form>
     </>
   );
-}
+};
+
+export default SignupForm;

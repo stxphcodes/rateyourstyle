@@ -733,7 +733,12 @@ func (h *Handler) PostUser() echo.HandlerFunc {
 		// uniqueness checks
 		_, ok := h.UserIndices.Usernames[data.Username]
 		if ok {
-			return ctx.String(http.StatusBadRequest, "username taken")
+			return ctx.String(http.StatusFailedDependency, "username")
+		}
+
+		_, ok = h.UserIndices.Emails[data.Email]
+		if ok {
+			return ctx.String(http.StatusFailedDependency, "email")
 		}
 
 		// assign cookie and id to user

@@ -22,6 +22,8 @@ type User struct {
 	Password string `json:"password"`
 	Cookie   string `json:"cookie"`
 	Id       string `json:"id"`
+
+	Verified bool `json:"verified"`
 }
 
 type UserProfile struct {

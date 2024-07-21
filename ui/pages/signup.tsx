@@ -1,14 +1,15 @@
 import { GetServerSideProps } from "next";
 import { Footer } from "../components/footer";
 import { Navbar } from "../components/navarbar";
-import { GetServerURL } from "../apis/get_server";
+import { GetServerURL, GetAuthServerURL } from "../apis/get_server";
 import { PageMetadata } from "./_app";
-import { CreateAccount } from "../components/forms/signup";
+import SignupForm from "../components/forms/signup";
 import { GoogleButton } from "../components/Buttons/google";
 import Link from "next/link";
 
 type Props = {
   clientServer: string;
+  authServer: string;
   error: string | null;
   metadata: PageMetadata;
 };
@@ -16,6 +17,7 @@ type Props = {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   let props: Props = {
     error: null,
+    authServer: "",
     clientServer: "",
     metadata: {
       title: "Sign Up",
@@ -40,10 +42,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
   props.clientServer = clientServer;
 
+  const authServer = GetAuthServerURL();
+  if (authServer instanceof Error) {
+    props.error = authServer.message;
+    return { props };
+  }
+  props.authServer = authServer;
+
   return { props };
 };
 
-function Signup({ clientServer, error }: Props) {
+function Signup({ clientServer, authServer, error }: Props) {
   if (error) {
     return <div>error {error} </div>;
   }
@@ -63,20 +72,23 @@ function Signup({ clientServer, error }: Props) {
                     style 🫶.
                   </p>
                 </div>
-                <form
+
+                {/* <form
                   action="http://localhost:8003/auth/google/signin"
                   method="get"
                 >
                   <GoogleButton styles="m-auto" />
                 </form>
+
                 <div className="inline-flex items-center justify-center w-full">
                   <hr className="w-64 h-px my-8 bg-black border-0 " />
                   <span className="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-900">
                     or
                   </span>
-                </div>
+                </div> */}
               </div>
-              <CreateAccount clientServer={clientServer} />
+
+              <SignupForm clientServer={clientServer} authServer={authServer} />
             </div>
 
             <div className="pt-4">

@@ -1,3 +1,4 @@
+import { ERR_GENERAL_BAD_REQUEST, ERR_GENERAL_INTERNAL_SERVER, ERR_POST_OTP_EXPIRED, ERR_POST_OTP_INVALID, StatusCodes } from "./errors";
 import { SetCookieExpiration } from "./post_user";
 
 export async function PostSigninPassword(
@@ -79,8 +80,6 @@ export async function PostSSO(
     ): Promise<string | Error> {
       let error: Error | null = null;
       let cookie: string = "";
-    
-      //`${server}/api/signin`
 
       let url = `${authServer}/auth/signin/otp`
       await fetch(url, {
@@ -93,7 +92,16 @@ export async function PostSSO(
       })
         .then((response) => {
           if (!response.ok) {
-            throw new Error("response not ok");
+            switch (response.status) {
+              case StatusCodes.NOT_FOUND:
+                  throw new Error(ERR_POST_OTP_INVALID);
+              case StatusCodes.FAILED_DEPENDENCY:
+                throw new Error(ERR_POST_OTP_EXPIRED);
+              case StatusCodes.BAD_REQUEST:
+                throw new Error(ERR_GENERAL_BAD_REQUEST)
+              default:
+                throw new Error(ERR_GENERAL_INTERNAL_SERVER)
+            }
           }
     
           return response.text();
