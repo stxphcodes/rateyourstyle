@@ -37,11 +37,6 @@ export function Navbar(props: {
 
   const mobileMenuButtonRef = useRef<any>();
 
-  // const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
-
-  // const [showCreateAccountModal, setShowCreateAccountModal] =
-  //   useState<boolean>(false);
-
   const [hasNotifs, setHasNotifs] = useState<boolean>(false);
 
   const [user, setUser] = useState<string>(
@@ -224,19 +219,6 @@ export function Navbar(props: {
           </Link>
         </div>
       )}
-      {/* 
-      {showSignInModal && (
-        <SignIn
-          handleClose={() => setShowSignInModal(false)}
-          clientServer={props.clientServer}
-        />
-      )}
-      {showCreateAccountModal && (
-        <CreateAccount
-          clientServer={props.clientServer}
-          handleClose={() => setShowCreateAccountModal(false)}
-        />
-      )} */}
 
       {outfit && (
         <OutfitModal

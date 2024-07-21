@@ -16,7 +16,6 @@ export async function PostUser(
   password: string
 ): Promise<Error | null> {
   let error: Error | null = null;
-  //let cookie: string = ""
 
   try {
     const resp = await fetch(`${server}/api/user`, {
@@ -32,7 +31,6 @@ export async function PostUser(
     const data = await resp.text();
     switch (resp.status) {
       case StatusCodes.OK, StatusCodes.OK_CREATED:
-        //cookie = data;
         break;
       case StatusCodes.BAD_REQUEST:
         throw new Error(ERR_SIGNUP_BAD_REQUEST);
@@ -53,12 +51,6 @@ export async function PostUser(
   }
 
   return error;
-
-  // if (error) {
-  //   return error;
-  // }
-
-  // return SetCookieExpiration(cookie, 365)
 }
 
 

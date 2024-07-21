@@ -95,8 +95,6 @@ const SignupForm = (props: { clientServer: string; authServer: string }) => {
 
     setIsLoading(false);
     setSentVerification(true);
-    // document.cookie = resp2;
-    // location.reload();
     return;
   };
 
