@@ -94,7 +94,7 @@ func run() error {
 
 	server.POST("/auth/signup/verification", HandlePostOTP(bucket))
 
-	server.GET("/admin/otps", HandleGetOTPs())
+	server.GET("/auth/admin/otps", HandleGetOTPs())
 
 	return server.Start(httpAddr)
 }
