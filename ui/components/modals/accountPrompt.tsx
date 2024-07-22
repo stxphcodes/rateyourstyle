@@ -1,7 +1,4 @@
-import { useState } from "react";
 import { Modal } from "./";
-import { SignIn } from "./signin";
-import { CreateAccount } from "./createaccount";
 import Link from "next/link";
 
 export function AccountPromptModal(props: { clientServer: string }) {
