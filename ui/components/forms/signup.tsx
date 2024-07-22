@@ -171,9 +171,9 @@ const SignupForm = (props: { clientServer: string; authServer: string }) => {
                 }}
               />
               <label>
-                I agree to Rate Your Style's cookie policy. Rate Your Style uses
-                cookies to maintain your login session. The cookie is only used
-                for the purpose of saving your login details.
+                I agree to Rate Your Style&apos;s cookie policy. Rate Your Style
+                uses cookies to maintain your login session. The cookie is only
+                used for the purpose of saving your login details.
               </label>
             </div>
 
