@@ -75,6 +75,11 @@ func run() error {
 	corsCfg.AllowOrigins = []string{"*"}
 	server.Use(middleware.CORSWithConfig(corsCfg))
 
+	// For gke ingress health check
+	server.GET("/", func(ctx echo.Context) error {
+		return ctx.JSON(200, nil)
+	})
+
 	server.POST("/auth/signin/password", HandlePostPasswordSignIn(bucket))
 
 	server.GET("/auth/signin/otp", HandleGetOTP(bucket, smtpClient, "templates/signin-otp.html", "RateYourStyle Signin"))
