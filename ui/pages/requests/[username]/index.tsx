@@ -114,7 +114,7 @@ export default function Index({
           <h1>😕 Oh no</h1>
           Looks like there&apos;s an error on our end. Please refresh the page
           in a few minutes. If the issue persists, please email
-          sitesbystephanie@gmail.com.
+          rateyourstyle@gmail.com.
         </main>
       </>
     );
@@ -146,7 +146,7 @@ export default function Index({
               give good fashion advice.
               <br /> <br />
               That being said, this feature is in beta and I apologize if you
-              experience any bugs. Feel free to email sitesbystephanie@gmail.com
+              experience any bugs. Feel free to email rateyourstyle@gmail.com
               with any thoughts or concerns.
             </div>
           </button>

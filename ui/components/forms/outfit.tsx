@@ -71,6 +71,9 @@ function validateForm(
 
   let itemMissingField = false;
   outfitItems.forEach((item) => {
+    if (!item.description && !item.brand && !item.review && !item.color) {
+    }
+
     if (!item.description || !item.brand || !item.review || !item.color) {
       itemMissingField = true;
       return;
@@ -186,9 +189,18 @@ export const OutfitForm = (props: {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
+    let filtered = outfitItems.filter((item) => {
+      let empty =
+        !item.description && !item.brand && !item.review && !item.color;
+
+      if (!empty) {
+        return item;
+      }
+    });
+
     if (
       !imageURL ||
-      !validateForm(imageURL, outfitCaption, styleTags, outfitItems)
+      !validateForm(imageURL, outfitCaption, styleTags, filtered)
     ) {
       setMissingFields(true);
       return;
@@ -228,7 +240,7 @@ export const OutfitForm = (props: {
       picture_url: imageURL,
       picture_url_resized: "",
       style_tags: tags,
-      items: outfitItems,
+      items: filtered,
       private: privateMode,
       date: "",
       user_id: "",
@@ -356,9 +368,6 @@ export const OutfitForm = (props: {
             Private
           </span>
         </label>
-        <label className="italic font-normal">
-          Private posts are only vieable to you.
-        </label>
       </div>
 
       <div className="my-4">
@@ -405,7 +414,10 @@ export const OutfitForm = (props: {
             {outfitItems.map((item, index) => {
               let displayCount = index + 1;
               return (
-                <li className="shadow my-4 rounded-lg p-4" key={displayCount}>
+                <li
+                  className="shadow border-b-2 border-custom-tan  my-4 rounded-lg p-4"
+                  key={displayCount}
+                >
                   <div className="flex items-start justify-between">
                     <h5 className="font-bold">Item #{displayCount}.</h5>
                     <XButton onClick={(e: any) => handleRemoveItem(e, index)} />

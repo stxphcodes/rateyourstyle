@@ -147,8 +147,8 @@ function PostOutfitPage({
               How does Rate Your Style generate my outfit items?
             </div>
             <p>
-              Rate Your Style uses Open AI&apos;s gpt4o model to find and
-              describe items in your outfit.
+              RateYourStyle uses AI to help identify and describe items in your
+              outfit.
             </p>
           </div>
         </section>
@@ -171,8 +171,7 @@ function PostOutfitPage({
             <h3>Uh oh 😕 Our servers might be down. </h3> Please try submitting
             the form again when you are able.
             <br />
-            If the error persists, please email us at sitesbystephanie@gmail.com
-            .
+            If the error persists, please email us at rateyourstyle@gmail.com .
           </div>
         </Modal>
       )}

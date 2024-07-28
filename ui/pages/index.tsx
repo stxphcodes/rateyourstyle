@@ -114,7 +114,7 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
             Welcome to Rate Your Style
           </h1>
           <h2 className="text-center uppercase pb-8  m-auto">
-            a fashion community to support you in finding your personal style 🫶
+            a fashion community to help you find your personal style 🫶
           </h2>
 
           <div className="sm:w-3/4 m-auto">
@@ -259,15 +259,28 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
         <section className="bg-white p-4 md:p-8">
           <h1 className="mb-4">Privacy</h1>
           <div>
-            We value your privacy. That&apos;s why each outfit post has its own
-            visibility setting and your closet will only display clothing items
-            from public outfit posts. Private outfits and its clothing items can
-            only be viewed by you and the sponsor of a campaign if it uses a
-            campaign #tag. <br />
-            <br />
-            Rate Your Style also uses cookies to maintain your login session.
-            The cookie is only used for the purpose of saving your login
-            details.
+            We want to be transparent with our visitors and users. Here&apos;s
+            what you need to know about how we use the data gatherered on our
+            platform:
+            <ul className="list-decimal list-inside">
+              <li className="py-2">
+                RateYourStyle uses cookies to maintain your login session. The
+                cookie is only used for the prupose of saving your login
+                details.
+              </li>
+              <li className="pb-2">
+                {" "}
+                Each outfit post has its own visibility setting and your closet
+                will only display clothing items from public outfit posts.
+                Private outfits and its clothing items can only be viewed by
+                you.
+              </li>
+              <li>
+                RateYourStyle uses Aritifical Intelligence (AI) to enhance your
+                experience. AI is used during the outfit posting process to help
+                our users identify and describe outfit items.
+              </li>
+            </ul>
           </div>
         </section>
       </main>

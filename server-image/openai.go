@@ -16,7 +16,7 @@ type OutfitItem struct {
 const (
 	openAIURL   = "https://api.openai.com/v1/chat/completions"
 	openAIModel = "gpt-4o"
-	prompt      = "can you describe each clothing item in this image and include the hex color code? use this json format without deviation: {'clothingItems': [{'description': 'description of item', 'colorHex': 'color hex code'}]}"
+	prompt      = "can you describe each clothing item in this image without color, and include the hex color code in a separate field? use this json format without deviation: {'clothingItems': [{'description': 'description of item without color', 'colorHex': 'color hex code'}]}"
 )
 
 func postBody(img string) ([]byte, error) {

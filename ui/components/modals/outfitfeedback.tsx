@@ -159,7 +159,7 @@ export function OutfitFeedbackModal(props: {
                   <div className="bg-custom-pink p-2 rounded my-2 w-fit">
                     Sorry, there was an issue processing your submission. Please
                     refresh the page and try again, or email
-                    sitesbystephanie@gmail.com if the issue persists.
+                    rateyourstyle@gmail.com if the issue persists.
                   </div>
                 )}
               </>
@@ -230,8 +230,8 @@ function AcceptRequestForm(props: {
           <h2>Uh oh</h2>
           <div>
             Sorry, there was an error processing your request. <br /> Please
-            refresh the page and try again or contact sitesbystephanie@gmail.com
-            if the issue persists.
+            refresh the page and try again or contact rateyourstyle@gmail.com if
+            the issue persists.
           </div>
         </>
       ) : (

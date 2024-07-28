@@ -4,7 +4,6 @@ import { HexColorPicker } from "react-colorful";
 import { OutfitItem } from "../../apis/get_outfits";
 import { EyedropperIcon } from "../../components/icons/eyedropper";
 import { ntc } from "../../components/color/ntc";
-import { ChevronDownIcon } from "../icons/chevron-down-2";
 
 export const OutfitItemForm = (props: {
   item: OutfitItem;
@@ -103,14 +102,16 @@ export const OutfitItemForm = (props: {
               ) : (
                 <button
                   onClick={() => setShowColorPicker(true)}
-                  className="text-xs border-2 border-black rounded-lg flex justify-center items-center text-center"
+                  className="text-xs border border-black rounded-lg flex justify-center items-stretch text-center w-full"
+                  style={{ backgroundColor: color }}
                 >
-                  <div className="bg-white p-1 rounded-lg">
+                  <div className="bg-white p-1 rounded-l-lg border border-black ">
                     <EyedropperIcon />
                   </div>
-                  <div className="w-full" style={{ backgroundColor: color }}>
+                  <div className="w-full p-1">
                     <span className="bg-white opacity-50">
-                      {ntc.name(color)[1]} {"("}
+                      {ntc.name(color)[1]}
+                      {"("}
                       {ntc.name(color)[3]}
                       {")"} {color}
                     </span>

@@ -68,6 +68,11 @@ const howItWorks = [
         the <a href="">Post Oufit</a> page. Posting an outfit will involve
         submitting a photo of the outfit, writing a general description, and
         ID-ing each item that makes the outfit.
+        <br />
+        <br />
+        We&apos;d like to make outfit submission as quick and painless as
+        possible, so we also use AI to help you identify and describe outfit
+        items.
       </div>
     ),
   },
@@ -137,15 +142,6 @@ function HowItWorks({ cookie, clientServer }: Props) {
               </div>
             ))}
           </div>
-        </section>
-        <section className="px-4 md:px-8 py-8">
-          <h1 className="pb-2">Questions?</h1>
-          Feel free to contact sitesbystephanie@gmail.com if you have any
-          questions about how the platforms works.
-          <br />
-          If you are a personal stylist, personal shopper or wardrobe
-          consultant, I would love to set up a call to describe more how RYS
-          might help you. Please contact sitesbystephanie@gmail.com
         </section>
       </main>
       <Footer />

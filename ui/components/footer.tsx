@@ -3,7 +3,7 @@ export function Footer() {
     <footer className="bottom-0 w-full m-auto grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-black text-white text break-words">
       <div className="col-span-1">
         <h6>Rate Your Style&copy; 2024</h6>
-        <div>💌 sitesbystephanie@gmail.com</div>
+        <div>💌 rateyourstyle@gmail.com</div>
         <a
           href="https://www.buymeacoffee.com/rateyourstyle"
           target="_blank"
