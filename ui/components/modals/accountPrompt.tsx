@@ -1,13 +1,7 @@
-import { useState } from "react";
 import { Modal } from "./";
-import { SignIn } from "./signin";
-import { CreateAccount } from "./createaccount";
 import Link from "next/link";
 
 export function AccountPromptModal(props: { clientServer: string }) {
-  const [signInClicked, setSignInClicked] = useState<boolean>(false);
-  const [createAccountClicked, setCreateAccountClicked] =
-    useState<boolean>(false);
   return (
     <Modal
       handleClose={() => (window.location.href = "/")}
@@ -15,20 +9,6 @@ export function AccountPromptModal(props: { clientServer: string }) {
       noPadding={true}
     >
       <div className="py-20">
-        {signInClicked && (
-          <SignIn
-            clientServer={props.clientServer}
-            handleClose={() => setSignInClicked(false)}
-          />
-        )}
-
-        {createAccountClicked && (
-          <CreateAccount
-            clientServer={props.clientServer}
-            handleClose={() => setCreateAccountClicked(false)}
-          />
-        )}
-
         <div className="text-center">
           <h3 className="pb-4">Um excuse me, I need to see some ID.</h3>
           <img
@@ -37,12 +17,8 @@ export function AccountPromptModal(props: { clientServer: string }) {
             alt="the jackest jack russell in all of existence is a bouncer for the page."
           />
           <p className="py-4 text-xl">
-            Please{" "}
-            <a onClick={() => setSignInClicked(!signInClicked)}>sign in</a> or{" "}
-            <a onClick={() => setCreateAccountClicked(!createAccountClicked)}>
-              create an account
-            </a>
-            .{" "}
+            Please <Link href="/signin">sign in</Link> or{" "}
+            <Link href="/signup">create an account</Link>.
           </p>
           <p>
             Go back to{" "}

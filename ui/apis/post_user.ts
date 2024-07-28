@@ -1,3 +1,4 @@
+import { ERR_GENERAL_INTERNAL_SERVER, ERR_SIGNUP_BAD_REQUEST, ERR_SIGNUP_FAILED_DEPENDENCY_EMAIL, ERR_SIGNUP_FAILED_DEPENDENCY_USERNAME, StatusCodes } from "./errors";
 import { UserProfile, UserGeneral } from "./get_user";
 
 export async function SetCookieExpiration(cookie: string, expDays: number)  {
@@ -13,9 +14,8 @@ export async function PostUser(
   username: string,
   email: string,
   password: string
-): Promise<string | Error> {
+): Promise<Error | null> {
   let error: Error | null = null;
-  let cookie: string = ""
 
   try {
     const resp = await fetch(`${server}/api/user`, {
@@ -29,22 +29,28 @@ export async function PostUser(
     });
 
     const data = await resp.text();
-    if (resp.ok) {
-      cookie = data;
-    } else {
-      throw new Error(data);
+    switch (resp.status) {
+      case StatusCodes.OK, StatusCodes.OK_CREATED:
+        break;
+      case StatusCodes.BAD_REQUEST:
+        throw new Error(ERR_SIGNUP_BAD_REQUEST);
+      case StatusCodes.FAILED_DEPENDENCY:
+        if (data.includes("email")) {
+          throw new Error(ERR_SIGNUP_FAILED_DEPENDENCY_EMAIL)
+        } else {
+          throw new Error(ERR_SIGNUP_FAILED_DEPENDENCY_USERNAME)
+        }
+      default:
+        throw new Error(ERR_GENERAL_INTERNAL_SERVER)
     }
+
   } catch (e) {
     if (e instanceof Error) {
       error = e;
     }
   }
 
-  if (error) {
-    return error;
-  }
-
-  return SetCookieExpiration(cookie, 365)
+  return error;
 }
 
 

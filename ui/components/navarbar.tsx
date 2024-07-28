@@ -9,8 +9,6 @@ import { GetUsernameAndNotifications, UserNotifResp } from "../apis/get_user";
 import { HamburgerMenuIcon } from "./icons/menu-burger";
 import { NotificationEmptyIcon } from "./icons/notification-empty";
 import { NotificationFilledIcon } from "./icons/notification-filled";
-import { CreateAccount } from "./modals/createaccount";
-import { SignIn } from "./modals/signin";
 import { OutfitModal } from "./modals/outfit";
 import { GetOutfitFeedbackResponse, GetFeedback } from "../apis/get_feedback";
 import { OutfitFeedbackModal } from "./modals/outfitfeedback";
@@ -38,11 +36,6 @@ export function Navbar(props: {
   const mobileMenuRef = useRef<any>();
 
   const mobileMenuButtonRef = useRef<any>();
-
-  const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
-
-  const [showCreateAccountModal, setShowCreateAccountModal] =
-    useState<boolean>(false);
 
   const [hasNotifs, setHasNotifs] = useState<boolean>(false);
 
@@ -174,20 +167,16 @@ export function Navbar(props: {
               username={user}
             />
           ) : (
-            <div className="flex flex-row gap-2 items-center">
-              <button
-                className="mr-2 uppercase"
-                onClick={() => setShowSignInModal(true)}
-              >
-                <a>Sign in</a>
-              </button>
+            <div className="flex flex-row gap-2 items-center uppercase">
+              <Link href="/signin" className="mr-2">
+                Sign In
+              </Link>
 
-              <button
-                className="px-1 bg-custom-lime font-bold rounded-lg uppercase"
-                onClick={() => setShowCreateAccountModal(true)}
-              >
-                Create Account
-              </button>
+              <Link href="/signup" passHref>
+                <a className="px-2 bg-custom-lime py-1 uppercase rounded-lg font-bold hover:text-custom-pink">
+                  Create account
+                </a>
+              </Link>
             </div>
           )}
         </div>
@@ -229,19 +218,6 @@ export function Navbar(props: {
             Post Outfit
           </Link>
         </div>
-      )}
-
-      {showSignInModal && (
-        <SignIn
-          handleClose={() => setShowSignInModal(false)}
-          clientServer={props.clientServer}
-        />
-      )}
-      {showCreateAccountModal && (
-        <CreateAccount
-          clientServer={props.clientServer}
-          handleClose={() => setShowCreateAccountModal(false)}
-        />
       )}
 
       {outfit && (

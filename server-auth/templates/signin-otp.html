@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+    <title>RateYourStyle Sign In</title>
+    <style>
+        body        { padding-top:70px; }
+    </style>
+</head>
+<body>
+    Hi {{ .Username }},<br/><br/>
+    To complete your sign in process, please use this one time password. This password expires in 5 minutes.
+    <br />
+    <h1>{{ .OTP }}</h1>
+    <br />
+    <br />
+    If you did not request this one time password, please report this email <a href="mailto:rateyourstyle@gmail.com">here</a>.
+</body>
+</html> 

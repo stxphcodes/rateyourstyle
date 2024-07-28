@@ -2,12 +2,10 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	gcs "cloud.google.com/go/storage"
@@ -42,15 +40,13 @@ func main() {
 
 func run() error {
 	var (
-		cfg           Config
-		campaignsPath string
+		cfg Config
 	)
 	flag.StringVar(&cfg.HttpAddr, "http.addr", "0.0.0.0:8000", "HTTP bind address.")
 	flag.StringVar(&cfg.HealthAddr, "health.addr", "0.0.0.0:8001", "HTTP health address.")
 	flag.StringVar(&cfg.CORSOrigins, "cors.origin", "*", "CORS origins, separated by ,")
 	flag.StringVar(&cfg.GCS.CredsPath, "gcs.creds", "", "Path to GCS credentials file")
 	flag.StringVar(&cfg.GCS.BucketName, "gcs.bucket", "rateyourstyle-dev", "Name of GCS bucket")
-	flag.StringVar(&campaignsPath, "campaigns.path", "campaigns.json", "Path to campaigns file")
 	flag.Parse()
 
 	if err := validateConfig(&cfg); err != nil {
@@ -89,22 +85,6 @@ func run() error {
 	// For gke ingress health check
 	mux.GET("/", func(ctx echo.Context) error {
 		return ctx.JSON(200, nil)
-	})
-
-	mux.GET("/api/campaigns", func(ctx echo.Context) error {
-		bytes, err := os.ReadFile(campaignsPath)
-		if err != nil {
-			log.Println(err.Error())
-			return ctx.JSON(500, err.Error())
-		}
-
-		var a []interface{}
-		if err := json.Unmarshal(bytes, &a); err != nil {
-			log.Println(err.Error())
-			return ctx.JSON(500, err.Error())
-		}
-
-		return ctx.JSON(200, a)
 	})
 
 	mux.GET("/api/cookie", handler.GetCookie())
