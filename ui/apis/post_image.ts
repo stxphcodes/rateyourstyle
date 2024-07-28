@@ -1,10 +1,25 @@
-export async function PostImage(
+import { ERR_GENERAL_INTERNAL_SERVER } from "./errors";
+
+export type PostImageResponse = {
+    url: string;
+    items: AIOutfitItem[];
+}
+
+export type AIOutfitItem = {
+    Description: string;
+    ColorHex: string;
+}
+
+export async function PostImageWithAI(
     server: string,
     formData: FormData,
     cookie: string,
-): Promise<string | Error> {
+): Promise<PostImageResponse | Error> {
     let error: Error | null = null
-    let imageURL: string = ""
+    let toReturn: PostImageResponse = {
+        url: "",
+        items: [],
+    }
 
     await fetch(`${server}/api/image`, {
         method: "POST",
@@ -14,12 +29,12 @@ export async function PostImage(
         },
     }).then((response) => {
         if (!response.ok) {
-            throw new Error("response not ok");
+            throw new Error(ERR_GENERAL_INTERNAL_SERVER);
         }
 
-        return response.text()
-    }).then(data => {
-        imageURL = data
+        return response.json()
+    }).then((data: PostImageResponse) => {
+        toReturn = data
     })
         .catch((err: Error) => {
             error = err
@@ -29,6 +44,6 @@ export async function PostImage(
         return error
     }
 
-    return imageURL
+    return toReturn
 
 }

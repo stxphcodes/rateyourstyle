@@ -9,13 +9,11 @@ services:
     volumes:
       - ./secrets/:/secrets
       - ./server/dist/linux-amd64/:/mnt
-      - ./server/campaigns.json/:/mnt/campaigns.json
 
     command:
       # sh -c "tail -f /dev/null"
       - "./mnt/app"
       - "--gcs.creds=/secrets/localdev_sa.json"
-      - "--campaigns.path=/mnt/campaigns.json"
 
   server-image:
     build:
@@ -29,6 +27,7 @@ services:
       # sh -c "tail -f /dev/null"
       - "./app"
       - "--gcs.creds=/secrets/localdev_sa.json"
+      - "--openai.key=/secrets/openai.key"
 
   server-auth:
     build:
@@ -69,4 +68,3 @@ services:
     #command: "npm start"
     depends_on:
       - server
-      - server-image

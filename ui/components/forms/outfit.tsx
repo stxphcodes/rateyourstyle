@@ -1,0 +1,447 @@
+import { GetServerSideProps } from "next";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { EyeDropper, OnChangeEyedrop } from "react-eyedrop";
+import { HexColorPicker } from "react-colorful";
+import { GetOutfitsByUser, Outfit, OutfitItem } from "../../apis/get_outfits";
+import { PostImageWithAI } from "../../apis/post_image";
+import { PostOutfit } from "../../apis/post_outfit";
+import { Footer } from "../../components/footer";
+import { Modal, XButton } from "../../components/modals";
+import { GetImageServerURL, GetServerURL } from "../../apis/get_server";
+import { ntc } from "../../components/color/ntc";
+import LoadingGIF from "../../components/icons/loader-gif";
+import { OutfitItemForm } from "./outfit-item";
+
+function defaultOutfitItem(): OutfitItem {
+  return {
+    id: "",
+    brand: "",
+    description: "",
+    size: "",
+    price: "",
+    review: "",
+    rating: 2.5,
+    link: "",
+    color: "",
+    store: "",
+  };
+}
+
+function updateItem(item: OutfitItem, field: string, value: string) {
+  switch (field) {
+    case "description":
+      item.description = value;
+      break;
+    case "rating":
+      item.rating = Number(value);
+      break;
+    case "review":
+      item.review = value;
+      break;
+    case "link":
+      item.link = value;
+      break;
+    case "price":
+      item.price = value;
+      break;
+    case "size":
+      item.size = value;
+      break;
+    case "brand":
+      item.brand = value;
+      break;
+    case "store":
+      item.store = value;
+      break;
+  }
+
+  return item;
+}
+
+function validateForm(
+  imageURL: string | null,
+  caption: string,
+  tags: string,
+  outfitItems: OutfitItem[]
+) {
+  if (!imageURL || !caption || outfitItems.length == 0 || !tags) {
+    return false;
+  }
+
+  let itemMissingField = false;
+  outfitItems.forEach((item) => {
+    if (!item.description || !item.brand || !item.review || !item.color) {
+      itemMissingField = true;
+      return;
+    }
+  });
+
+  if (itemMissingField) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+export const OutfitForm = (props: {
+  clientServer: string;
+  imageServer: string;
+  cookie: string;
+  previousItems: OutfitItem[];
+  onSubmit: any;
+}) => {
+  const [file, setFile] = useState<File | null>(null);
+  const [imageURL, setImageURL] = useState<string | null>("");
+  const [fileError, setFileError] = useState<string | null>("");
+  const [outfitCaption, setOutfitCaption] = useState<string>("");
+  const [privateMode, setPrivateMode] = useState<boolean>(false);
+  const [styleTags, setStyleTags] = useState<string>("");
+  const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([
+    defaultOutfitItem(),
+  ]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [missingFields, setMissingFields] = useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    if (e.target.files) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const handleFormInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMissingFields(false);
+    if (e.target.id == "caption") {
+      setOutfitCaption(e.target.value);
+    }
+    if (e.target.id == "tags") {
+      setStyleTags(e.target.value);
+    }
+  };
+
+  const handleColorPick = (index: number, hex: string) => {
+    let item = outfitItems[index];
+    item.color_hex = hex;
+    item.color = ntc.name(hex)[3];
+    item.color_name = ntc.name(hex)[1];
+
+    setOutfitItems([
+      ...outfitItems.slice(0, index),
+      item,
+      ...outfitItems.slice(index + 1),
+    ]);
+  };
+
+  const handleItemChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    setMissingFields(false);
+    let item = outfitItems[index];
+
+    updateItem(item, e.target.id, e.target.value);
+
+    setOutfitItems([
+      ...outfitItems.slice(0, index),
+      item,
+      ...outfitItems.slice(index + 1),
+    ]);
+  };
+
+  const handlePreviousItemSelect = (e: any, index: number) => {
+    if (e.target.value == "") {
+      setOutfitItems([
+        ...outfitItems.slice(0, index),
+        defaultOutfitItem(),
+        ...outfitItems.slice(index + 1),
+      ]);
+      return;
+    }
+
+    let item = props.previousItems.filter(
+      (item) => item.id == e.target.value
+    )[0];
+
+    setOutfitItems([
+      ...outfitItems.slice(0, index),
+      item,
+      ...outfitItems.slice(index + 1),
+    ]);
+  };
+
+  const handleAddItem = (e: any) => {
+    e.preventDefault();
+    setOutfitItems([...outfitItems, defaultOutfitItem()]);
+  };
+
+  const handleRemoveItem = (e: any, index: number) => {
+    e.preventDefault();
+    setOutfitItems([
+      ...outfitItems.splice(0, index),
+      ...outfitItems.splice(index + 1),
+    ]);
+  };
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    if (
+      !imageURL ||
+      !validateForm(imageURL, outfitCaption, styleTags, outfitItems)
+    ) {
+      setMissingFields(true);
+      return;
+    }
+
+    setMissingFields(false);
+
+    let tags = styleTags.split(" ");
+    tags.forEach((tag, index) => {
+      if (tag == "" || tag == " ") {
+        tags.splice(index, 1);
+        return;
+      }
+
+      if (!tag.startsWith("#")) {
+        tags[index] = "#" + tag;
+      }
+    });
+
+    /// !!!! make image URL env variable
+    let outfitId =
+      process.env.NODE_ENV == "development"
+        ? imageURL?.replace(
+            "https://storage.googleapis.com/rateyourstyle-dev/imgs/outfits/",
+            ""
+          )
+        : imageURL?.replace(
+            "https://storage.googleapis.com/rateyourstyle/imgs/outfits/",
+            ""
+          );
+    outfitId = outfitId.split("/")[1];
+    outfitId = outfitId.split(".")[0];
+
+    let outfit: Outfit = {
+      id: outfitId,
+      title: outfitCaption,
+      picture_url: imageURL,
+      picture_url_resized: "",
+      style_tags: tags,
+      items: outfitItems,
+      private: privateMode,
+      date: "",
+      user_id: "",
+      username: "",
+      description: "",
+    };
+
+    props.onSubmit(outfit);
+  };
+
+  useEffect(() => {
+    async function upload(formData: any) {
+      const resp = await PostImageWithAI(
+        props.imageServer,
+        formData,
+        props.cookie
+      );
+      if (resp instanceof Error) {
+        setFileError(resp.message);
+        return;
+      }
+
+      setImageURL(resp.url);
+      let aiItems = resp.items.map((aiItem) => {
+        let i = defaultOutfitItem();
+        i.description = aiItem.Description;
+        i.color_hex = aiItem.ColorHex;
+        i.color = ntc.name(aiItem.ColorHex)[1];
+        return i;
+      });
+
+      if (aiItems.length > 0) {
+        setOutfitItems([...aiItems, defaultOutfitItem()]);
+      }
+      setIsLoading(false);
+    }
+
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      setIsLoading(true);
+      upload(formData);
+    }
+  }, [props.cookie, file]);
+
+  return (
+    <form className="">
+      {imageURL ? (
+        <div className="flex flex-wrap gap-4">
+          <img
+            alt={"outfit image to post"}
+            src={URL.createObjectURL(file as File)}
+            className="object-cover"
+            style={{ height: "600px" }}
+          />
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              setFile(null);
+              setImageURL("");
+              setOutfitItems([defaultOutfitItem()]);
+            }}
+            className="h-fit my-auto bg-black p-1 text-white rounded text-sm hover:bg-primary"
+          >
+            {" "}
+            remove
+          </button>
+        </div>
+      ) : (
+        <>
+          {fileError && (
+            <>
+              <div className="p-2 my-2 bg-red-500 text-white">
+                Encountered error uploading image. Please{" "}
+                <button
+                  onClick={(e) => {
+                    location.reload();
+                  }}
+                  className="h-fit my-auto bg-black p-1 text-white rounded text-sm hover:bg-primary"
+                >
+                  {" "}
+                  refresh
+                </button>{" "}
+                the page and try again.
+              </div>
+            </>
+          )}
+          <label htmlFor="file" className="">
+            Choose an image
+          </label>
+          {isLoading ? (
+            <LoadingGIF />
+          ) : (
+            <>
+              <input
+                className="w-full"
+                id="file"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+              <label className="requiredLabel">Required*</label>
+            </>
+          )}
+        </>
+      )}
+      <div className="my-4">
+        <label className="" htmlFor="caption">
+          Set to Private Post
+        </label>
+
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            checked={privateMode}
+            className="sr-only peer"
+            value={privateMode.toString()}
+            onChange={() => setPrivateMode(!privateMode)}
+          />
+          <div
+            className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:primary
+                   rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
+          ></div>
+          <span className="ml-3 text-sm font-medium text-gray-900">
+            Private
+          </span>
+        </label>
+        <label className="italic font-normal">
+          Private posts are only vieable to you.
+        </label>
+      </div>
+
+      <div className="my-4">
+        <label className="" htmlFor="caption">
+          Outfit Caption
+        </label>
+        <input
+          className="w-full"
+          id="caption"
+          type="text"
+          placeholder="Caption"
+          value={outfitCaption}
+          onChange={handleFormInput}
+        ></input>
+        <label className="requiredLabel">Required*</label>
+      </div>
+
+      <div className="my-4">
+        <label>
+          Select as many tags from the options below or enter your own. Start
+          tags with &apos;#&apos;
+        </label>
+        <input
+          className="w-full"
+          id="tags"
+          type="text"
+          placeholder="Ex. #athleisure #loungewear"
+          value={styleTags}
+          onChange={handleFormInput}
+        ></input>
+        <label className="requiredLabel">Required*</label>
+      </div>
+
+      {isLoading ? (
+        <LoadingGIF />
+      ) : (
+        <div className="mb-4">
+          <h5>Outfit Items</h5>
+          <label>
+            Describe and rate the items that appear in your outfit. At least one
+            outfit item is required.
+          </label>
+          <ul>
+            {outfitItems.map((item, index) => {
+              let displayCount = index + 1;
+              return (
+                <li className="shadow my-4 rounded-lg p-4" key={displayCount}>
+                  <div className="flex items-start justify-between">
+                    <h5 className="font-bold">Item #{displayCount}.</h5>
+                    <XButton onClick={(e: any) => handleRemoveItem(e, index)} />
+                  </div>
+
+                  <OutfitItemForm
+                    previousOutfitItems={props.previousItems}
+                    item={item}
+                    index={index}
+                    handleItemChange={handleItemChange}
+                    handlePreviousItemSelect={handlePreviousItemSelect}
+                    handleColorPick={handleColorPick}
+                    showForm={item.description !== ""}
+                  />
+                </li>
+              );
+            })}
+          </ul>
+          <button onClick={handleAddItem} className="primaryButton float-right">
+            add item
+          </button>
+        </div>
+      )}
+
+      {missingFields && (
+        <div className="mt-8 text-red-500 font-semibold">
+          Form is missing required fields.
+        </div>
+      )}
+
+      <button
+        className="bg-gradient hover:scale-105 font-bold py-2 px-4 rounded  w-full mt-8"
+        onClick={handleSubmit}
+      >
+        Submit
+      </button>
+    </form>
+  );
+};

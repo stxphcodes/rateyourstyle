@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -24,11 +26,13 @@ func main() {
 
 func run() error {
 	var (
-		httpAddr   string
-		healthAddr string
-		cors       string
-		gcsCreds   string
-		gcsBucket  string
+		httpAddr      string
+		healthAddr    string
+		cors          string
+		gcsCreds      string
+		gcsBucket     string
+		openAIKeyPath string
+		openAIKey     string
 	)
 
 	flag.StringVar(&httpAddr, "http.addr", "0.0.0.0:8002", "HTTP bind address.")
@@ -36,6 +40,7 @@ func run() error {
 	flag.StringVar(&cors, "cors.origin", "*", "CORS origins, separated by ,")
 	flag.StringVar(&gcsCreds, "gcs.creds", "", "Path to GCS credentials file")
 	flag.StringVar(&gcsBucket, "gcs.bucket", "rateyourstyle-dev", "Name of GCS bucket")
+	flag.StringVar(&openAIKeyPath, "openai.key", "", "key to open ai")
 
 	flag.Parse()
 
@@ -47,6 +52,11 @@ func run() error {
 		return err
 	}
 	bucket := gcsClient.Bucket(gcsBucket)
+
+	openAIKey, err = readSecret(openAIKeyPath)
+	if err != nil {
+		return err
+	}
 
 	// Configure and start /live and /ready check handling.
 	health := healthcheck.NewHandler()
@@ -67,12 +77,14 @@ func run() error {
 		return ctx.JSON(200, nil)
 	})
 
-	server.POST("/api/image", PostImage(gcsClient, bucket))
+	server.POST("/api/image", PostImage(gcsClient, bucket, openAIKey))
+
+	server.POST("/ai/outfit-description", HandlePostAIOutfit(bucket, openAIKey))
 
 	return server.Start(httpAddr)
 }
 
-func PostImage(gcs *gcs.Client, bucket *gcs.BucketHandle) echo.HandlerFunc {
+func PostImage(gcs *gcs.Client, bucket *gcs.BucketHandle, openAIKey string) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		cookie, err := getCookie(ctx.Request())
 		if err != nil {
@@ -136,6 +148,69 @@ func PostImage(gcs *gcs.Client, bucket *gcs.BucketHandle) echo.HandlerFunc {
 		}
 
 		url := "https://storage.googleapis.com/" + attr.Name + "/" + gcsFullPath
-		return ctx.String(http.StatusCreated, url)
+		urlResized := "https://storage.googleapis.com/" + attr.Name + "/" + gcsResizedPath
+
+		fmt.Println(urlResized)
+
+		m := map[string]interface{}{
+			"url": url,
+		}
+
+		openAI, err := getOpenAIDescriptions(openAIKey, url)
+		if err != nil {
+			log.Println("error generating ai descriptions", err.Error())
+			return ctx.JSON(http.StatusOK, m)
+		}
+
+		m["items"] = openAI.ClothingItems
+		return ctx.JSON(http.StatusOK, m)
+		//return ctx.String(http.StatusCreated, url)
 	}
+}
+
+func HandlePostAIOutfit(bucket *gcs.BucketHandle, key string) echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, err := getUserId(ctx.Request().Context(), bucket, cookie)
+		if err != nil {
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		if userId == "" {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		var m map[string]string
+		if err := ctx.Bind(&m); err != nil {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		imgPath, ok := m["image"]
+		if !ok {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		resp, err := getOpenAIDescriptions(key, imgPath)
+		if err != nil {
+			log.Println("error: " + err.Error())
+			ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		return ctx.JSON(http.StatusOK, resp.ClothingItems)
+	}
+}
+
+func readSecret(path string) (string, error) {
+	bytes, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+
+	return string(bytes), nil
 }
