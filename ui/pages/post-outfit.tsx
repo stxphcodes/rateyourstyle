@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { EyeDropper, OnChangeEyedrop } from "react-eyedrop";
 
-import { Campaign, GetCampaigns } from "../apis/get_campaigns";
 import { GetOutfitsByUser, Outfit, OutfitItem } from "../apis/get_outfits";
 import { PostImage } from "../apis/post_image";
 import { PostOutfit } from "../apis/post_outfit";
@@ -17,7 +16,6 @@ import { EyedropperButton } from "../components/color/eyedropper-button";
 import { ntc } from "../components/color/ntc";
 
 type Props = {
-  campaigns: Campaign[] | null;
   cookie: string;
   error: string | null;
   clientServer: string;
@@ -43,7 +41,6 @@ function defaultOutfitItem(): OutfitItem {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   let props: Props = {
-    campaigns: null,
     cookie: "",
     error: null,
     clientServer: "",
@@ -91,13 +88,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     });
   }
 
-  const resp = await GetCampaigns(server);
-  if (resp instanceof Error) {
-    props.error = resp.message;
-    return { props };
-  }
-  props.campaigns = resp;
-
   let clientServer = GetServerURL(true);
   if (clientServer instanceof Error) {
     props.error = clientServer.message;
@@ -142,7 +132,6 @@ function validateForm(
 }
 
 function PostOutfitPage({
-  campaigns,
   cookie,
   clientServer,
   imageServer,
@@ -508,31 +497,6 @@ function PostOutfitPage({
                 onChange={handleFormInput}
               ></input>
               <label className="requiredLabel">Required*</label>
-
-              {campaigns && (
-                <div className="flex gap-2 mt-2 flex-wrap">
-                  {campaigns.map((item) => (
-                    <button
-                      key={item.tag}
-                      className={`${
-                        styleTags.includes(item.tag)
-                          ? "bg-custom-lime"
-                          : "bg-white"
-                      } border-2 border-custom-lime p-1 rounded`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (!styleTags.includes(item.tag)) {
-                          setStyleTags(styleTags.concat(item.tag + " "));
-                        } else {
-                          setStyleTags(styleTags.replace(item.tag, ""));
-                        }
-                      }}
-                    >
-                      {item.tag}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
 
             <div className="mb-4">

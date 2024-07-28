@@ -47,7 +47,7 @@ export async function PostSigninPassword(
 
 export async function PostSigninOTP(
   authServer: string,
-  username: string,
+  user: string,
   otp: string
 ): Promise<string | Error> {
   let error: Error | null = null;
@@ -58,7 +58,7 @@ export async function PostSigninOTP(
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
-      user: username.toLowerCase(),
+      user: user.toLowerCase(),
       otp: otp,
     }),
   })

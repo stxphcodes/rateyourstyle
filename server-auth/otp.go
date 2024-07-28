@@ -79,7 +79,7 @@ func HandlePostOTP(bucket *gcs.BucketHandle) echo.HandlerFunc {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 
-		user, ok := m["user"]
+		usernameOrEmail, ok := m["user"]
 		if !ok {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
@@ -89,7 +89,31 @@ func HandlePostOTP(bucket *gcs.BucketHandle) echo.HandlerFunc {
 			return ctx.NoContent(http.StatusBadRequest)
 		}
 
-		key := fmt.Sprintf("email=%s&otp=%s", user, otp)
+		users, err := getAllUsers(ctx.Request().Context(), bucket)
+		if err != nil {
+			log.Println("error " + err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		var user User
+		for index, u := range users {
+			if strings.EqualFold(u.Username, usernameOrEmail) || strings.EqualFold(u.Email, usernameOrEmail) {
+
+				user = u
+				if !u.Verified {
+					users[index].Verified = true
+					updateUserVerification(ctx.Request().Context(), bucket, users)
+				}
+				break
+			}
+		}
+
+		// user not found
+		if user.Id == "" {
+			return ctx.NoContent(http.StatusNotFound)
+		}
+
+		key := fmt.Sprintf("email=%s&otp=%s", user.Email, otp)
 		expiry, ok := otps[key]
 		if !ok {
 			return ctx.NoContent(http.StatusNotFound)
@@ -100,25 +124,7 @@ func HandlePostOTP(bucket *gcs.BucketHandle) echo.HandlerFunc {
 			return ctx.NoContent(http.StatusFailedDependency)
 		}
 
-		users, err := getAllUsers(ctx.Request().Context(), bucket)
-		if err != nil {
-			log.Println("error " + err.Error())
-			return ctx.NoContent(http.StatusInternalServerError)
-		}
-
-		cookie := ""
-		for index, u := range users {
-			if strings.EqualFold(u.Username, user) || strings.EqualFold(u.Email, user) {
-				cookie = u.Cookie
-				if !u.Verified {
-					users[index].Verified = true
-					updateUserVerification(ctx.Request().Context(), bucket, users)
-				}
-				break
-			}
-		}
-
 		delete(otps, key)
-		return ctx.String(http.StatusOK, createCookieStr(cookie))
+		return ctx.String(http.StatusOK, createCookieStr(user.Cookie))
 	}
 }
