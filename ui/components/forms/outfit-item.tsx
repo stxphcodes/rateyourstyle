@@ -4,6 +4,8 @@ import { HexColorPicker } from "react-colorful";
 import { OutfitItem } from "../../apis/get_outfits";
 import { EyedropperIcon } from "../../components/icons/eyedropper";
 import { ntc } from "../../components/color/ntc";
+import { Toggle } from "../base/toggle";
+import { color } from "echarts";
 
 export const OutfitItemForm = (props: {
   item: OutfitItem;
@@ -20,7 +22,7 @@ export const OutfitItemForm = (props: {
 
   const [showOptionalFields, setShowOptionalFields] = useState(false);
 
-  const [color, setColor] = useState(props.item.color_hex || "#000000");
+  const [colorPicker, setColorPicker] = useState("#000000");
 
   if (
     props.previousOutfitItems &&
@@ -66,33 +68,19 @@ export const OutfitItemForm = (props: {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="col-span-1">
           <div className="md:flex md:gap-4 items-end">
-            {/* <div className="md:basis-1/4">
-              <label>Item Color?</label>
-              <p className="text-xs">Select from image</p>
-              <EyeDropper
-                colorsPassThrough="colorPicked"
-                onChange={({ rgb, hex }: OnChangeEyedrop) => {
-                  return props.handleColorPick(props.index, rgb, hex);
-                }}
-                cursorActive="pointer"
-                cursorInactive="default"
-                customComponent={EyedropperButton}
-              />
-              <label className="requiredLabel">Required*</label>
-            </div>
-              */}
-
             <div className="md:basis-1/4">
               <label>Item Color?</label>
-
               {showColorPicker ? (
                 <div className="flex items-center gap-1 ">
-                  <HexColorPicker color={color} onChange={setColor} />
+                  <HexColorPicker
+                    color={colorPicker}
+                    onChange={setColorPicker}
+                  />
                   <button
-                    style={{ backgroundColor: color }}
+                    style={{ backgroundColor: props.item.color_hex }}
                     className="h-fit p-2 rounded"
                     onClick={() => {
-                      props.handleColorPick(props.index, color);
+                      props.handleColorPick(props.index, colorPicker);
                       setShowColorPicker(false);
                     }}
                   >
@@ -103,17 +91,17 @@ export const OutfitItemForm = (props: {
                 <button
                   onClick={() => setShowColorPicker(true)}
                   className="text-xs border border-black rounded-lg flex justify-center items-stretch text-center w-full"
-                  style={{ backgroundColor: color }}
+                  style={{ backgroundColor: props.item.color_hex || "#000000" }}
                 >
                   <div className="bg-white p-1 rounded-l-lg border border-black ">
                     <EyedropperIcon />
                   </div>
                   <div className="w-full p-1">
                     <span className="bg-white opacity-50">
-                      {ntc.name(color)[1]}
+                      {ntc.name(props.item.color_hex || "#000000")[1]}
                       {"("}
-                      {ntc.name(color)[3]}
-                      {")"} {color}
+                      {ntc.name(props.item.color_hex || "#000000")[3]}
+                      {")"} {props.item.color_hex || "#000000"}
                     </span>
                   </div>
                 </button>
@@ -156,22 +144,11 @@ export const OutfitItemForm = (props: {
             Required*
           </label>
 
-          <label className="relative inline-flex items-center cursor-pointer mt-4">
-            <input
-              type="checkbox"
-              checked={showOptionalFields}
-              className="sr-only peer"
-              value={showOptionalFields.toString()}
-              onChange={() => setShowOptionalFields(!showOptionalFields)}
-            />
-            <div
-              className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:primary
-                     rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
-            ></div>
-            <span className="ml-3 text-sm font-medium text-gray-900">
-              optional fields
-            </span>
-          </label>
+          <Toggle
+            checked={showOptionalFields}
+            onChange={() => setShowOptionalFields(!showOptionalFields)}
+            label="Optional fields"
+          />
 
           {showOptionalFields && (
             <>

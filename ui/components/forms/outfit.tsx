@@ -1,91 +1,11 @@
-import { GetServerSideProps } from "next";
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { EyeDropper, OnChangeEyedrop } from "react-eyedrop";
-import { HexColorPicker } from "react-colorful";
-import { GetOutfitsByUser, Outfit, OutfitItem } from "../../apis/get_outfits";
+import { Outfit, OutfitItem } from "../../apis/get_outfits";
 import { PostImageWithAI } from "../../apis/post_image";
-import { PostOutfit } from "../../apis/post_outfit";
-import { Footer } from "../../components/footer";
-import { Modal, XButton } from "../../components/modals";
-import { GetImageServerURL, GetServerURL } from "../../apis/get_server";
+import { XButton } from "../../components/modals";
 import { ntc } from "../../components/color/ntc";
 import LoadingGIF from "../../components/icons/loader-gif";
 import { OutfitItemForm } from "./outfit-item";
-
-function defaultOutfitItem(): OutfitItem {
-  return {
-    id: "",
-    brand: "",
-    description: "",
-    size: "",
-    price: "",
-    review: "",
-    rating: 2.5,
-    link: "",
-    color: "",
-    store: "",
-  };
-}
-
-function updateItem(item: OutfitItem, field: string, value: string) {
-  switch (field) {
-    case "description":
-      item.description = value;
-      break;
-    case "rating":
-      item.rating = Number(value);
-      break;
-    case "review":
-      item.review = value;
-      break;
-    case "link":
-      item.link = value;
-      break;
-    case "price":
-      item.price = value;
-      break;
-    case "size":
-      item.size = value;
-      break;
-    case "brand":
-      item.brand = value;
-      break;
-    case "store":
-      item.store = value;
-      break;
-  }
-
-  return item;
-}
-
-function validateForm(
-  imageURL: string | null,
-  caption: string,
-  tags: string,
-  outfitItems: OutfitItem[]
-) {
-  if (!imageURL || !caption || outfitItems.length == 0 || !tags) {
-    return false;
-  }
-
-  let itemMissingField = false;
-  outfitItems.forEach((item) => {
-    if (!item.description && !item.brand && !item.review && !item.color) {
-    }
-
-    if (!item.description || !item.brand || !item.review || !item.color) {
-      itemMissingField = true;
-      return;
-    }
-  });
-
-  if (itemMissingField) {
-    return false;
-  } else {
-    return true;
-  }
-}
+import { Toggle } from "../base/toggle";
 
 export const OutfitForm = (props: {
   clientServer: string;
@@ -143,7 +63,7 @@ export const OutfitForm = (props: {
     setMissingFields(false);
     let item = outfitItems[index];
 
-    updateItem(item, e.target.id, e.target.value);
+    item = updateItem(item, e.target.id, e.target.value);
 
     setOutfitItems([
       ...outfitItems.slice(0, index),
@@ -180,23 +100,18 @@ export const OutfitForm = (props: {
 
   const handleRemoveItem = (e: any, index: number) => {
     e.preventDefault();
-    setOutfitItems([
-      ...outfitItems.splice(0, index),
-      ...outfitItems.splice(index + 1),
-    ]);
+
+    var arr = [...outfitItems];
+    arr.splice(index, 1);
+    setOutfitItems(arr);
   };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    let filtered = outfitItems.filter((item) => {
-      let empty =
-        !item.description && !item.brand && !item.review && !item.color;
-
-      if (!empty) {
-        return item;
-      }
-    });
+    let filtered = filterEmptyItems(outfitItems);
+    let tags = cleanStyleTags(styleTags);
+    setMissingFields(false);
 
     if (
       !imageURL ||
@@ -206,34 +121,7 @@ export const OutfitForm = (props: {
       return;
     }
 
-    setMissingFields(false);
-
-    let tags = styleTags.split(" ");
-    tags.forEach((tag, index) => {
-      if (tag == "" || tag == " ") {
-        tags.splice(index, 1);
-        return;
-      }
-
-      if (!tag.startsWith("#")) {
-        tags[index] = "#" + tag;
-      }
-    });
-
-    /// !!!! make image URL env variable
-    let outfitId =
-      process.env.NODE_ENV == "development"
-        ? imageURL?.replace(
-            "https://storage.googleapis.com/rateyourstyle-dev/imgs/outfits/",
-            ""
-          )
-        : imageURL?.replace(
-            "https://storage.googleapis.com/rateyourstyle/imgs/outfits/",
-            ""
-          );
-    outfitId = outfitId.split("/")[1];
-    outfitId = outfitId.split(".")[0];
-
+    let outfitId = getOutfitId(imageURL);
     let outfit: Outfit = {
       id: outfitId,
       title: outfitCaption,
@@ -268,12 +156,14 @@ export const OutfitForm = (props: {
         let i = defaultOutfitItem();
         i.description = aiItem.Description;
         i.color_hex = aiItem.ColorHex;
-        i.color = ntc.name(aiItem.ColorHex)[1];
+        i.color = ntc.name(aiItem.ColorHex)[3];
+        i.color_name = ntc.name(aiItem.ColorHex)[1];
         return i;
       });
 
       if (aiItems.length > 0) {
-        setOutfitItems([...aiItems, defaultOutfitItem()]);
+        aiItems.push(defaultOutfitItem());
+        setOutfitItems([...aiItems]);
       }
       setIsLoading(false);
     }
@@ -352,22 +242,11 @@ export const OutfitForm = (props: {
           Set to Private Post
         </label>
 
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            checked={privateMode}
-            className="sr-only peer"
-            value={privateMode.toString()}
-            onChange={() => setPrivateMode(!privateMode)}
-          />
-          <div
-            className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:primary
-                   rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
-          ></div>
-          <span className="ml-3 text-sm font-medium text-gray-900">
-            Private
-          </span>
-        </label>
+        <Toggle
+          checked={privateMode}
+          onChange={() => setPrivateMode(!privateMode)}
+          label="Private"
+        />
       </div>
 
       <div className="my-4">
@@ -413,10 +292,11 @@ export const OutfitForm = (props: {
           <ul>
             {outfitItems.map((item, index) => {
               let displayCount = index + 1;
+              let key = item.description || displayCount;
               return (
                 <li
                   className="shadow border-b-2 border-custom-tan  my-4 rounded-lg p-4"
-                  key={displayCount}
+                  key={key}
                 >
                   <div className="flex items-start justify-between">
                     <h5 className="font-bold">Item #{displayCount}.</h5>
@@ -457,3 +337,118 @@ export const OutfitForm = (props: {
     </form>
   );
 };
+
+function defaultOutfitItem(): OutfitItem {
+  return {
+    id: "",
+    brand: "",
+    description: "",
+    size: "",
+    price: "",
+    review: "",
+    rating: 2.5,
+    link: "",
+    color: "",
+    store: "",
+  };
+}
+
+function updateItem(item: OutfitItem, field: string, value: string) {
+  switch (field) {
+    case "description":
+      item.description = value;
+      break;
+    case "rating":
+      item.rating = Number(value);
+      break;
+    case "review":
+      item.review = value;
+      break;
+    case "link":
+      item.link = value;
+      break;
+    case "price":
+      item.price = value;
+      break;
+    case "size":
+      item.size = value;
+      break;
+    case "brand":
+      item.brand = value;
+      break;
+    case "store":
+      item.store = value;
+      break;
+  }
+
+  return item;
+}
+
+function validateForm(
+  imageURL: string | null,
+  caption: string,
+  tags: string,
+  outfitItems: OutfitItem[]
+) {
+  if (!imageURL || !caption || outfitItems.length == 0 || !tags) {
+    return false;
+  }
+
+  let itemMissingField = false;
+  outfitItems.forEach((item) => {
+    if (!item.description || !item.brand || !item.review) {
+      itemMissingField = true;
+      return;
+    }
+  });
+
+  if (itemMissingField) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+function filterEmptyItems(items: OutfitItem[]) {
+  return items.filter((item) => {
+    let empty = !item.description && !item.brand && !item.review;
+
+    if (!empty) {
+      return item;
+    }
+  });
+}
+
+function cleanStyleTags(styleTags: string) {
+  let tags = styleTags.split(" ");
+  tags.forEach((tag, index) => {
+    if (tag == "" || tag == " ") {
+      tags.splice(index, 1);
+      return;
+    }
+
+    if (!tag.startsWith("#")) {
+      tags[index] = "#" + tag;
+    }
+  });
+
+  return tags;
+}
+
+function getOutfitId(imageURL: string) {
+  /// !!!! TODO make image URL env variable
+  let outfitId =
+    process.env.NODE_ENV == "development"
+      ? imageURL?.replace(
+          "https://storage.googleapis.com/rateyourstyle-dev/imgs/outfits/",
+          ""
+        )
+      : imageURL?.replace(
+          "https://storage.googleapis.com/rateyourstyle/imgs/outfits/",
+          ""
+        );
+  outfitId = outfitId.split("/")[1];
+  outfitId = outfitId.split(".")[0];
+
+  return outfitId;
+}

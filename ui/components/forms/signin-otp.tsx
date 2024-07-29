@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { PostSigninOTP } from "../../apis/post_signin";
-import { PrimaryButton } from "../Buttons/primary";
+import { PrimaryButton } from "../base/buttons/primary";
 import { GetOTP } from "../../apis/get_otp";
 import LoadingGIF from "../icons/loader-gif";
 

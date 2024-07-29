@@ -4,7 +4,7 @@ import { Navbar } from "../components/navarbar";
 import { GetServerURL, GetAuthServerURL } from "../apis/get_server";
 import { PageMetadata } from "./_app";
 import SignupForm from "../components/forms/signup";
-import { GoogleButton } from "../components/Buttons/google";
+import { GoogleButton } from "../components/base/buttons/google";
 import Link from "next/link";
 
 type Props = {

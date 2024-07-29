@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { OTPForm } from "./signin-otp";
 import { PostUser } from "../../apis/post_user";
-import { PrimaryButton } from "../Buttons/primary";
+import { PrimaryButton } from "../base/buttons/primary";
 import { GetSignupVerification } from "../../apis/get_signupverification";
 import LoadingGIF from "../icons/loader-gif";
 

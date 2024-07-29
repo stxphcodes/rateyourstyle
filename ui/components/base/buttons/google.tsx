@@ -1,4 +1,4 @@
-import GoogleIcon from "../icons/google-logo";
+import GoogleIcon from "../../icons/google-logo";
 
 export function GoogleButton(props: { styles?: string; label?: string }) {
   return (

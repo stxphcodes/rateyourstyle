@@ -9,7 +9,7 @@ import {
   GetOutfitFeedbackResponse,
   GetOutgoingFeedback,
 } from "../../../apis/get_feedback";
-import { Table, TableHead } from "../../../components/table";
+import { Table, TableHead } from "../../../components/base/table";
 import { getFeedbackRequestStatus } from "../../../components/feedback";
 
 type Props = {
