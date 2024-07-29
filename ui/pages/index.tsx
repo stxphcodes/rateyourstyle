@@ -44,7 +44,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     metadata: {
       title: "",
       description:
-        "Rate Your Style is a fashion community to support people in finding their personal style. Use Rate Your Style to get outfit feedback and style advice, and to find fashion outfit inspo. You can also connect with professional stylists on Rate Your Style.",
+        "RateYourStyle is a fashion community to support people in finding their personal style. Use RateYourStyle to get outfit feedback and style advice, and to find fashion outfit inspo. You can also connect with professional stylists on RateYourStyle.",
     },
   };
 
@@ -111,7 +111,7 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
       <main className="">
         <section className="p-4 md:p-8 bg-gradient mt-8">
           <h1 className="text-4xl text-center pt-8">
-            Welcome to Rate Your Style
+            Welcome to RateYourStyle
           </h1>
           <h2 className="text-center uppercase pb-8  m-auto">
             a fashion community to help you find your personal style 🫶
@@ -148,7 +148,7 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
             <div>
               <h1>For Personal Stylists</h1>
               <h5 className="my-4">
-                Rate Your Style is a marketplace that connects people seeking
+                RateYourStyle is a marketplace that connects people seeking
                 fashion advice to personal stylists.
               </h5>
               <ul className="text-lg">
@@ -168,7 +168,7 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
             <div>
               <h1>For Fashion Enthusiasts</h1>
               <h5 className="my-4">
-                Rate Your Style is an online community for anyone interested in
+                RateYourStyle is an online community for anyone interested in
                 fashion.
               </h5>
               <ul className="text-lg">
@@ -233,7 +233,7 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
                   So as a software engineer, I wanted to try creating a platform
                   that helps other people in their journey to find their
                   personal style too. Everyone deserves to feel good in what
-                  they wear, and who they are. I hope that Rate Your Style can
+                  they wear, and who they are. I hope that RateYourStyle can
                   help you achieve that.
                   <br />
                   <br />

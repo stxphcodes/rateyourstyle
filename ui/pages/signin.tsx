@@ -25,7 +25,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     metadata: {
       title: "Sign In",
       description:
-        "Rate Your Style is a fashion community to support people in finding their personal style. Use Rate Your Style to get outfit feedback and style advice, and to find fashion outfit inspo. You can also connect with professional stylists on Rate Your Style.",
+        "RateYourStyle is a fashion community to support people in finding their personal style. Use RateYourStyle to get outfit feedback and style advice, and to find fashion outfit inspo. You can also connect with professional stylists on RateYourStyle.",
     },
   };
 
@@ -77,7 +77,7 @@ function Signin({ authServer, clientServer, error }: Props) {
         <div className="md:w-1/2 m-auto py-12">
           <div className="p-8 shadow-lg rounded-lg bg-white">
             <div className="py-8 text-center">
-              <h2 className="">Sign in to Rate Your Style</h2>
+              <h2 className="">Sign in to RateYourStyle</h2>
               <h3>Welcome back!</h3>
 
               <img

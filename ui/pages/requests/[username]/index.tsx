@@ -140,7 +140,7 @@ export default function Index({
               } font-normal mt-2`}
             >
               We envision the request outfit feedback feature to be a core
-              functionality of Rate Your Style that will set it apart from other
+              functionality of RateYourStyle that will set it apart from other
               marketplaces. The idea is that users can seek specific outfit
               feedback from professional stylists, or anyone they believe can
               give good fashion advice.

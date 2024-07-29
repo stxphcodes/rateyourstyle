@@ -78,7 +78,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     metadata: {
       title: "Discover",
       description:
-        "Discover fashion and outfit inspo from real people. Rate Your Style is a community for fashion lovers.",
+        "Discover fashion and outfit inspo from real people. RateYourStyle is a community for fashion lovers.",
     },
   };
 

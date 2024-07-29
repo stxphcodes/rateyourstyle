@@ -155,7 +155,7 @@ export function Navbar(props: {
           ) : (
             <div className="mb-1">
               <Link href="/" passHref={true}>
-                <a className="text-lg">Rate Your Style</a>
+                <a className="text-lg">RateYourStyle</a>
               </Link>
             </div>
           )}

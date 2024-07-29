@@ -20,7 +20,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     metadata: {
       title: "How It Works",
       description:
-        "Rate Your Style is a fashion community to support people in finding their personal style. Use Rate Your Style to get outfit feedback and style advice, and to find fashion outfit inspo. You can also connect with professional stylists on Rate Your Style.",
+        "RateYourStyle is a fashion community to support people in finding their personal style. Use RateYourStyle to get outfit feedback and style advice, and to find fashion outfit inspo. You can also connect with professional stylists on RateYourStyle.",
     },
   };
 
@@ -81,8 +81,8 @@ const howItWorks = [
     title: "3. Get outfit feedback",
     content: (
       <div>
-        The Rate Your Style community will rate and review your outfits. There
-        are professional stylists on Rate Your Style. If you&apos;d like their
+        The RateYourStyle community will rate and review your outfits. There are
+        professional stylists on RateYourStyle. If you&apos;d like their
         specific outfit feedback, you can send an outfit feedback request to
         them directly.
       </div>
@@ -114,7 +114,7 @@ function HowItWorks({ cookie, clientServer }: Props) {
         <section className="px-4 md:px-8">
           <h1>How It Works</h1>
           <div className="my-4">
-            As a platform, Rate Your Style is free to join and use. However, if
+            As a platform, RateYourStyle is free to join and use. However, if
             you&apos;d like specific style feedback or fashion help from
             professional stylists that are on the platform, they may charge a
             fee.

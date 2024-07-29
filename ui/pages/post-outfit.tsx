@@ -31,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     metadata: {
       title: "Post Outfit",
       description:
-        "Start building your virtual closet by posting an outfit and get rewarded for your style. Rate Your Style is an online fashion community for all of your style inspo needs.",
+        "Start building your virtual closet by posting an outfit and get rewarded for your style. RateYourStyle is an online fashion community for all of your style inspo needs.",
     },
   };
 
@@ -144,7 +144,7 @@ function PostOutfitPage({
               feel!
             </p>
             <div className="font-semibold mt-2">
-              How does Rate Your Style generate my outfit items?
+              How does RateYourStyle generate my outfit items?
             </div>
             <p>
               RateYourStyle uses AI to help identify and describe items in your
