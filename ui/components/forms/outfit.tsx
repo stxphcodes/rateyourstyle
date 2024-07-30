@@ -152,12 +152,13 @@ export const OutfitForm = (props: {
       }
 
       setImageURL(resp.url);
-      let aiItems = resp.items.map((aiItem) => {
+      let aiItems = resp.items.map((aiItem, index) => {
         let i = defaultOutfitItem();
         i.description = aiItem.Description;
         i.color_hex = aiItem.ColorHex;
         i.color = ntc.name(aiItem.ColorHex)[3];
         i.color_name = ntc.name(aiItem.ColorHex)[1];
+        i.id = `ai-${index}`;
         return i;
       });
 
@@ -292,7 +293,7 @@ export const OutfitForm = (props: {
           <ul>
             {outfitItems.map((item, index) => {
               let displayCount = index + 1;
-              let key = item.description || displayCount;
+              let key = displayCount;
               return (
                 <li
                   className="shadow border-b-2 border-custom-tan  my-4 rounded-lg p-4"
@@ -310,7 +311,7 @@ export const OutfitForm = (props: {
                     handleItemChange={handleItemChange}
                     handlePreviousItemSelect={handlePreviousItemSelect}
                     handleColorPick={handleColorPick}
-                    showForm={item.description !== ""}
+                    showForm={item.id.includes("ai")}
                   />
                 </li>
               );
@@ -414,6 +415,10 @@ function filterEmptyItems(items: OutfitItem[]) {
     let empty = !item.description && !item.brand && !item.review;
 
     if (!empty) {
+      // reset ai id
+      if (item.id) {
+        item.id = "";
+      }
       return item;
     }
   });
