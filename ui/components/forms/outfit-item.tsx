@@ -112,14 +112,14 @@ export const OutfitItemForm = (props: {
 
             <div>
               <label>Please describe what the item is in a few words.</label>
-              <input
+              <textarea
                 className="w-full"
                 id="description"
-                type="text"
+                rows={2}
                 placeholder="Description"
                 value={props.item.description}
                 onChange={(e) => props.handleItemChange(e, props.index)}
-              ></input>
+              ></textarea>
               <label htmlFor="" className="requiredLabel">
                 Required*
               </label>
