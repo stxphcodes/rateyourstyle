@@ -113,7 +113,7 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
           <h1 className="text-4xl text-center pt-8">
             Welcome to RateYourStyle
           </h1>
-          <h2 className="text-center uppercase pb-8  m-auto">
+          <h2 className="text-xl sm:text-2xl text-center uppercase pt-4 pb-8  m-auto">
             a fashion community to help you find your personal style 🫶
           </h2>
 
