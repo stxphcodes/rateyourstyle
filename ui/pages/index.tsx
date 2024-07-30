@@ -143,116 +143,29 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
           </div>
         </section>
 
-        <section className="p-4 md:p-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-8">
-            <div>
-              <h1>For Personal Stylists</h1>
-              <h5 className="my-4">
-                RateYourStyle is a marketplace that connects people seeking
-                fashion advice to personal stylists.
-              </h5>
-              <ul className="text-lg">
-                {personalStylistList.map((item, index) => (
-                  <li
-                    key={`personal-stylist-reason-${index}`}
-                    className="flex gap-2 items-center mb-4"
-                  >
-                    <div className="flex-none">
-                      <CircleCheckIcon />
-                    </div>
-                    <div className="flex-none">{item}</div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h1>For Fashion Enthusiasts</h1>
-              <h5 className="my-4">
-                RateYourStyle is an online community for anyone interested in
-                fashion.
-              </h5>
-              <ul className="text-lg">
-                {fashionEnthusiastList.map((item, index) => (
-                  <li
-                    key={`fashion-enthusiast-reason-${index}`}
-                    className="flex gap-2 items-center mb-4 flex-none"
-                  >
-                    <div className="shrink-0">
-                      <CircleCheckIcon />
-                    </div>
-
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          <div className="flex justify-center my-4">
-            <Link href="/how-it-works" passHref={true}>
-              <a className="uppercase bg-custom-lime py-2 px-16 rounded hover:bg-custom-pink">
-                <h2>How it works</h2>
-              </a>
-            </Link>
-          </div>
-        </section>
-
         <section className="bg-custom-tan">
-          <div className="grid sm:grid-cols-2 gap-2">
-            <div className="col-span-1 px-4 md:px-8 py-4 text-balance">
-              <h1 className="pb-2 animate-typing overflow-hidden whitespace-nowrap">
-                Hello World!
-              </h1>
-              Growing up, one of my favorite past times was shopping and
-              dressing up with my mom. We would spend our weekends pillaging the
-              sale section of department stores, looking for deals on pieces
-              that we felt beautiful in.
-              <br />
-              {readMore && (
-                <>
-                  <br />
-                  Somewhere in between those blissful, weekend shopping trips as
-                  a kid, and the tumultous years of adolscence when my self
-                  awareness heightened and my self confidence dropped, I stopped
-                  enjoying shopping, and I struggled to feel good in anything
-                  that I wore.
-                  <br />
-                  <br />
-                  This continued for most of my early twenties. I remember
-                  visiting home during the holidays, and turning down my
-                  mom&apos;s invitations to go shopping, which I knew were also
-                  invitations to bond and reconnect.
-                  <br />
-                  <br />
-                  It wasn&apos;t until my mid twenties, when I started to
-                  understand and accept who I was, that I rediscovered my love
-                  for shopping and putting together outfits. Around that time, I
-                  also learned about personal style, and I found that defining
-                  my personal style helped make shopping less overwhelming, and
-                  made getting ready everyday easier and fun again. <br />{" "}
-                  <br />
-                  So as a software engineer, I wanted to try creating a platform
-                  that helps other people in their journey to find their
-                  personal style too. Everyone deserves to feel good in what
-                  they wear, and who they are. I hope that RateYourStyle can
-                  help you achieve that.
-                  <br />
-                  <br />
-                  With love, <br />
-                  Steph
-                </>
-              )}
-              <br />
-              <a onClick={() => setReadMore(!readMore)}>
-                Read {readMore ? "less" : "more"}
-              </a>
-            </div>
-
-            <div>
-              <img
-                src="./mom-and-me.jpeg"
-                className="w-full h-full object-contain"
-              />
-            </div>
+          <h1 className="m-auto px-4 sm:px-8 py-8 sm:py-16 sm:text-center sm:animate-typing  sm:overflow-hidden sm:whitespace-nowrap ">
+            For the fashionista, data nerd and stylist
+          </h1>
+          <div className="grid sm:grid-cols-3">
+            {howItWorks.map((item, index) => (
+              <div
+                className={`px-4 sm:px-8 sm:py-12 py-4 whitespace-pre-line ${item.bgcolor}`}
+                key={`how-it-works-step-${index}`}
+              >
+                <div className="grid grid-cols-2 gap-4 items-start mt-4">
+                  <div className="col-span-1 ">
+                    <h2 className="pb-4 uppercase">{item.title}</h2>
+                    {item.content}
+                  </div>
+                  <img
+                    alt={`how-it-works-img-${index}`}
+                    src={item.picture_url}
+                    className=" border-4 border-black"
+                  ></img>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -288,5 +201,46 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
     </>
   );
 }
+
+const howItWorks = [
+  {
+    picture_url: "/screenshot-1.png",
+    title: "Document your outfits with AI",
+    bgcolor: "bg-custom-pink",
+    content: (
+      <div>
+        Start building your virtual closet by posting your outfits. To make
+        outfit submission quick and easy, we use AI to help you identify and
+        describe outfit items.
+      </div>
+    ),
+  },
+  {
+    picture_url: "/screenshot-5.png",
+    title: "Gather data about your clothes",
+    content: (
+      <div>
+        RateYourStyle aggregates your clothes into a virtual closet, and creates
+        basic graphs to give you analytics such as most worn item, cost per
+        wear, color analysis and more.
+      </div>
+    ),
+    bgcolor: "bg-custom-lime",
+  },
+  {
+    picture_url: "/screenshot-6.png",
+    title: "Give & receive style advice",
+    content: (
+      <div>
+        Find fashion inspo on our{" "}
+        <Link href="/discover" passHref={true}>
+          <a className="hover:text-custom-lime">Discover page</a>
+        </Link>
+        , and rate & review each other&apos;s outfits.
+      </div>
+    ),
+    bgcolor: "bg-custom-pink",
+  },
+];
 
 export default Home;

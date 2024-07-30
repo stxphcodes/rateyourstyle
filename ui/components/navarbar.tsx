@@ -183,10 +183,6 @@ export function Navbar(props: {
 
         {!useMobileMenu && (
           <div className="">
-            <Link href="/how-it-works" passHref={true}>
-              How It Works
-            </Link>
-            <span className="mx-1">|</span>
             <Link href="/discover" passHref={true}>
               <a className="">Discover</a>
             </Link>
@@ -204,10 +200,6 @@ export function Navbar(props: {
         >
           <Link href="/" passHref={true}>
             <a className="">Home</a>
-          </Link>
-
-          <Link href="/how-it-works" passHref={true}>
-            How It Works
           </Link>
 
           <Link href="/discover" passHref={true}>
