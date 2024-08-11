@@ -1,4 +1,4 @@
-key="sk-proj-exAF36GEm9ZGYF5MWmDpT3BlbkFJt7cthPUnOgi6YG1jrajy"
+key=""
 prompt="can you describe each clothing item in this image and include the hex color code? use this json format without deviation: {'clothingItems': [{ 'description': 'description of item', 'colorHex': 'color hex code'}]}"
 img="https://storage.googleapis.com/rateyourstyle/imgs/outfits/ATteL88XFAOM9nC7/HmY6k5xgXiiTedxs.jpeg"
 
