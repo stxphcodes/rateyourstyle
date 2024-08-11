@@ -311,7 +311,7 @@ export const OutfitForm = (props: {
                     handleItemChange={handleItemChange}
                     handlePreviousItemSelect={handlePreviousItemSelect}
                     handleColorPick={handleColorPick}
-                    showForm={item.id.includes("ai")}
+                    showForm={item.id.includes("ai-")}
                   />
                 </li>
               );
@@ -416,7 +416,7 @@ function filterEmptyItems(items: OutfitItem[]) {
 
     if (!empty) {
       // reset ai id
-      if (item.id) {
+      if (item.id.includes("ai-")) {
         item.id = "";
       }
       return item;

@@ -144,7 +144,7 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
         </section>
 
         <section className="bg-custom-tan">
-          <h1 className="m-auto px-4 sm:px-8 py-8 sm:py-16 sm:text-center sm:animate-typing  sm:overflow-hidden sm:whitespace-nowrap ">
+          <h1 className="m-auto px-4 sm:px-8 py-8 sm:py-12 sm:text-center sm:animate-typing  sm:overflow-hidden sm:whitespace-nowrap ">
             For the fashionista, data nerd and stylist
           </h1>
           <div className="grid sm:grid-cols-3">
