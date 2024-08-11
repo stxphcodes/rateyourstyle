@@ -163,7 +163,7 @@ export default function Index({
           <h1>😕 Oh no</h1>
           Looks like there&apos;s an error on our end. Please refresh the page
           in a few minutes. If the issue persists, please email
-          sitesbystephanie@gmail.com.
+          rateyourstyle@gmail.com.
         </main>
       </>
     );

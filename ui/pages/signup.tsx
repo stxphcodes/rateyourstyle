@@ -4,7 +4,7 @@ import { Navbar } from "../components/navarbar";
 import { GetServerURL, GetAuthServerURL } from "../apis/get_server";
 import { PageMetadata } from "./_app";
 import SignupForm from "../components/forms/signup";
-import { GoogleButton } from "../components/Buttons/google";
+import { GoogleButton } from "../components/base/buttons/google";
 import Link from "next/link";
 
 type Props = {
@@ -22,7 +22,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     metadata: {
       title: "Sign Up",
       description:
-        "Rate Your Style is a fashion community to support people in finding their personal style. Use Rate Your Style to get outfit feedback and style advice, and to find fashion outfit inspo. You can also connect with professional stylists on Rate Your Style.",
+        "RateYourStyle is a fashion community to support people in finding their personal style. Use RateYourStyle to get outfit feedback and style advice, and to find fashion outfit inspo. You can also connect with professional stylists on RateYourStyle.",
     },
   };
 
@@ -66,7 +66,7 @@ function Signup({ clientServer, authServer, error }: Props) {
             <div className="p-8 shadow-lg rounded-lg bg-white">
               <div className="text-center">
                 <div className="py-4">
-                  <h2 className=" ">Join Rate Your Style</h2>
+                  <h2 className=" ">Join RateYourStyle</h2>
                   <p>
                     A fashion community to support you in finding your personal
                     style 🫶.

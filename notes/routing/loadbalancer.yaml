@@ -1,0 +1,12 @@
+defaultService: projects/rateyourstyle/global/backendServices/custom-domains-rateyourstyle-com-ui-49a4-be
+name: rateyourstyle-com
+pathRules:
+- paths:
+  - /*
+  service: projects/rateyourstyle/global/backendServices/custom-domains-rateyourstyle-com-ui-49a4-be
+- paths:
+  - /search/*
+  service: projects/rateyourstyle/global/backendServices/search-server
+- paths:
+  - /api/*
+  service: projects/rateyourstyle/global/backendServices/custom-domains-rateyourstyle-com-server-49a4-be

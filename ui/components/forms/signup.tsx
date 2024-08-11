@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { OTPForm } from "./signin-otp";
 import { PostUser } from "../../apis/post_user";
-import { PrimaryButton } from "../Buttons/primary";
+import { PrimaryButton } from "../base/buttons/primary";
 import { GetSignupVerification } from "../../apis/get_signupverification";
 import LoadingGIF from "../icons/loader-gif";
 
@@ -171,7 +171,7 @@ const SignupForm = (props: { clientServer: string; authServer: string }) => {
                 }}
               />
               <label>
-                I agree to Rate Your Style&apos;s cookie policy. Rate Your Style
+                I agree to RateYourStyle&apos;s cookie policy. RateYourStyle
                 uses cookies to maintain your login session. The cookie is only
                 used for the purpose of saving your login details.
               </label>

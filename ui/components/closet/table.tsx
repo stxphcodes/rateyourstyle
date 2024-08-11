@@ -10,7 +10,7 @@ import { EyedropperButton } from "../color/eyedropper-button";
 import { ntc } from "../color/ntc";
 import { ColorDiv } from "../color/color-div";
 import { ClosetGraphs } from "./graphs";
-import { Table } from "../table";
+import { Table } from "../base/table";
 
 export function ClosetTable(props: {
   outfits: Outfit[];
@@ -137,7 +137,7 @@ export function ClosetTable(props: {
     );
     if (resp instanceof Error) {
       setItemEditError(
-        "Server error. We apologize for the inconvenience, please try again at a later time or email sitesbystephanie@gmail.com if the issue persists."
+        "Server error. We apologize for the inconvenience, please try again at a later time or email rateyourstyle@gmail.com if the issue persists."
       );
       return;
     } else {

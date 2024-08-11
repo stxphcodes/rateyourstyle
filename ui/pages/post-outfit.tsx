@@ -1,19 +1,16 @@
 import { GetServerSideProps } from "next";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { EyeDropper, OnChangeEyedrop } from "react-eyedrop";
-
-import { GetOutfitsByUser, Outfit, OutfitItem } from "../apis/get_outfits";
-import { PostImage } from "../apis/post_image";
-import { PostOutfit } from "../apis/post_outfit";
+import { GetOutfitsByUser, OutfitItem } from "../apis/get_outfits";
 import { Footer } from "../components/footer";
-import { Modal, XButton } from "../components/modals";
+import { Modal } from "../components/modals";
 import { Navbar } from "../components/navarbar";
 import { GetImageServerURL, GetServerURL } from "../apis/get_server";
 import { PageMetadata } from "./_app";
 import { AccountPromptModal } from "../components/modals/accountPrompt";
-import { EyedropperButton } from "../components/color/eyedropper-button";
-import { ntc } from "../components/color/ntc";
+import { OutfitForm } from "../components/forms/outfit";
+import { PostOutfit } from "../apis/post_outfit";
+import { Outfit } from "../apis/get_outfits";
 
 type Props = {
   cookie: string;
@@ -23,21 +20,6 @@ type Props = {
   previousOutfitItems: OutfitItem[];
   metadata: PageMetadata;
 };
-
-function defaultOutfitItem(): OutfitItem {
-  return {
-    id: "",
-    brand: "",
-    description: "",
-    size: "",
-    price: "",
-    review: "",
-    rating: 2.5,
-    link: "",
-    color: "",
-    store: "",
-  };
-}
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   let props: Props = {
@@ -49,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     metadata: {
       title: "Post Outfit",
       description:
-        "Start building your virtual closet by posting an outfit and get rewarded for your style. Rate Your Style is an online fashion community for all of your style inspo needs.",
+        "Start building your virtual closet by posting an outfit and get rewarded for your style. RateYourStyle is an online fashion community for all of your style inspo needs.",
     },
   };
 
@@ -106,31 +88,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return { props };
 };
 
-function validateForm(
-  imageURL: string | null,
-  caption: string,
-  tags: string,
-  outfitItems: OutfitItem[]
-) {
-  if (!imageURL || !caption || outfitItems.length == 0 || !tags) {
-    return false;
-  }
-
-  let itemMissingField = false;
-  outfitItems.forEach((item) => {
-    if (!item.description || !item.brand || !item.review || !item.color) {
-      itemMissingField = true;
-      return;
-    }
-  });
-
-  if (itemMissingField) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
 function PostOutfitPage({
   cookie,
   clientServer,
@@ -138,208 +95,16 @@ function PostOutfitPage({
   previousOutfitItems,
   error,
 }: Props) {
-  const [file, setFile] = useState<File | null>(null);
-  const [imageURL, setImageURL] = useState<string | null>("");
-  const [fileError, setFileError] = useState<string | null>("");
-  const [outfitCaption, setOutfitCaption] = useState<string>("");
-  const [privateMode, setPrivateMode] = useState<boolean>(false);
-  const [styleTags, setStyleTags] = useState<string>("");
   const [formSubmissionStatus, setFormSubmissionStatus] = useState("");
-  const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([
-    defaultOutfitItem(),
-  ]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    if (e.target.files) {
-      setFile(e.target.files[0]);
-    }
-  };
-
-  const handleFormInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.id == "caption") {
-      setOutfitCaption(e.target.value);
-    }
-    if (e.target.id == "tags") {
-      setStyleTags(e.target.value);
-    }
-  };
-
-  const handleColorPick = (index: number, rgb: string, hex: string) => {
-    let item = outfitItems[index];
-    item.color_rgb = rgb;
-    item.color_hex = hex;
-    item.color = ntc.name(hex)[3];
-    item.color_name = ntc.name(hex)[1];
-
-    setOutfitItems([
-      ...outfitItems.slice(0, index),
-      item,
-      ...outfitItems.slice(index + 1),
-    ]);
-  };
-
-  const handleItemChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ) => {
-    let item = outfitItems[index];
-
-    if (e.target.id == "description") {
-      item.description = e.target.value;
-    }
-
-    if (e.target.id == "rating") {
-      item.rating = Number(e.target.value);
-    }
-
-    if (e.target.id == "review") {
-      item.review = e.target.value;
-    }
-
-    if (e.target.id == "link") {
-      item.link = e.target.value;
-    }
-
-    if (e.target.id == "price") {
-      item.price = e.target.value;
-    }
-
-    if (e.target.id == "size") {
-      item.size = e.target.value;
-    }
-
-    if (e.target.id == "brand") {
-      item.brand = e.target.value;
-    }
-
-    if (e.target.id == "store") {
-      item.store = e.target.value;
-    }
-
-    setOutfitItems([
-      ...outfitItems.slice(0, index),
-      item,
-      ...outfitItems.slice(index + 1),
-    ]);
-  };
-
-  const handlePreviousItemSelect = (e: any, index: number) => {
-    if (e.target.value == "") {
-      setOutfitItems([
-        ...outfitItems.slice(0, index),
-        defaultOutfitItem(),
-        ...outfitItems.slice(index + 1),
-      ]);
-      return;
-    }
-
-    let item = previousOutfitItems.filter(
-      (item) => item.id == e.target.value
-    )[0];
-
-    setOutfitItems([
-      ...outfitItems.slice(0, index),
-      item,
-      ...outfitItems.slice(index + 1),
-    ]);
-  };
-
-  const handleAddItem = (e: any) => {
-    e.preventDefault();
-    setOutfitItems([...outfitItems, defaultOutfitItem()]);
-  };
-
-  const handleRemoveItem = (e: any, index: number) => {
-    e.preventDefault();
-    setOutfitItems([
-      ...outfitItems.splice(0, index),
-      ...outfitItems.splice(index + 1),
-    ]);
-  };
-
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-
-    if (
-      imageURL &&
-      validateForm(imageURL, outfitCaption, styleTags, outfitItems)
-    ) {
-      setFormSubmissionStatus("");
-
-      let tags = styleTags.split(" ");
-      tags.forEach((tag, index) => {
-        if (tag == "" || tag == " ") {
-          tags.splice(index, 1);
-          return;
-        }
-
-        if (!tag.startsWith("#")) {
-          tags[index] = "#" + tag;
-        }
-      });
-
-      /// !!!! make image URL env variable
-      let outfitId =
-        process.env.NODE_ENV == "development"
-          ? imageURL?.replace(
-              "https://storage.googleapis.com/rateyourstyle-dev/imgs/outfits/",
-              ""
-            )
-          : imageURL?.replace(
-              "https://storage.googleapis.com/rateyourstyle/imgs/outfits/",
-              ""
-            );
-      outfitId = outfitId.split("/")[1];
-      outfitId = outfitId.split(".")[0];
-
-      let outfit: Outfit = {
-        id: outfitId,
-        title: outfitCaption,
-        picture_url: imageURL,
-        picture_url_resized: "",
-        style_tags: tags,
-        items: outfitItems,
-        private: privateMode,
-        date: "",
-        user_id: "",
-        username: "",
-        description: "",
-      };
-
-      const resp = await PostOutfit(clientServer, cookie, outfit);
-      if (resp instanceof Error) {
-        setFormSubmissionStatus("errorOnSubmission");
-      } else {
-        setFormSubmissionStatus("success");
-      }
+  const onSubmit = async (outfit: Outfit) => {
+    const resp = await PostOutfit(clientServer, cookie, outfit);
+    if (resp instanceof Error) {
+      setFormSubmissionStatus("errorOnSubmission");
     } else {
-      setFormSubmissionStatus("missingFields");
+      setFormSubmissionStatus("success");
     }
   };
-
-  useEffect(() => {
-    async function upload(formData: any) {
-      const resp = await PostImage(imageServer, formData, cookie);
-      if (resp instanceof Error) {
-        setFileError(resp.message);
-        return;
-      }
-
-      setImageURL(resp);
-    }
-
-    if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      upload(formData);
-    }
-  }, [cookie, file]);
-
-  if (error) {
-    return <div>error {error} </div>;
-  }
 
   return (
     <>
@@ -348,7 +113,6 @@ function PostOutfitPage({
 
       <main className="mt-12 sm:mt-20 px-4 md:px-8 w-full md:w-3/4">
         <section className="mb-4">
-          <h1>Outfit Post</h1>
           <div className="bg-custom-tan p-2 rounded">
             <h3>FAQs</h3>
             <div className="font-semibold mt-2">
@@ -359,16 +123,15 @@ function PostOutfitPage({
               <span className="underline">not</span> appear on the homepage and
               are not discoverable by the general public. The post is only
               visible to you, the creator of the post, when you log into your
-              account However, if your post includes a campaign #tag, the
-              sponsor of the campaign is also able view the post, regardless of
-              the privacy setting on the post.{" "}
+              account.
             </p>
             <div className="font-semibold mt-2">
-              How will I be notified if I win a campaign?
+              What outfit items should I include?
             </div>
             <p>
-              You will be notified via the email associated to your user account
-              the next day after a campaign ends.
+              You can include anything you&apos;re wearing! For example,
+              accessories, shoes, bags, shirts, jackets are all considered one
+              item each.
             </p>
             <div className="font-semibold mt-2">
               What should I include in the item review?
@@ -380,193 +143,39 @@ function PostOutfitPage({
               in your closet in the future, so try to be honest about how you
               feel!
             </p>
+            <div className="font-semibold mt-2">
+              How does RateYourStyle generate my outfit items?
+            </div>
+            <p>
+              RateYourStyle uses AI to help identify and describe items in your
+              outfit.
+            </p>
           </div>
         </section>
-        {formSubmissionStatus == "success" && (
-          <div className="h-screen">
-            <p>Your outfit was successfully submitted</p>
-          </div>
-        )}
-        {formSubmissionStatus !== "success" && (
-          <form className=" shadow px-4 py-8 border-background border-2">
-            {imageURL ? (
-              <div className="flex flex-wrap gap-4">
-                <img
-                  alt={"outfit image to post"}
-                  src={URL.createObjectURL(file as File)}
-                  className="object-cover"
-                  style={{ height: "600px" }}
-                />
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setFile(null);
-                    setImageURL("");
-                  }}
-                  className="h-fit my-auto bg-black p-1 text-white rounded text-sm hover:bg-primary"
-                >
-                  {" "}
-                  remove
-                </button>
-              </div>
-            ) : (
-              <>
-                {fileError && (
-                  <>
-                    <div className="p-2 my-2 bg-red-500 text-white">
-                      Encountered error uploading image. Please{" "}
-                      <button
-                        onClick={(e) => {
-                          location.reload();
-                        }}
-                        className="h-fit my-auto bg-black p-1 text-white rounded text-sm hover:bg-primary"
-                      >
-                        {" "}
-                        refresh
-                      </button>{" "}
-                      the page and try again.
-                    </div>
-                  </>
-                )}
-                <label htmlFor="file" className="">
-                  Choose an image
-                </label>
-                <input
-                  className="w-full"
-                  id="file"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                />
-                <label className="requiredLabel">Required*</label>
-              </>
-            )}
-            <div className="my-4">
-              <label className="" htmlFor="caption">
-                Set to Private Post
-              </label>
 
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={privateMode}
-                  className="sr-only peer"
-                  value={privateMode.toString()}
-                  onChange={() => setPrivateMode(!privateMode)}
-                />
-                <div
-                  className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:primary
-							 rounded-full peer  peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
-                ></div>
-                <span className="ml-3 text-sm font-medium text-gray-900">
-                  Private
-                </span>
-              </label>
-              <label className="italic font-normal">
-                Private posts are only viewable by you and the sponsor of the
-                campaign if you use a campaign tag.
-              </label>
-            </div>
-
-            <div className="my-4">
-              <label className="" htmlFor="caption">
-                Outfit Caption
-              </label>
-              <input
-                className="w-full"
-                id="caption"
-                type="text"
-                placeholder="Caption"
-                value={outfitCaption}
-                onChange={handleFormInput}
-              ></input>
-              <label className="requiredLabel">Required*</label>
-            </div>
-
-            <div className="my-4">
-              <label>
-                Select as many tags from the options below or enter your own.
-                Start tags with &apos;#&apos;
-              </label>
-              <input
-                className="w-full"
-                id="tags"
-                type="text"
-                placeholder="Ex. #athleisure #loungewear"
-                value={styleTags}
-                onChange={handleFormInput}
-              ></input>
-              <label className="requiredLabel">Required*</label>
-            </div>
-
-            <div className="mb-4">
-              <h5>Outfit Items</h5>
-              <label>
-                Describe and rate the items that appear in your outfit. For
-                example: shoes, accessories, tops and bottoms are all considered
-                one item each. <br />
-                At least one outfit item is required.
-              </label>
-              <ul>
-                {outfitItems.map((item, index) => {
-                  let displayCount = index + 1;
-                  return (
-                    <li
-                      className="shadow border-2 border-background my-2 rounded-lg p-4"
-                      key={displayCount}
-                    >
-                      <div className="flex items-start justify-between">
-                        <h6 className="mx-2">Item #{displayCount}.</h6>
-                        <XButton
-                          onClick={(e: any) => handleRemoveItem(e, index)}
-                        />
-                      </div>
-
-                      <OutfitItemForm
-                        previousOutfitItems={previousOutfitItems}
-                        item={item}
-                        index={index}
-                        handleItemChange={handleItemChange}
-                        handlePreviousItemSelect={handlePreviousItemSelect}
-                        handleColorPick={handleColorPick}
-                      />
-                    </li>
-                  );
-                })}
-              </ul>
-              <button
-                onClick={handleAddItem}
-                className="primaryButton float-right"
-              >
-                add item
-              </button>
-            </div>
-
-            <button
-              className="bg-gradient hover:scale-105 font-bold py-2 px-4 rounded  w-full mt-8"
-              onClick={handleSubmit}
-            >
-              Submit
-            </button>
-          </form>
-        )}
+        <section className="my-8">
+          <h1>Outfit Post</h1>
+          <OutfitForm
+            clientServer={clientServer}
+            imageServer={imageServer}
+            cookie={cookie}
+            previousItems={previousOutfitItems}
+            onSubmit={onSubmit}
+          />
+        </section>
       </main>
-      {formSubmissionStatus == "missingFields" && (
-        <Modal handleClose={() => setFormSubmissionStatus("")}>
-          <div>Form is missing required fields.</div>
-        </Modal>
-      )}
+
       {formSubmissionStatus == "errorOnSubmission" && (
         <Modal handleClose={() => setFormSubmissionStatus("")}>
           <div>
             <h3>Uh oh 😕 Our servers might be down. </h3> Please try submitting
             the form again when you are able.
             <br />
-            If the error persists, please email us at sitesbystephanie@gmail.com
-            .
+            If the error persists, please email us at rateyourstyle@gmail.com .
           </div>
         </Modal>
       )}
+
       {formSubmissionStatus == "success" && (
         <Modal handleClose={() => location.assign("/")}>
           <div>
@@ -583,207 +192,6 @@ function PostOutfitPage({
       )}
       <Footer />
     </>
-  );
-}
-
-function OutfitItemForm(props: {
-  item: OutfitItem;
-  index: number;
-  handleItemChange: any;
-  previousOutfitItems: OutfitItem[];
-  handlePreviousItemSelect: any;
-  handleColorPick: any;
-}) {
-  const [createNewItem, setCreateNewItem] = useState(false);
-
-  if (
-    props.previousOutfitItems &&
-    props.previousOutfitItems.length > 0 &&
-    !createNewItem
-  ) {
-    return (
-      <div>
-        <div className="flex flex-wrap">
-          <div className="mr-2">Select previous clothing item</div>
-
-          <select
-            onChange={(e) => props.handlePreviousItemSelect(e, props.index)}
-            className="border-2 overflow-x-scroll max-w-full capitalize"
-          >
-            <option value="">--Please select an item--</option>
-            {props.previousOutfitItems.map((item) => (
-              <option value={item.id} key={item.id}>
-                {item.brand} {item.description}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          or{" "}
-          <button
-            className="text-primary underline"
-            onClick={(e) => {
-              e.preventDefault();
-              setCreateNewItem(true);
-            }}
-          >
-            create new item
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className="col-span-1">
-        <div className="md:flex md:gap-4 items-end">
-          <div className="md:basis-1/4">
-            <label>Item Color?</label>
-            <p className="text-xs">Select from image</p>
-            <EyeDropper
-              colorsPassThrough="colorPicked"
-              onChange={({ rgb, hex }: OnChangeEyedrop) => {
-                return props.handleColorPick(props.index, rgb, hex);
-              }}
-              cursorActive="pointer"
-              cursorInactive="default"
-              customComponent={EyedropperButton}
-            />
-            <label className="requiredLabel">Required*</label>
-          </div>
-
-          <div>
-            <label>Please describe what the item is in a few words.</label>
-            <input
-              className="w-full"
-              id="description"
-              type="text"
-              placeholder="Description"
-              value={props.item.description}
-              onChange={(e) => props.handleItemChange(e, props.index)}
-            ></input>
-            <label htmlFor="" className="requiredLabel">
-              Required*
-            </label>
-          </div>
-        </div>
-
-        <label className="mt-2 mb-0">
-          What is the item&apos;s brand or designer?
-        </label>
-        <label htmlFor="" className="-mt-1 italic font-normal leading-tight">
-          (Use &quot;Unknown&quot; if brand is unknown.)
-        </label>
-        <input
-          className="w-full"
-          id="brand"
-          type="text"
-          placeholder="Brand"
-          value={props.item.brand}
-          onChange={(e) => props.handleItemChange(e, props.index)}
-        ></input>
-        <label htmlFor="" className="requiredLabel">
-          Required*
-        </label>
-
-        <label className="mt-2 mb-0">
-          What store, or where did you purchase the item from?
-        </label>
-        <label htmlFor="" className="-mt-1 italic font-normal leading-tight">
-          (Leave blank if it&apos;s the same as the brand name. You can use
-          online marketplaces like &quot;Depop&quot; or &quot;Poshmark&quot;. If
-          there&apos;s no store name, generic phrases like &quot;Thrift
-          shop&quot; or &quot;Hand me down&quot; are fine too.)
-        </label>
-        <input
-          className="w-full"
-          id="store"
-          type="text"
-          placeholder="Store"
-          value={props.item.store}
-          onChange={(e) => props.handleItemChange(e, props.index)}
-        ></input>
-
-        <label className="mt-2">Link to the item</label>
-        <input
-          className="w-full mb-2"
-          id="link"
-          type="text"
-          placeholder="Link"
-          value={props.item.link}
-          onChange={(e) => props.handleItemChange(e, props.index)}
-        ></input>
-
-        <div className="flex gap-4">
-          <div>
-            <label>Item Size</label>
-            <input
-              className="w-full"
-              id="size"
-              type="text"
-              placeholder="Size"
-              value={props.item.size}
-              onChange={(e) => props.handleItemChange(e, props.index)}
-            ></input>
-          </div>
-
-          <div>
-            <label>Purchase Price</label>
-            <input
-              className="w-full"
-              id="price"
-              type="text"
-              placeholder="Price"
-              value={props.item.price}
-              onChange={(e) => props.handleItemChange(e, props.index)}
-            ></input>
-          </div>
-        </div>
-      </div>
-
-      <div className="col-span-1">
-        <div className="flex gap-4 items-center">
-          <div className="w-fit">
-            <label>Your rating</label>
-            <input
-              id="rating"
-              type="range"
-              min="1"
-              max="5"
-              step="0.5"
-              className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer  p-0 m-0"
-              onChange={(e) => props.handleItemChange(e, props.index)}
-              list="rating"
-              value={props.item.rating}
-            />
-            <datalist
-              className="flex text-primary -mt-2 p-0 justify-between items-start"
-              id="rating"
-            >
-              <option className="text-xs">|</option>
-              <option className="text-xs">|</option>
-              <option className="text-xs">|</option>
-              <option className="text-xs">|</option>
-              <option className="text-xs">|</option>
-            </datalist>
-          </div>
-          <h1 className="text-primary">{props.item.rating}</h1>
-        </div>
-
-        <label className="mt-2">Your Review</label>
-        <textarea
-          rows={4}
-          className="w-full"
-          id="review"
-          placeholder="Review"
-          onChange={(e) => props.handleItemChange(e, props.index)}
-          value={props.item.review}
-        ></textarea>
-        <label className="requiredLabel">Required*</label>
-      </div>
-    </div>
   );
 }
 

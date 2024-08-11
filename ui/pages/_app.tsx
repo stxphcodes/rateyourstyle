@@ -20,7 +20,7 @@ function MyApp({ Component, pageProps }: AppProps<any>) {
     <>
       <Head>
         <title>
-          {metadata && metadata.title ? metadata.title : "Rate Your Style"}
+          {metadata && metadata.title ? metadata.title : "RateYourStyle"}
         </title>
         <link rel="icon" type="image/x-icon" href="/favicon.ico"></link>
         <meta
@@ -28,7 +28,7 @@ function MyApp({ Component, pageProps }: AppProps<any>) {
           content={
             metadata && metadata.description
               ? metadata.description
-              : "Get style feedback on Rate Your Style through outfit reviews and keep track of the clothes you wear through our virtual closet, a database-like table that takes inventory of your clothes and uses data science to create graphs about your closet."
+              : "Get style feedback on RateYourStyle through outfit reviews and keep track of the clothes you wear through our virtual closet, a database-like table that takes inventory of your clothes and uses data science to create graphs about your closet."
           }
         />
       </Head>

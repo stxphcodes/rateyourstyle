@@ -133,7 +133,7 @@ export default function RequestClosetPage({ cookie, clientServer }: Props) {
                 <div className="col-span-4">
                   Uh oh. Looks like there was an error on our end in receiving
                   your request. We&apos;re s sorry! Please refresh the page and
-                  try again, or email sitesbystephanie@gmail.com.
+                  try again, or email rateyourstyle@gmail.com.
                 </div>
               )
             )}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { PostSigninPassword } from "../../apis/post_signin";
-import { PrimaryButton } from "../Buttons/primary";
+import { PrimaryButton } from "../base/buttons/primary";
 
 export function PasswordSigninForm(props: { authServer: string }) {
   const [username, setUsername] = useState("");

@@ -9,7 +9,7 @@ import {
   GetOutfitFeedbackResponse,
   GetOutgoingFeedback,
 } from "../../../apis/get_feedback";
-import { Table, TableHead } from "../../../components/table";
+import { Table, TableHead } from "../../../components/base/table";
 import { getFeedbackRequestStatus } from "../../../components/feedback";
 
 type Props = {
@@ -114,7 +114,7 @@ export default function Index({
           <h1>😕 Oh no</h1>
           Looks like there&apos;s an error on our end. Please refresh the page
           in a few minutes. If the issue persists, please email
-          sitesbystephanie@gmail.com.
+          rateyourstyle@gmail.com.
         </main>
       </>
     );
@@ -140,13 +140,13 @@ export default function Index({
               } font-normal mt-2`}
             >
               We envision the request outfit feedback feature to be a core
-              functionality of Rate Your Style that will set it apart from other
+              functionality of RateYourStyle that will set it apart from other
               marketplaces. The idea is that users can seek specific outfit
               feedback from professional stylists, or anyone they believe can
               give good fashion advice.
               <br /> <br />
               That being said, this feature is in beta and I apologize if you
-              experience any bugs. Feel free to email sitesbystephanie@gmail.com
+              experience any bugs. Feel free to email rateyourstyle@gmail.com
               with any thoughts or concerns.
             </div>
           </button>

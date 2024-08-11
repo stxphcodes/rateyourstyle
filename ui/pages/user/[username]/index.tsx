@@ -184,7 +184,7 @@ export default function Index({
           <h1>😕 Oh no</h1>
           Looks like there&apos;s an error on our end. Please refresh the page
           in a few minutes. If the issue persists, please email
-          sitesbystephanie@gmail.com.
+          rateyourstyle@gmail.com.
         </main>
       </>
     );
@@ -203,7 +203,7 @@ export default function Index({
             RateYourStyle is still being developed - we&apos;re working as fast
             as we can on new features. If there&apos;s an outfit you&apos;d like
             to edit, or want to report a bug or feature idea, please email
-            sitesbystephanie@gmail.com. Thank you for your patience and
+            rateyourstyle@gmail.com. Thank you for your patience and
             understanding 💛.
           </div>
         </section>

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"path/filepath"
 	"sort"
@@ -95,7 +96,22 @@ func (h Handler) GetOutfits() echo.HandlerFunc {
 
 		errc := make(chan error, 1)
 		outfitsc := make(chan *OutfitResponse)
+
+		outfitArr := []string{}
 		for outfit := range h.OutfitIndices.PublicOutfits {
+			outfitArr = append(outfitArr, outfit)
+		}
+
+		if count != len(h.OutfitIndices.PublicOutfits) {
+			n := rand.Int() % len(h.OutfitIndices.PublicOutfits)
+			if n > len(h.OutfitIndices.PublicOutfits)-count {
+				n = 20
+			}
+
+			outfitArr = outfitArr[n:]
+		}
+
+		for _, outfit := range outfitArr {
 			go func(outfit string) {
 				o, err := getOutfit(ctx.Request().Context(), h.Gcs.Bucket, h.UserIndices.IdUsername, outfit)
 				if err != nil {

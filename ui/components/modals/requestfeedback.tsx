@@ -160,7 +160,7 @@ export function RequestFeedbackModal(props: {
                 <div>
                   We are encountering server issues. Please try refreshing the
                   page. If the issue persists, please contact
-                  sitesbystephanie@gmail.com.
+                  rateyourstyle@gmail.com.
                 </div>
               </div>
             )}

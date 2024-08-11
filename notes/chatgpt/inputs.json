@@ -1,0 +1,14 @@
+{
+    "prompts": [
+        {
+            "id": "1",
+            "img_url": "",
+            "prompt": "in raw json output, can you list each clothing item and its hex color code"
+        },
+        {
+            "id": "2",
+            "img_url": "",
+            "prompt": ""
+        }
+    ]
+}
