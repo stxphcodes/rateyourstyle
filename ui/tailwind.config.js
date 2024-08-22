@@ -21,13 +21,20 @@ module.exports = {
     },
     extend: {
       colors: {
+        // "custom-lime": "rgba(108,113.5,1.5,1)",
+        // "custom-pink": "rgba(125,61.5,112.5,1)",
+        // "custom-tan": "rgba(115,103.5,135.5,1)",
         "custom-grey-brown": "#b5ada2",
         "custom-lime": "#d8e303",
         "custom-pink": "#fa7be1",
         "custom-tan": "#e6cfab",
       },
         backgroundImage: {
-          "gradient": "linear-gradient(90deg, rgba(216,227,3,1) 0%, rgba(230,207,171,1) 53%, rgba(250,123,225,1) 100%)",
+          // "gradient": "linear-gradient(90deg, rgba(216,227,3,1) 0%, rgba(230,207,171,1) 53%, rgba(250,123,225,1) 100%)",
+
+
+
+          "gradient": "linear-gradient(90deg, rgba(108,113.5,1.5,1) 0%, rgba(115,103.5,135.5,1) 53%, rgba(125,61.5,112.5,1) 100%)"
 
       },
       maxHeight: {

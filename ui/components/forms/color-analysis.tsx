@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { Outfit, OutfitItem } from "../../apis/get_outfits";
 import { PostImageWithAI } from "../../apis/post_image";
-import { XButton } from "../../components/modals";
-import { ntc } from "../../components/color/ntc";
-import LoadingGIF from "../../components/icons/loader-gif";
+import { XButton } from "../modals";
+import { ntc } from "../color/ntc";
+import LoadingGIF from "../icons/loader-gif";
 import { OutfitItemForm } from "./outfit-item";
 import { Toggle } from "../base/toggle";
 
-export const OutfitForm = (props: {
+export const ColorAnalysisForm = (props: {
   clientServer: string;
   imageServer: string;
   cookie: string;
@@ -18,7 +18,7 @@ export const OutfitForm = (props: {
   const [imageURL, setImageURL] = useState<string | null>("");
   const [fileError, setFileError] = useState<string | null>("");
   const [outfitCaption, setOutfitCaption] = useState<string>("");
-  const [privateMode, setPrivateMode] = useState<boolean>(false);
+
   const [styleTags, setStyleTags] = useState<string>("");
   const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([
     defaultOutfitItem(),
@@ -129,7 +129,6 @@ export const OutfitForm = (props: {
       picture_url_resized: "",
       style_tags: tags,
       items: filtered,
-      private: privateMode,
       date: "",
       user_id: "",
       username: "",
@@ -220,34 +219,40 @@ export const OutfitForm = (props: {
             </>
           )}
           <label htmlFor="file" className="">
-            Choose an image
+            For more accurate results, please choose an image that is:
+            <ul className="list-disc list-inside">
+              <li>A front-facing headshot</li>
+              <li>High resolution</li>
+              <li>Zero or limited face accessories</li>
+              <li>Taken in natural lighting</li>
+              <li>No filters</li>
+            </ul>
           </label>
+
           {isLoading ? (
             <LoadingGIF />
           ) : (
-            <>
+            <div className="h-40 border border-black rounded content-center justify-self-center">
+              <h1 className="opacity-20 text-center">Image</h1>
               <input
-                className="w-full"
+                className="w-full border-0"
                 id="file"
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
               />
-              <label className="requiredLabel">Required*</label>
-            </>
+            </div>
           )}
         </>
       )}
-      <div className="my-4">
-        <label className="" htmlFor="caption">
-          Set to Private Post
-        </label>
 
-        <Toggle
-          checked={privateMode}
-          onChange={() => setPrivateMode(!privateMode)}
-          label="Private"
-        />
+      <div className="my-4">
+        <h2>Your Results</h2>
+        <div>Skintone</div>
+        <div>Hair Color</div>
+        <div>Eye Color</div>
+
+        <div></div>
       </div>
 
       <div className="my-4">
@@ -330,7 +335,7 @@ export const OutfitForm = (props: {
       )}
 
       <button
-        className="bg-gradient hover:scale-105 font-bold py-2 px-4 rounded  w-full mt-8 text-white"
+        className="bg-gradient hover:scale-105 font-bold py-2 px-4 rounded  w-full mt-8"
         onClick={handleSubmit}
       >
         Submit

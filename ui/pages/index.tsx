@@ -110,10 +110,10 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
       <Navbar clientServer={clientServer} cookie={cookie} />
       <main className="">
         <section className="p-4 md:p-8 bg-gradient mt-8">
-          <h1 className="text-4xl text-center pt-8">
+          <h1 className="text-4xl text-center text-white pt-8">
             Welcome to RateYourStyle
           </h1>
-          <h2 className="text-xl sm:text-2xl text-center uppercase pt-4 pb-8  m-auto">
+          <h2 className="text-xl sm:text-2xl text-center uppercase pt-4 pb-8  m-auto text-white">
             a fashion community to help you find your personal style 🫶
           </h2>
 
@@ -143,8 +143,8 @@ function Home({ cookie, outfits, clientServer, error }: Props) {
           </div>
         </section>
 
-        <section className="bg-custom-tan">
-          <h1 className="m-auto px-4 sm:px-8 py-8 sm:py-12 sm:text-center sm:animate-typing  sm:overflow-hidden sm:whitespace-nowrap ">
+        <section className="bg-black">
+          <h1 className="m-auto px-4 sm:px-8 py-8 sm:py-12 sm:text-center sm:animate-typing  sm:overflow-hidden sm:whitespace-nowrap text-white">
             For the fashionista, data nerd and stylist
           </h1>
           <div className="grid sm:grid-cols-3">

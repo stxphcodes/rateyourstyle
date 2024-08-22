@@ -186,7 +186,7 @@ export default function Index({
           />
 
           <button
-            className="bg-gradient rounded p-2 font-bold uppercase hover:scale-110 h-fit text-left"
+            className="bg-gradient rounded p-2 font-bold uppercase hover:scale-110 h-fit text-left text-white"
             onClick={(e) => {
               e.preventDefault();
               setSubmitOutfitClicked(true);

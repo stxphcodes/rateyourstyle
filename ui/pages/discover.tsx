@@ -211,7 +211,7 @@ function DiscoverPage({
       {!cookie && <AccountPromptModal clientServer={clientServer} />}
       <main className="mt-8 sm:mt-14 overflow-y-hidden">
         <section className="mb-4 p-4 md:p-8 bg-gradient ">
-          <h1 className="mb-4">Discover Outfits and Stylists</h1>
+          <h1 className="mb-4 text-white">Discover Outfits and Stylists</h1>
 
           <div className="flex flex-wrap justify-start items-start gap-2 mb-4">
             <div className="bg-black text-white p-2 rounded w-60">

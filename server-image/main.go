@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/csv"
 	"flag"
 	"fmt"
 	"log"
@@ -80,6 +81,23 @@ func run() error {
 	server.POST("/api/image", PostImage(gcsClient, bucket, openAIKey))
 
 	server.POST("/ai/outfit-description", HandlePostAIOutfit(bucket, openAIKey))
+
+	server.GET("/munsell", func(ctx echo.Context) error {
+		f, err := os.Open("/")
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		csvReader := csv.NewReader(f)
+		records, err := csvReader.ReadAll()
+		if err != nil {
+			return err
+		}
+
+		return records
+
+	})
 
 	return server.Start(httpAddr)
 }
