@@ -6,7 +6,37 @@ export type MunsellData = {
     dR: number;
     dG: number;
     dB: number;
+    x: number;
+    hue: number;
 }
+
+export const MunsellHues: [] = [
+    {
+        "h": "2.5R",
+        "order": 1
+    }, {
+        "h": "2.5YR"
+    },
+    {
+        "h": "2.5Y"
+    },{
+        "h": "2.5GY"
+    },
+    {
+        "h": "2.5G"
+    },{
+        "h": "2.5BG"
+    },{
+        "h": "2.5B"
+    }, {
+        "h": "2.5PB"
+    },
+    {
+        "h": "2.5P"
+    },{
+        "h": "2.5RP"
+    }
+]
 
 
 export const MunsellColors: MunsellData[] = [

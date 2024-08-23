@@ -6,6 +6,7 @@ import { ntc } from "../color/ntc";
 import LoadingGIF from "../icons/loader-gif";
 import { OutfitItemForm } from "./outfit-item";
 import { Toggle } from "../base/toggle";
+import { MunsellColorChart } from "../color/munsell-colors";
 
 export const ColorAnalysisForm = (props: {
   clientServer: string;
@@ -176,15 +177,18 @@ export const ColorAnalysisForm = (props: {
     }
   }, [props.cookie, file]);
 
+  const [colorChart, setColorChart] = useState("rgb(255,255,255)");
+
   return (
     <form className="">
+      <MunsellColorChart setColorSelected={setColorChart} />
       {imageURL ? (
         <div className="flex flex-wrap gap-4">
           <img
             alt={"outfit image to post"}
             src={URL.createObjectURL(file as File)}
             className="object-cover"
-            style={{ height: "600px" }}
+            style={{ height: "600px", border: `100px solid ${colorChart}` }}
           />
           <button
             onClick={(e) => {

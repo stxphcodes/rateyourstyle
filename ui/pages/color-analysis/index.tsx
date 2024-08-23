@@ -14,7 +14,8 @@ import { Outfit } from "../../apis/get_outfits";
 import { ColorPalette } from "../../components/color/palette";
 import { MunsellColors } from "../../apis/get_munsell";
 import { RatingDiv } from "../../components/outfit/rating";
-import { Slider } from "../../components/base/slider";
+import { DualSlider } from "../../components/base/slider";
+import { MunsellColorChart } from "../../components/color/munsell-colors";
 
 type Props = {
   cookie: string;
@@ -140,84 +141,7 @@ function PostOutfitPage({ cookie, clientServer }: Props) {
             color palettes.
           </div>
 
-          <Slider
-            label="Value"
-            value1={value}
-            value2={value2}
-            onChange1={(e: any) => setValue(Number(e.target.value))}
-            onChange2={(e: any) => setValue2(Number(e.target.value))}
-          />
-
-          {/* <div className="flex gap-4 items-center">
-            <div className="w-fit">
-              <label>Your rating</label>
-              <input
-                id="rating"
-                type="range"
-                min="0"
-                max="10"
-                step="2"
-                className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer  p-0 m-0"
-                onChange={(e) => setValue(Number(e.target.value))}
-                list="rating"
-                value={value}
-              />
-              <datalist
-                className="flex text-primary -mt-2 p-0 justify-between items-start"
-                id="rating"
-              >
-                <option className="text-xs">|</option>
-                <option className="text-xs">|</option>
-                <option className="text-xs">|</option>
-                <option className="text-xs">|</option>
-                <option className="text-xs">|</option>
-              </datalist>
-            </div>
-            <h1 className="text-primary">{value}</h1>
-          </div> */}
-
-          <div className="flex gap-4 items-center">
-            <div className="w-fit">
-              <label>Your rating</label>
-              <input
-                id="rating"
-                type="range"
-                min="0"
-                max="28"
-                step="2"
-                className="h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer  p-0 m-0"
-                onChange={(e) => setChroma(Number(e.target.value))}
-                list="rating"
-                value={chroma}
-              />
-              <datalist
-                className="flex text-primary -mt-2 p-0 justify-between items-start"
-                id="rating"
-              >
-                <option className="text-xs">|</option>
-                <option className="text-xs">|</option>
-                <option className="text-xs">|</option>
-                <option className="text-xs">|</option>
-                <option className="text-xs">|</option>
-              </datalist>
-            </div>
-            <h1 className="text-primary">{chroma}</h1>
-          </div>
-
-          <div className="flex w-full flex-wrap">
-            {MunsellColors.map((c) => {
-              let rgb = `rgb(${c.dR.toString()},${c.dG.toString()},${c.dB.toString()})`;
-
-              if (value <= c.V && c.V <= value2 && c.C === chroma) {
-                return (
-                  <div
-                    style={{ backgroundColor: rgb }}
-                    className="border-2 w-8 aspect-square"
-                  ></div>
-                );
-              }
-            })}
-          </div>
+          <MunsellColorChart />
         </section>
       </main>
 
