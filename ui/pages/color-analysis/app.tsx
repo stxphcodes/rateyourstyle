@@ -11,6 +11,7 @@ import { AccountPromptModal } from "../../components/modals/accountPrompt";
 import { ColorAnalysisForm } from "../../components/forms/color-analysis";
 import { PostOutfit } from "../../apis/post_outfit";
 import { Outfit } from "../../apis/get_outfits";
+import { HeadShotForm } from "../../components/forms/headshot";
 
 type Props = {
   cookie: string;
@@ -117,13 +118,19 @@ function PostOutfitPage({
 
         <section className="p-8 sm:w-1/2">
           <h1>Step 1. Upload a headshot</h1>
-          <ColorAnalysisForm
+          <HeadShotForm
+            imageServer={imageServer}
+            cookie={cookie}
+            imageURL=""
+            onSubmit={null}
+          />
+          {/* <ColorAnalysisForm
             clientServer={clientServer}
             imageServer={imageServer}
             cookie={cookie}
             previousItems={previousOutfitItems}
             onSubmit={onSubmit}
-          />
+          /> */}
         </section>
       </main>
 

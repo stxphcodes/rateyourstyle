@@ -17,7 +17,9 @@
     "react": "18.2.0",
     "react-colorful": "^5.6.1",
     "react-dom": "18.2.0",
+    "react-easy-crop": "^5.0.8",
     "react-eyedrop": "^5.4.2",
+    "react-image-crop": "^11.0.6",
     "swr": "^2.2.2"
   },
   "devDependencies": {
@@ -30,5 +32,9 @@
     "postcss": "^8.4.29",
     "tailwindcss": "^3.3.3",
     "typescript": "5.2.2"
+  },
+  "resolutions": {
+    "@types/react": "^17.0.44",
+    "@types/react-dom": "^17.0.16"
   }
 }

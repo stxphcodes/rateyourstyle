@@ -1341,3 +1341,51 @@ func (h Handler) PostFeedbackRequest() echo.HandlerFunc {
 		return ctx.NoContent(http.StatusCreated)
 	}
 }
+
+func (h Handler) PutHeadshotURL() echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		cookie, err := getCookie(ctx.Request())
+		if err != nil {
+			log.Println("error retrieving cookie")
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		userId, ok := h.UserIndices.CookieId[cookie]
+		if !ok {
+			log.Println("user id not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		user, err := getUser(ctx.Request().Context(), h.Gcs.Bucket, userId)
+		if err != nil {
+			log.Println("user not found based on cookie " + cookie)
+			return ctx.NoContent(http.StatusForbidden)
+		}
+
+		f, err := getUserFile(ctx.Request().Context(), h.Gcs.Bucket, user)
+		if err != nil {
+			log.Println("error getting user profile + " + err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		var data map[string]string
+		if err := ctx.Bind(&data); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+		headshot, ok := data["headshot_url"]
+		if !ok {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		f.UserGeneral.HeadshotURL = headshot
+		f.User = user
+
+		if err := createUserFile(ctx.Request().Context(), h.Gcs.Bucket, f); err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		return ctx.NoContent(http.StatusCreated)
+	}
+}

@@ -12,10 +12,11 @@ import { OutfitForm } from "../../components/forms/outfit";
 import { PostOutfit } from "../../apis/post_outfit";
 import { Outfit } from "../../apis/get_outfits";
 import { ColorPalette } from "../../components/color/palette";
-import { MunsellColors } from "../../apis/get_munsell";
+import { MunsellColors, SeasonIds } from "../../apis/get_munsell";
 import { RatingDiv } from "../../components/outfit/rating";
 import { DualSlider } from "../../components/base/slider";
 import { MunsellColorChart } from "../../components/color/munsell-colors";
+import { MunsellSeasonalColors } from "../../components/color/munsell-seasonal-colors";
 
 type Props = {
   cookie: string;
@@ -52,9 +53,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 function PostOutfitPage({ cookie, clientServer }: Props) {
-  const [value, setValue] = useState(2);
-  const [value2, setValue2] = useState(8);
-  const [chroma, setChroma] = useState(0);
+  const [season, setSeason] = useState("dark-winter");
+
   return (
     <>
       <Navbar clientServer={clientServer} cookie={cookie} />
@@ -66,13 +66,29 @@ function PostOutfitPage({ cookie, clientServer }: Props) {
         <section className="p-8">
           <div className="grid sm:grid-cols-2 gap-8">
             <div>
-              <ColorPalette palette="true-summer" />
+              <MunsellSeasonalColors season={season} />
+              <div className="flex gap-4 flex-wrap">
+                {SeasonIds().map((s) => (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setSeason(s);
+                    }}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+              <div></div>
+              {/* <MunsellSeasonalColors season="bright-winter" />
+              <MunsellSeasonalColors season="dark-autumn" /> */}
+              {/* <ColorPalette palette="true-summer" />
               <ColorPalette palette="true-winter" />
               <ColorPalette palette="true-autumn" />
-              <ColorPalette palette="true-spring" />
+              <ColorPalette palette="true-spring" /> */}
             </div>
             <div>
-              <h2>Color Theory</h2>
+              <h2>Your Personal Colors</h2>
               <p>
                 Have you ever noticed that certain clothing colors make you look
                 tired and washed out, while others instantly make you look

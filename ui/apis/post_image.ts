@@ -45,5 +45,41 @@ export async function PostImageWithAI(
     }
 
     return toReturn
+}
 
+
+export async function PostColorAnalysisImage(
+    server: string,
+    formData: FormData,
+    cookie: string,
+): Promise<PostImageResponse | Error> {
+    let error: Error | null = null
+    let toReturn: any = {
+        url: "",
+    }
+
+    await fetch(`${server}/api/color-analysis/image`, {
+        method: "POST",
+        body: formData,
+        headers: {
+            "rys-login": cookie,
+        },
+    }).then((response) => {
+        if (!response.ok) {
+            throw new Error(ERR_GENERAL_INTERNAL_SERVER);
+        }
+
+        return response.json()
+    }).then((data: any) => {
+        toReturn = data
+    })
+        .catch((err: Error) => {
+            error = err
+        });
+
+    if (error) {
+        return error
+    }
+
+    return toReturn
 }

@@ -40,6 +40,7 @@ type UserGeneral struct {
 	Description string   `json:"description"`
 	Links       []string `json:"links"`
 	Date        string   `json:"date"`
+	HeadshotURL string   `json:"headshot_url"`
 }
 
 type UserResponse struct {

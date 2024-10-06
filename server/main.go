@@ -145,6 +145,8 @@ func run() error {
 
 	mux.PUT("/api/outfit-item", handler.PutOutfitItem())
 
+	mux.PUT("/api/headshot-url", handler.PutHeadshotURL())
+
 	return mux.Start(cfg.HttpAddr)
 }
 
