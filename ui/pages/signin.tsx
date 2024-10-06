@@ -114,7 +114,7 @@ function Signin({ authServer, clientServer, error }: Props) {
             )}
           </div>
 
-          <div className="pt-4">
+          <div className="pt-4 text-white">
             Don&apos;t have an account? <Link href="/signup">Sign up</Link>{" "}
             instead.
           </div>

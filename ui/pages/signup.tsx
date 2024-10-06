@@ -91,7 +91,7 @@ function Signup({ clientServer, authServer, error }: Props) {
               <SignupForm clientServer={clientServer} authServer={authServer} />
             </div>
 
-            <div className="pt-4">
+            <div className="pt-4 text-white">
               Have an account? <Link href="/signin">Sign in</Link> instead.
             </div>
           </div>
