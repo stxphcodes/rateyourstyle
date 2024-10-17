@@ -8,6 +8,7 @@ import {
   //MunsellHues,
 } from "../../apis/get_munselldata";
 import { MunsellHueCircle } from "./color-hue";
+import { ColorDiv, ColorDivRGB, MunsellColorDiv } from "./color-div";
 
 function groupColors(colors: MunsellData[]) {
   var groups: MunsellData[][] = [];
@@ -109,16 +110,9 @@ export const MunsellColorCharts = () => {
         {colorGroups.map((g) => {
           return (
             <div className="flex">
-              {g.map((c) => {
-                let rgb = `rgb(${c.dR.toString()},${c.dG.toString()},${c.dB.toString()})`;
-
-                return (
-                  <div
-                    style={{ backgroundColor: rgb }}
-                    className=" w-8 aspect-square"
-                  />
-                );
-              })}
+              {g.map((c) => (
+                <MunsellColorDiv color={c} />
+              ))}
             </div>
           );
         })}
