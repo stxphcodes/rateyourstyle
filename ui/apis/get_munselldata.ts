@@ -18,7 +18,29 @@ export type MunsellHueData = {
   data?: MunsellData;
 };
 
-function getHighestChroma(hue: string) {
+export function getHighestValue(hue: string) {
+  let highestValue: MunsellData = {
+    file_order: 0,
+    h: "",
+    V: 0,
+    C: 0,
+    dR: 0,
+    dG: 0,
+    dB: 0,
+  };
+
+  munselldata.data
+    .filter((d) => d.h === hue)
+    .forEach((d) => {
+      if (d.V >= highestValue.C) {
+        highestValue = d;
+      }
+    });
+
+  return highestValue;
+}
+
+export function getHighestChroma(hue: string) {
   let highestChroma: MunsellData = {
     file_order: 0,
     h: "",
@@ -29,16 +51,18 @@ function getHighestChroma(hue: string) {
     dB: 0,
   };
 
-  munselldata.data.filter(d => d.h === hue).forEach((d) => {
-    if (d.C >= highestChroma.C) {
-      highestChroma = d
-    }
-  })
+  munselldata.data
+    .filter((d) => d.h === hue)
+    .forEach((d) => {
+      if (d.C >= highestChroma.C) {
+        highestChroma = d;
+      }
+    });
 
   return highestChroma;
 }
 
-const getMunsellHues = () => {
+export const getMunsellHues = () => {
   const numbers: string[] = ["2.5", "5", "7.5", "10"];
   const letters: string[] = [
     "R",
@@ -71,5 +95,23 @@ const getMunsellHueData = () => {
     };
   });
 };
+
+export function getRandomMunsellData() {
+  const max = munselldata.data.length - 1;
+  const randomInt = Math.floor(Math.random() * max);
+  return munselldata.data[randomInt];
+}
+
+export function calcMunsellData(hue: number, value: number, chroma: number) {
+  const hueString = getMunsellHues()[hue];
+  const match = munselldata.data.filter(
+    (data) => data.h === hueString && data.V === value && data.C === chroma
+  );
+
+  if (match.length > 0) {
+    return match[0]
+  } 
+  return null
+}
 
 export const MunsellHueData = getMunsellHueData();
