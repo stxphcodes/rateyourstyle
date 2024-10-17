@@ -1,3 +1,5 @@
+import { MunsellData } from "../../apis/get_munselldata";
+
 export function ColorDiv(props: {
   color: string;
   hex?: string;
@@ -18,3 +20,25 @@ export function ColorDiv(props: {
     </div>
   );
 }
+
+export const ColorDivRGB = (props: { r: number; g: number; b: number }) => {
+  let rgb = `rgb(${props.r.toString()},${props.g.toString()},${props.b.toString()})`;
+  return <div style={{ backgroundColor: rgb }} className="w-8 aspect-square" />;
+};
+
+export const MunsellColorDiv = (props: {
+  color: MunsellData;
+  border?: boolean;
+  large?: boolean;
+  className?: string;
+}) => {
+  let rgb = `rgb(${props.color.dR.toString()},${props.color.dG.toString()},${props.color.dB.toString()})`;
+  return (
+    <div
+      style={{ backgroundColor: rgb }}
+      className={`${props.className && props.className} aspect-square ${
+        props.large ? "w-16" : "w-8"
+      } ${props.border ? "border-2 border-black" : ""}`}
+    />
+  );
+};
