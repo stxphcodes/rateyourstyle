@@ -5,7 +5,7 @@ import { Navbar } from "../components/navarbar";
 import { GetServerURL } from "../apis/get_server";
 import { PageMetadata } from "./_app";
 import { MunsellColorCharts } from "../components/color/color-charts";
-
+import { ColorIdentificationGame } from "../components/color/color-game";
 type Props = {
   clientServer: string;
   error: string | null;
@@ -68,15 +68,62 @@ function ColorSciencePage({ clientServer, error }: Props) {
         <section className="p-4 md:p-8">
           <h2>1. Dimensions of color </h2>
           <div>
-            One of the most widely used color systems in the world is the
-            Munsell Color System. Munsell defined a structured approach to color
-            perception that closes matches the human visual expereince. He
-            categorized colors based on the following elements: 1. Hue 2. Chroma
-            3. Value
-            <MunsellColorCharts />
+            There are 3 main properties of color that the human eye can detect:
+            <ul className="list-decimal list-inside my-2">
+              <li>
+                <span className="font-bold">Hue</span> which refers to the
+                actual color or shade.
+              </li>
+              <li>
+                <span className="font-bold">Saturation</span> which refers to
+                how intense or vivid a color appears
+              </li>
+              <li>
+                <span className="font-bold">Brightness</span> which refers to
+                the relative lightness or darkness of a particular color, from
+                black (no brightness) to white (full brightness)
+              </li>
+            </ul>
+            Over time, scientists and artists have developed color systems in
+            order to quantify these properties of color, and to create a
+            structured approach to color notation. The color system that our
+            tutorials and app are based is the Munsell color system, but other
+            color systems include ___, and ___.
+            <br />
+            <br />
+            <h4 className="font-bold">Munsell Color System</h4>
+            The Munsell color system arranges color such that all three color
+            properites are visually uniform in distance from each other. The
+            scales used for each color property is as follows:
+            <ul className="list-decimal list-inside my-2">
+              <li>
+                <span className="font-bold">Hue</span> There are 10 Munsell Hues
+                that are placed in equal intervals around a circle. There are 5
+                principle Munsell hues - red, yellow, green, blue, and purple,
+                and 5 itermediate hues - yellow-red, green-yellow, blue-green,
+                purple-blue and red-purple.. For simplicity, the hues are
+                referred to by the intials: R, YR, Y, GY, G, BG, B, PB, P, and
+                RP.
+              </li>
+              <li>
+                <span className="font-bold">Chroma (aka Saturation)</span>{" "}
+                Chroma is along the X-axis, and its scale ranges from 0 (neutral
+                color) to an arbitrary maximum that depends on the hue and
+                value.
+              </li>
+              <li>
+                <span className="font-bold">Value (aka Brightness)</span> value
+                is along with Y-axis, and its scale ranges from 0 (pure black)
+                to 10 (pure white)
+              </li>
+            </ul>
           </div>
+          <MunsellColorCharts />
         </section>
-        <section className="p-4 md:p-8"></section>
+        <section className="p-4 md:p-8">
+          <h2>2. Color Identification Game </h2>
+          <ColorIdentificationGame />
+        </section>
       </main>
 
       <Footer />
