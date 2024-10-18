@@ -3,10 +3,16 @@ export function PrimaryButton(props: {
   disabled?: boolean;
   isSubmit?: boolean;
   onClick?: any;
+  styles?: string;
+  fitContent?: boolean;
 }) {
   return (
     <button
-      className="bg-black py-2 w-full rounded-lg shadow border text-white hover:bg-neutral-700 hover:cursor-pointer"
+      className={`${props.disabled ? "bg-neutral-700" : "bg-black"} py-2 ${
+        props.fitContent ? "fit-content" : "w-full"
+      } rounded-lg shadow border text-white hover:bg-neutral-700 ${
+        props.disabled ? "hover:cursor-not-allowed" : "hover:cursor-pointer"
+      } ${props.styles && props.styles}`}
       type={props.isSubmit ? "submit" : "button"}
       disabled={props.disabled}
       onClick={props.onClick}
