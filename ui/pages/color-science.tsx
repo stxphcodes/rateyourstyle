@@ -1,11 +1,14 @@
 import { GetServerSideProps } from "next";
-
+import { useState } from "react";
 import { Footer } from "../components/footer";
 import { Navbar } from "../components/navarbar";
 import { GetServerURL } from "../apis/get_server";
 import { PageMetadata } from "./_app";
+import { PrimaryButton } from "../components/base/buttons/primary";
 import { MunsellColorCharts } from "../components/color/color-charts";
-import { ColorIdentificationGame } from "../components/color/color-game";
+import { ColorMatchingGame } from "../components/color/color-matching-game";
+import { Modal } from "../components/modals";
+import { ColorDifferenceGame } from "../components/color/color-difference-game";
 type Props = {
   clientServer: string;
   error: string | null;
@@ -34,6 +37,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 function ColorSciencePage({ clientServer, error }: Props) {
+  const [launchColorMatchGame, setLaunchColorMatchGame] = useState(false);
+  const [launchColorDifferenceGame, setLaunchColorDifferenceGame] =
+    useState(false);
+
   return (
     <>
       <Navbar clientServer={clientServer} />
@@ -43,26 +50,26 @@ function ColorSciencePage({ clientServer, error }: Props) {
         </section>
 
         <section className="p-4 md:p-8">
-          <h2>Introduction</h2>
-          <div>
-            Color is one of the first aspects of clothing that we notice,
-            whether it's on ourselves or on others. As fundamental to style as
-            color is, color science is often not taught due to the highly
-            subjective nature of color perception. Indeed, while the physical
-            nature of color is scientificaly defined as the range of wavelengths
-            along the electromagnetic spectrum the human eye can pereceive, the
-            psychological nature is dependent on a number of factors that can
-            vary from person to person, including: physiological differences in
-            sensory processing, and individual differences in conscious
-            experiences and learned adaptions. <br />
-            <br />
-            Despite the subjective nature of color perception, the following
-            tutorials aim to provide a basic foundation of color science
-            education. We hope that users find this knowledge useful in their
-            can transfer this knowledge to bridge the gap in color science
-            education. We hope that with a better understanding of color
-            science, users can determine things like personal color analysis to
-            help them in their fashion journey.
+          <div className="p-6 rounded-lg bg-neutral-200 shadow-sm">
+            <h2>Introduction</h2>
+            <div>
+              Color is one of the first aspects of clothing that we notice,
+              whether it's on ourselves or on others. As fundamental to style as
+              color is, color science is often not taught due to the highly
+              subjective nature of color perception. Indeed, while the physical
+              nature of color is scientificaly defined as the range of
+              wavelengths along the electromagnetic spectrum the human eye can
+              pereceive, the psychological nature is dependent on a number of
+              factors that can vary from person to person, including:
+              physiological differences in sensory processing, and individual
+              differences in conscious experiences and learned adaptions. <br />
+              <br />
+              Despite the subjective nature of color perception, the following
+              page aims to share very basic knowledge about the dimensions that
+              make up color perception. We hope that with this basic knowledge,
+              users can better understand things like personal color analysis to
+              help them in their fashion journey.
+            </div>
           </div>
         </section>
         <section className="p-4 md:p-8">
@@ -121,9 +128,52 @@ function ColorSciencePage({ clientServer, error }: Props) {
           <MunsellColorCharts />
         </section>
         <section className="p-4 md:p-8">
-          <h2>2. Color Identification Game </h2>
-          <ColorIdentificationGame />
+          <h2>Train your color sensitivity</h2>
+          <div className="flex ">
+            <div className="w-1/2">
+              <h4>Color Matching Game</h4>
+              <PrimaryButton
+                fitContent={true}
+                styles="p-4"
+                onClick={() => setLaunchColorMatchGame(true)}
+              >
+                Launch
+              </PrimaryButton>
+            </div>
+            <div className="w-1/2">
+              <h4>Color Difference Game</h4>
+              <p>
+                How well do you know the differences amongst the color
+                dimnesions?
+                <br /> Play this game to find out!
+              </p>
+              <PrimaryButton
+                fitContent={true}
+                styles="p-4"
+                onClick={() => setLaunchColorDifferenceGame(true)}
+              >
+                Launch
+              </PrimaryButton>
+            </div>
+          </div>
         </section>
+        {launchColorMatchGame && (
+          <Modal
+            // wideScreen={true}
+            handleClose={() => setLaunchColorMatchGame(false)}
+          >
+            <ColorMatchingGame />
+          </Modal>
+        )}
+
+        {launchColorDifferenceGame && (
+          <Modal
+            // wideScreen={true}
+            handleClose={() => setLaunchColorDifferenceGame(false)}
+          >
+            <ColorDifferenceGame />
+          </Modal>
+        )}
       </main>
 
       <Footer />
