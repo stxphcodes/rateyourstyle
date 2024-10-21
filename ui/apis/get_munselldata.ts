@@ -1,4 +1,4 @@
-import * as munselldata from "../public/munsell-data.json";
+import { data as munselldata } from "../public/munsell-data.json";
 
 export type MunsellData = {
   file_order: number;
@@ -10,7 +10,7 @@ export type MunsellData = {
   dB: number;
 };
 
-export const MunsellColors: MunsellData[] = munselldata.data;
+export const MunsellColors: MunsellData[] = munselldata;
 
 export type MunsellHueData = {
   h: string;
@@ -29,7 +29,7 @@ export function getHighestValue(hue: string) {
     dB: 0,
   };
 
-  munselldata.data
+  munselldata
     .filter((d) => d.h === hue)
     .forEach((d) => {
       if (d.V >= highestValue.C) {
@@ -51,7 +51,7 @@ export function getHighestChroma(hue: string) {
     dB: 0,
   };
 
-  munselldata.data
+  munselldata
     .filter((d) => d.h === hue)
     .forEach((d) => {
       if (d.C >= highestChroma.C) {
@@ -97,21 +97,60 @@ const getMunsellHueData = () => {
 };
 
 export function getRandomMunsellData() {
-  const max = munselldata.data.length - 1;
+  const max = munselldata.length - 1;
   const randomInt = Math.floor(Math.random() * max);
-  return munselldata.data[randomInt];
+  return munselldata[randomInt];
 }
+
+export function getAdjacentMunsellColor(color: MunsellData) {}
 
 export function calcMunsellData(hue: number, value: number, chroma: number) {
   const hueString = getMunsellHues()[hue];
-  const match = munselldata.data.filter(
+  const match = munselldata.filter(
     (data) => data.h === hueString && data.V === value && data.C === chroma
   );
 
   if (match.length > 0) {
-    return match[0]
-  } 
-  return null
+    return match[0];
+  }
+  return null;
+}
+
+export function groupColors(colors: MunsellData[]) {
+  var groups: MunsellData[][] = [];
+  var maxChroma = 0;
+  var maxValue = 0;
+  colors.forEach((c) => {
+    if (c.C > maxChroma) {
+      maxChroma = c.C;
+    }
+
+    if (c.V > maxValue) {
+      maxValue = c.V;
+    }
+  });
+
+  for (let i = 0; i < maxValue; i++) {
+    var temp: MunsellData[] = [];
+    colors.forEach((c) => {
+      if (i == c.V) {
+        temp.push(c);
+      }
+    });
+
+    groups.push(temp);
+  }
+
+  groups.forEach((g, i) =>
+    groups[i].sort((a, b) => {
+      if (a.V > b.V) {
+        return -1;
+      }
+      return 1;
+    })
+  );
+
+  return groups;
 }
 
 export const MunsellHueData = getMunsellHueData();
