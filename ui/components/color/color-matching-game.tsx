@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { MunsellColorCharts } from "./color-charts";
 import {
   getMunsellHues,
   calcMunsellData,
