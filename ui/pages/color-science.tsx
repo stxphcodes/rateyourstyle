@@ -5,10 +5,11 @@ import { Navbar } from "../components/navarbar";
 import { GetServerURL } from "../apis/get_server";
 import { PageMetadata } from "./_app";
 import { PrimaryButton } from "../components/base/buttons/primary";
-import { MunsellColorCharts } from "../components/color/color-charts";
+import { MunsellColorSystem } from "../components/color/color-system";
 import { ColorMatchingGame } from "../components/color/color-matching-game";
 import { Modal } from "../components/modals";
 import { ColorDifferenceGame } from "../components/color/color-difference-game";
+import { MunsellHueData } from "../apis/get_munselldata";
 type Props = {
   clientServer: string;
   error: string | null;
@@ -49,20 +50,20 @@ function ColorSciencePage({ clientServer, error }: Props) {
           <h1 className="text-white text-2xl">Color Science</h1>
         </section>
 
-        <section className="p-4 md:p-8">
-          <div className="p-6 rounded-lg bg-neutral-200 shadow-sm">
+        <section className="px-4 py-2 md:px-8 md:py-2">
+          <div className="p-6 rounded-lg bg-neutral-100 shadow-sm">
             <h2>Introduction</h2>
             <div>
               Color is one of the first aspects of clothing that we notice,
               whether it's on ourselves or on others. As fundamental to style as
               color is, color science is often not taught due to the highly
-              subjective nature of color perception. Indeed, while the physical
-              nature of color is scientificaly defined as the range of
-              wavelengths along the electromagnetic spectrum the human eye can
-              pereceive, the psychological nature is dependent on a number of
-              factors that can vary from person to person, including:
-              physiological differences in sensory processing, and individual
-              differences in conscious experiences and learned adaptions. <br />
+              subjective nature of color perception. While the physical nature
+              of color is scientificaly defined as the range of wavelengths
+              along the electromagnetic spectrum the human eye can pereceive,
+              the psychological nature is dependent on a number of factors that
+              can vary from person to person, including: physiological
+              differences in sensory processing, and individual differences in
+              conscious experiences and learned adaptions. <br />
               <br />
               Despite the subjective nature of color perception, the following
               page aims to share very basic knowledge about the dimensions that
@@ -72,23 +73,80 @@ function ColorSciencePage({ clientServer, error }: Props) {
             </div>
           </div>
         </section>
-        <section className="p-4 md:p-8">
-          <h2>1. Dimensions of color </h2>
-          <div>
+        <section className="px-4 py-2 md:px-8 md:py-2">
+          <div className="p-6 rounded-lg bg-neutral-100 shadow-sm">
+            <h2>Dimensions of color </h2>
             There are 3 main properties of color that the human eye can detect:
             <ul className="list-decimal list-inside my-2">
-              <li>
+              <li className="mb-4">
                 <span className="font-bold">Hue</span> which refers to the
                 actual color or shade.
+                <div className="ml-4">
+                  <div className="underline mb-2">Example</div>
+                  <div className="flex">
+                    <div className="flex gap-2">
+                      <div
+                        className="w-8 h-8"
+                        style={{ backgroundColor: "rgb(255, 68, 85)" }}
+                      ></div>
+                      <div
+                        className="w-8 h-8"
+                        style={{ backgroundColor: "rgb(255, 139, 45)" }}
+                      ></div>
+                      <div
+                        className="w-8 h-8"
+                        style={{ backgroundColor: "rgb(251, 236, 93)" }}
+                      ></div>
+                      <div
+                        className="w-8 h-8"
+                        style={{ backgroundColor: "rgb(50, 202, 53)" }}
+                      ></div>
+                      <div
+                        className="w-8 h-8"
+                        style={{ backgroundColor: "rgb(67, 53, 255)" }}
+                      ></div>
+                      <div
+                        className="w-8 h-8"
+                        style={{ backgroundColor: "rgb(124, 23, 243)" }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
               </li>
-              <li>
+              <li className="mb-4">
                 <span className="font-bold">Saturation</span> which refers to
-                how intense or vivid a color appears
+                how intense or vivid a color appears.
+                <div className="ml-4">
+                  <div className="underline mb-2">Example</div>
+                  <div className="flex gap-2">
+                    <div
+                      className="w-8 h-8"
+                      style={{ backgroundColor: "#2a4974" }}
+                    ></div>
+                    <div
+                      className="w-8 h-8"
+                      style={{ backgroundColor: "#51637e" }}
+                    ></div>
+                  </div>
+                </div>
               </li>
               <li>
                 <span className="font-bold">Brightness</span> which refers to
                 the relative lightness or darkness of a particular color, from
                 black (no brightness) to white (full brightness)
+                <div className="ml-4">
+                  <div className="underline mb-2">Example</div>
+                  <div className="flex gap-2">
+                    <div
+                      className="w-8 h-8"
+                      style={{ backgroundColor: "#b546dd" }}
+                    ></div>
+                    <div
+                      className="w-8 h-8"
+                      style={{ backgroundColor: "#481e57" }}
+                    ></div>
+                  </div>
+                </div>
               </li>
             </ul>
             Over time, scientists and artists have developed color systems in
@@ -96,64 +154,84 @@ function ColorSciencePage({ clientServer, error }: Props) {
             structured approach to color notation. The color system that our
             tutorials and app are based is the Munsell color system, but other
             color systems include ___, and ___.
-            <br />
-            <br />
-            <h4 className="font-bold">Munsell Color System</h4>
+          </div>
+        </section>
+        <section className="px-4 py-2 md:px-8 md:py-2">
+          <div className="p-6 rounded-lg bg-neutral-100 shadow-sm">
+            <h2>Munsell Color System</h2>
             The Munsell color system arranges color such that all three color
             properites are visually uniform in distance from each other. The
-            scales used for each color property is as follows:
+            scale used for each color property is as follows:
             <ul className="list-decimal list-inside my-2">
-              <li>
-                <span className="font-bold">Hue</span> There are 10 Munsell Hues
-                that are placed in equal intervals around a circle. There are 5
-                principle Munsell hues - red, yellow, green, blue, and purple,
-                and 5 itermediate hues - yellow-red, green-yellow, blue-green,
-                purple-blue and red-purple.. For simplicity, the hues are
-                referred to by the intials: R, YR, Y, GY, G, BG, B, PB, P, and
-                RP.
+              <li className="mb-4">
+                <span className="font-bold">Hue</span> There are are 5 principle
+                Munsell hues: Red, Yellow, Green, Blue, Purple, and 5
+                intermediate hues: Yellow-Red, Green-Yellow, Blue-Green,
+                Purple-Blue and Red-Purple. Each of these hues are placed at
+                equal intervals around a circle (see below).
+              </li>
+              <li className="mb-4">
+                <span className="font-bold">Value (aka Brightness)</span> The
+                value scale ranges from 0 (pure black) to 10 (pure white). The
+                black, white and grays that occur in between are all considered
+                neutral colors because they have no chroma (chroma=0).
               </li>
               <li>
                 <span className="font-bold">Chroma (aka Saturation)</span>{" "}
-                Chroma is along the X-axis, and its scale ranges from 0 (neutral
-                color) to an arbitrary maximum that depends on the hue and
-                value.
-              </li>
-              <li>
-                <span className="font-bold">Value (aka Brightness)</span> value
-                is along with Y-axis, and its scale ranges from 0 (pure black)
-                to 10 (pure white)
+                Munsell defines chroma as the degree departure of the color from
+                the neutral color of the same value. The chroma scale ranges
+                from 0 (neutral color) to an arbitrary maximum that depends on
+                the hue and value. Colors with high reflectivity can have chroma
+                as high 30. Most colors have a max chroma of around 20.
               </li>
             </ul>
-          </div>
-          <MunsellColorCharts />
-        </section>
-        <section className="p-4 md:p-8">
-          <h2>Train your color sensitivity</h2>
-          <div className="flex ">
-            <div className="w-1/2">
-              <h4>Color Matching Game</h4>
-              <PrimaryButton
-                fitContent={true}
-                styles="p-4"
-                onClick={() => setLaunchColorMatchGame(true)}
-              >
-                Launch
-              </PrimaryButton>
+            <div className="mt-8 mb-4">
+              Interact with the hue circle, value scale, and chroma scales to
+              see how the dimensions affect the resulting colors.
             </div>
-            <div className="w-1/2">
-              <h4>Color Difference Game</h4>
-              <p>
-                How well do you know the differences amongst the color
-                dimnesions?
-                <br /> Play this game to find out!
-              </p>
-              <PrimaryButton
-                fitContent={true}
-                styles="p-4"
-                onClick={() => setLaunchColorDifferenceGame(true)}
-              >
-                Launch
-              </PrimaryButton>
+            <MunsellColorSystem />
+          </div>
+        </section>
+        <section className="px-4 py-2 md:px-8 md:py-2">
+          <div className="p-6 rounded-lg bg-neutral-100 shadow-sm">
+            <h2 className="mb-4">
+              {" "}
+              Let's put your knowledge of color dimensions to the test!
+            </h2>
+
+            <div className="flex gap-16">
+              <div className="w-1/2">
+                <h3>Color Matching Game</h3>
+                <p className="mt-2 mb-4">
+                  How sensitive are your eyes to the color dimensions?
+                  <br />
+                  In this riveting game, players must generate matching color
+                  blocks by adjusting each of the color dimension scales.
+                </p>
+                <PrimaryButton
+                  fitContent={true}
+                  styles="p-4"
+                  onClick={() => setLaunchColorMatchGame(true)}
+                >
+                  Launch
+                </PrimaryButton>
+              </div>
+              <div className="w-1/2">
+                <h3>Color Difference Game</h3>
+                <p className="mt-2 mb-4">
+                  How well do you know the differences amongst the color
+                  dimnesions?
+                  <br /> In this riveting game, players must generate matching
+                  color blocks by adjusting each of the color dimension scales.
+                </p>
+                <PrimaryButton
+                  fitContent={true}
+                  styles="p-4"
+                  onClick={() => setLaunchColorDifferenceGame(true)}
+                >
+                  Launch
+                </PrimaryButton>
+              </div>
             </div>
           </div>
         </section>
