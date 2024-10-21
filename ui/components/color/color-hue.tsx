@@ -8,8 +8,6 @@ export const MunsellHueCircle = (props: { setHue: any }) => {
           height: "250px",
           borderRadius: "50%",
           position: "relative",
-          //padding: "2em",
-          //margin: "0 auto",
           listStyle: "none",
         }}
       >
@@ -38,6 +36,20 @@ export const MunsellHueCircle = (props: { setHue: any }) => {
             )
         )}
       </ul>
+      <div
+        style={{
+          top: "-50%",
+          left: "16%",
+          position: "relative",
+          margin: "5px",
+          display: "block",
+          textAlign: "center",
+          width: "14em",
+        }}
+      >
+        <h3>Munsell Hues</h3>
+        <div>Select a hue from the circle.</div>
+      </div>
     </div>
   );
 };
