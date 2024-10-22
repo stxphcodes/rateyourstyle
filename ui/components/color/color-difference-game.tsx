@@ -1,15 +1,10 @@
 import { useEffect, useState } from "react";
 import {
-  getMunsellHues,
-  calcMunsellData,
-  getHighestChroma,
   getRandomMunsellData,
   MunsellData,
-  getHighestValue,
   getAdjacentMunsellColor,
 } from "../../apis/get_munselldata";
 import { MunsellColorDiv } from "./color-div";
-import { Slider } from "../base/sliders/slider";
 import { PrimaryButton } from "../base/buttons/primary";
 
 const results = ["correct!", "incorrect"];

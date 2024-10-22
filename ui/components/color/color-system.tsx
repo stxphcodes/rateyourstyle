@@ -1,14 +1,12 @@
 import { DualSlider } from "../base/sliders/dualSlider";
-import { Slider } from "../base/sliders/slider";
 import { useState, useEffect } from "react";
 import {
   MunsellColors,
   MunsellData,
   MunsellHueData,
-  //MunsellHues,
 } from "../../apis/get_munselldata";
 import { MunsellHueCircle } from "./color-hue";
-import { ColorDiv, ColorDivRGB, MunsellColorDiv } from "./color-div";
+import { MunsellColorDiv } from "./color-div";
 import { groupColors } from "../../apis/get_munselldata";
 
 export const MunsellColorSystem = () => {
@@ -67,7 +65,8 @@ export const MunsellColorSystem = () => {
           <div className="flex w-full flex-wrap flex-col">
             {colorGroups.map((g) => {
               return (
-                <div className="flex" key={g.length && g[0].h}>
+                /* eslint-disable */
+                <div className="flex">
                   {g.map((c) => (
                     <MunsellColorDiv color={c} key={c.file_order} />
                   ))}
