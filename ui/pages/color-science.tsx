@@ -55,15 +55,15 @@ function ColorSciencePage({ clientServer, error }: Props) {
             <h2>Introduction</h2>
             <div>
               Color is one of the first aspects of clothing that we notice,
-              whether it's on ourselves or on others. As fundamental to style as
-              color is, color science is often not taught due to the highly
-              subjective nature of color perception. While the physical nature
-              of color is scientificaly defined as the range of wavelengths
-              along the electromagnetic spectrum the human eye can pereceive,
-              the psychological nature is dependent on a number of factors that
-              can vary from person to person, including: physiological
-              differences in sensory processing, and individual differences in
-              conscious experiences and learned adaptions. <br />
+              whether it&apos;s on ourselves or on others. As fundamental to
+              style as color is, color science is often not taught due to the
+              highly subjective nature of color perception. While the physical
+              nature of color is scientificaly defined as the range of
+              wavelengths along the electromagnetic spectrum the human eye can
+              pereceive, the psychological nature is dependent on a number of
+              factors that can vary from person to person, including:
+              physiological differences in sensory processing, and individual
+              differences in conscious experiences and learned adaptions. <br />
               <br />
               Despite the subjective nature of color perception, the following
               page aims to share very basic knowledge about the dimensions that
@@ -196,7 +196,7 @@ function ColorSciencePage({ clientServer, error }: Props) {
           <div className="p-6 rounded-lg bg-neutral-100 shadow-sm">
             <h2 className="mb-4">
               {" "}
-              Let's put your knowledge of color dimensions to the test!
+              Let&apos;s put your knowledge of color dimensions to the test!
             </h2>
 
             <div className="flex gap-16">
