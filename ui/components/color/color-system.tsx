@@ -67,9 +67,9 @@ export const MunsellColorSystem = () => {
           <div className="flex w-full flex-wrap flex-col">
             {colorGroups.map((g) => {
               return (
-                <div className="flex">
+                <div className="flex" key={g.length && g[0].h}>
                   {g.map((c) => (
-                    <MunsellColorDiv color={c} />
+                    <MunsellColorDiv color={c} key={c.file_order} />
                   ))}
                 </div>
               );

@@ -15,6 +15,7 @@ export const MunsellHueCircle = (props: { setHue: any }) => {
           (hue, index) =>
             hue.data.h && (
               <button
+                key={hue.data.file_order}
                 style={{
                   background: `rgb(${hue.data.dR.toString()},${hue.data.dG.toString()},${hue.data.dB.toString()})`,
                   top: "50%",
