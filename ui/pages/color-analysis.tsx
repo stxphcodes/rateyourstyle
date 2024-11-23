@@ -4,13 +4,8 @@ import { Footer } from "../components/footer";
 import { Navbar } from "../components/navarbar";
 import { GetServerURL, GetImageServerURL } from "../apis/get_server";
 import { PageMetadata } from "./_app";
-import { PrimaryButton } from "../components/base/buttons/primary";
-import { MunsellColorSystem } from "../components/color/color-system";
-import { ColorMatchingGame } from "../components/color/color-matching-game";
-import { Modal } from "../components/modals";
-import { ColorDifferenceGame } from "../components/color/color-difference-game";
+import { ColorAttributes } from "../components/color/color-attributes";
 import {
-  MunsellHueData,
   getAutumnColors,
   getSpringColors,
   getSummerColors,
@@ -18,8 +13,9 @@ import {
 } from "../apis/get_munselldata";
 import { HeadShotForm } from "../components/forms/headshot";
 
-import { ColorDiv, MunsellColorDiv } from "../components/color/color-div";
+import { MunsellColorDiv } from "../components/color/color-div";
 import { ColorAnalysisForm } from "../components/forms/color-analysis";
+
 type Props = {
   clientServer: string;
   imageServer: string;
@@ -114,72 +110,88 @@ function ColorAnalysisPage({
         <section className="px-4 py-2 md:px-8 md:py-2">
           <div className="p-6 rounded-lg bg-neutral-100 shadow-sm">
             <h2>Color Seasons</h2>
+            <div>
+              <h3 className="font-bold">Summer</h3>
 
-            <div className="flex gap-2 flex-wrap">
-              <div>
-                <h3>Summer</h3>
-                <p>
-                  This season is characterized by:
-                  <ul>
-                    <li>Cool hue</li>
-                    <li>Light value</li>
-                    <li>Muted chroma</li>
-                  </ul>
-                </p>
-              </div>
-              <div className="flex w-full flex-wrap ">
-                {getSummerColors().map((g) => {
-                  return (
-                    /* eslint-disable */
-                    <div className="flex">
-                      <MunsellColorDiv color={g} key={g.file_order} />
-                    </div>
-                  );
-                })}
+              <div className="flex gap-8 mb-4">
+                <ColorAttributes coolHue highValue lowChroma />
+                <div className="flex w-full flex-wrap">
+                  {getSummerColors().map((g) => {
+                    return (
+                      <MunsellColorDiv
+                        color={g}
+                        large={true}
+                        key={g.file_order}
+                        singleLine
+                      />
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            <div className="flex gap-2 flex-wrap">
-              Winter Color
-              <div className="flex w-full flex-wrap ">
-                {getWinterColors().map((g) => {
-                  return (
-                    /* eslint-disable */
-                    <div className="flex">
-                      <MunsellColorDiv color={g} key={g.file_order} />
-                    </div>
-                  );
-                })}
+            <div>
+              <h3 className="font-bold">Spring</h3>
+
+              <div className="flex gap-8 mb-4">
+                <ColorAttributes coolHue highValue highChroma />
+                <div className="flex w-full flex-wrap">
+                  {getSpringColors().map((g) => {
+                    return (
+                      <MunsellColorDiv
+                        color={g}
+                        large={true}
+                        key={g.file_order}
+                        singleLine
+                      />
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            <div className="flex gap-2 flex-wrap">
-              <div className="flex w-full flex-wrap ">
-                {getSpringColors().map((g) => {
-                  return (
-                    /* eslint-disable */
-                    <div className="flex">
-                      <MunsellColorDiv color={g} key={g.file_order} />
-                    </div>
-                  );
-                })}
+            <div>
+              <h3 className="font-bold">Autumn</h3>
+
+              <div className="flex gap-8 mb-4">
+                <ColorAttributes warmHue lowValue highChroma />
+                <div className="flex w-full flex-wrap">
+                  {getAutumnColors().map((g) => {
+                    return (
+                      <MunsellColorDiv
+                        color={g}
+                        large={true}
+                        key={g.file_order}
+                        singleLine
+                      />
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            <div className="flex gap-2 flex-wrap">
-              <div className="flex w-full flex-wrap ">
-                {getAutumnColors().map((g) => {
-                  return (
-                    /* eslint-disable */
-                    <div className="flex">
-                      <MunsellColorDiv color={g} key={g.file_order} />
-                    </div>
-                  );
-                })}
+            <div>
+              <h3 className="font-bold">Winter</h3>
+
+              <div className="flex gap-8 mb-4">
+                <ColorAttributes coolHue lowValue highChroma />
+                <div className="flex w-full flex-wrap">
+                  {getWinterColors().map((g) => {
+                    return (
+                      <MunsellColorDiv
+                        color={g}
+                        large={true}
+                        key={g.file_order}
+                        singleLine
+                      />
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
         </section>
+
         <section className="px-4 py-2 md:px-8 md:py-2">
           <h2>Color Analysis App </h2>
           {!imageURL ? (
