@@ -12,9 +12,10 @@ import {
   getWinterColors,
 } from "../apis/get_munselldata";
 import { HeadShotForm } from "../components/forms/headshot";
-
+import { PrimaryButton } from "../components/base/buttons/primary";
 import { MunsellColorDiv } from "../components/color/color-div";
 import { ColorAnalysisForm } from "../components/forms/color-analysis";
+import { Modal } from "../components/modals";
 
 type Props = {
   clientServer: string;
@@ -65,6 +66,7 @@ function ColorAnalysisPage({
   error,
 }: Props) {
   const [imageURL, setImageURL] = useState("");
+  const [launchColorAnalysisApp, setLaunchColorAnalysisApp] = useState(false);
 
   return (
     <>
@@ -79,12 +81,11 @@ function ColorAnalysisPage({
             <h2>Introduction</h2>
             <div>
               Personal color analysis is the process of finding the colors that
-              best compliment your natural features. If you've ever noticed that
-              certain color-ed clothing or make up "washes you out", it might be
-              because you were wearing colors outside of your "season".
-              Likewise, if you ever felt like wearing a certain color
-              "brightened" your look, it might have been because you were
-              wearing colors within your seasonal palette.
+              best compliment your natural features. If you've ever felt that
+              certain clothing or makeup "washes you out", it might be because
+              you were wearing colors outside of your "season". Likewise, if you
+              ever felt like certain colors "brightened" your look, you were
+              likely wearing colors within your seasonal palette.
               <br />
               <br />
               <span className="font-semibold">
@@ -102,7 +103,8 @@ function ColorAnalysisPage({
               harmonized well for that season. <br /> <br />
               While the process of finding one's seasonal/personal colors is
               rooted in the general principles of color science, at the end of
-              the day, there are no rules or limitation in fashion!
+              the day, there are no rules or limitation in fashion! Wear any
+              color that your heart desires ❤️.
             </div>
           </div>
         </section>
@@ -110,92 +112,128 @@ function ColorAnalysisPage({
         <section className="px-4 py-2 md:px-8 md:py-2">
           <div className="p-6 rounded-lg bg-neutral-100 shadow-sm">
             <h2>Color Seasons</h2>
-            <div>
+            <div className="pb-8">
               <h3 className="font-bold">Summer</h3>
 
               <div className="flex gap-8 mb-4">
-                <ColorAttributes coolHue highValue lowChroma />
-                <div className="flex w-full flex-wrap">
-                  {getSummerColors().map((g) => {
-                    return (
-                      <MunsellColorDiv
-                        color={g}
-                        large={true}
-                        key={g.file_order}
-                        singleLine
-                      />
-                    );
-                  })}
+                <div className="flex-1">
+                  Summer season is characterized by cool colors that are high in
+                  value (bright) and low in chroma (muted saturation).
+                  <div className="flex w-full flex-wrap h-full">
+                    {getSummerColors().map((g) => {
+                      return (
+                        <MunsellColorDiv
+                          color={g}
+                          large={true}
+                          key={g.file_order}
+                          singleLine
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
+
+                <ColorAttributes coolHue highValue lowChroma />
               </div>
             </div>
 
-            <div>
+            <div className="pb-8">
               <h3 className="font-bold">Spring</h3>
 
               <div className="flex gap-8 mb-4">
-                <ColorAttributes coolHue highValue highChroma />
-                <div className="flex w-full flex-wrap">
-                  {getSpringColors().map((g) => {
-                    return (
-                      <MunsellColorDiv
-                        color={g}
-                        large={true}
-                        key={g.file_order}
-                        singleLine
-                      />
-                    );
-                  })}
+                <div className="flex-1">
+                  Srping season is characterized by cool colors that are high in
+                  value (bright) and high in chroma (high saturation).
+                  <div className="flex w-full flex-wrap h-full">
+                    {getSpringColors().map((g) => {
+                      return (
+                        <MunsellColorDiv
+                          color={g}
+                          large={true}
+                          key={g.file_order}
+                          singleLine
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
+                <ColorAttributes coolHue highValue highChroma />
               </div>
             </div>
 
-            <div>
+            <div className="pb-8">
               <h3 className="font-bold">Autumn</h3>
-
               <div className="flex gap-8 mb-4">
-                <ColorAttributes warmHue lowValue highChroma />
-                <div className="flex w-full flex-wrap">
-                  {getAutumnColors().map((g) => {
-                    return (
-                      <MunsellColorDiv
-                        color={g}
-                        large={true}
-                        key={g.file_order}
-                        singleLine
-                      />
-                    );
-                  })}
+                <div className="flex-1">
+                  Autumn season is characterized by warm colors that are low in
+                  value (dark) and high in chroma (high saturation).
+                  <div className="flex w-full flex-wrap h-full">
+                    {getAutumnColors().map((g) => {
+                      return (
+                        <MunsellColorDiv
+                          color={g}
+                          large={true}
+                          key={g.file_order}
+                          singleLine
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
+                <ColorAttributes warmHue lowValue highChroma />
               </div>
             </div>
 
             <div>
               <h3 className="font-bold">Winter</h3>
-
               <div className="flex gap-8 mb-4">
-                <ColorAttributes coolHue lowValue highChroma />
-                <div className="flex w-full flex-wrap">
-                  {getWinterColors().map((g) => {
-                    return (
-                      <MunsellColorDiv
-                        color={g}
-                        large={true}
-                        key={g.file_order}
-                        singleLine
-                      />
-                    );
-                  })}
+                <div className="flex-1">
+                  Winter season is characterized by cool colors that are low in
+                  value (dark) and high in chroma (high saturation).
+                  <div className="flex w-full flex-wrap h-full">
+                    {getWinterColors().map((g) => {
+                      return (
+                        <MunsellColorDiv
+                          color={g}
+                          large={true}
+                          key={g.file_order}
+                          singleLine
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
+                <ColorAttributes coolHue lowValue highChroma />
               </div>
             </div>
           </div>
         </section>
 
         <section className="px-4 py-2 md:px-8 md:py-2">
-          <h2>Color Analysis App </h2>
+          <div className="p-6 rounded-lg bg-neutral-100 shadow-sm">
+            <h2>Color Analysis App </h2>
+            <div>Ready to discover your personal colors?</div>
+            <PrimaryButton
+              fitContent={true}
+              styles="p-4"
+              onClick={() => setLaunchColorAnalysisApp(true)}
+            >
+              Launch
+            </PrimaryButton>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+      {launchColorAnalysisApp && (
+        <Modal
+          handleClose={() => {
+            setImageURL("");
+            setLaunchColorAnalysisApp(false);
+          }}
+        >
           {!imageURL ? (
-            <div className="p-6 rounded-lg bg-neutral-100 shadow-sm sm:w-1/2">
+            <div className="p-6 rounded-lg bg-neutral-100 shadow-sm ">
               <HeadShotForm
                 imageServer={imageServer}
                 cookie={cookie || ""}
@@ -207,10 +245,8 @@ function ColorAnalysisPage({
               <ColorAnalysisForm imageURL={imageURL} />
             </div>
           )}
-        </section>
-      </main>
-
-      <Footer />
+        </Modal>
+      )}
     </>
   );
 }
