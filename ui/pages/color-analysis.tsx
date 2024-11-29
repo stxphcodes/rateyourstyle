@@ -16,6 +16,7 @@ import { PrimaryButton } from "../components/base/buttons/primary";
 import { MunsellColorDiv } from "../components/color/color-div";
 import { ColorAnalysisForm } from "../components/forms/color-analysis";
 import { Modal } from "../components/modals";
+import { ColorAnalysisQuiz } from "../components/forms/color-analysis-quiz";
 
 type Props = {
   clientServer: string;
@@ -59,6 +60,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return { props };
 };
 
+const explanation = {
+  Spring:
+    "Most of your color choices were high in value (light), high in chroma and cool toned.",
+  Autumn:
+    "Most of your color choices were medium in value (mixture of light and dark colors), high in chroma (saturated) and warm toned.",
+  Winter:
+    "Most of your color choices were dark in value, high in chroma (saturated), and cool toned.",
+  Summer:
+    "Most of your color choices were low in chroma (muted) and cool toned.",
+};
+
 function ColorAnalysisPage({
   clientServer,
   imageServer,
@@ -67,6 +79,15 @@ function ColorAnalysisPage({
 }: Props) {
   const [imageURL, setImageURL] = useState("");
   const [launchColorAnalysisApp, setLaunchColorAnalysisApp] = useState(false);
+  const [analysisResults, setAnalysisResults] = useState(null);
+  const [mostLikelySeasons, setMostLikelySeasons] = useState(null);
+
+  const handleClose = (e: any) => {
+    setImageURL("");
+    setLaunchColorAnalysisApp(false);
+    setAnalysisResults(null);
+    setMostLikelySeasons(null);
+  };
 
   return (
     <>
@@ -104,7 +125,7 @@ function ColorAnalysisPage({
               While the process of finding one's seasonal/personal colors is
               rooted in the general principles of color science, at the end of
               the day, there are no rules or limitation in fashion! Wear any
-              color that your heart desires ❤️.
+              color that your heart desires ❤️
             </div>
           </div>
         </section>
@@ -112,10 +133,35 @@ function ColorAnalysisPage({
         <section className="px-4 py-2 md:px-8 md:py-2">
           <div className="p-6 rounded-lg bg-neutral-100 shadow-sm">
             <h2>Color Seasons</h2>
+
+            <div className="pb-8">
+              <h3 className="font-bold">Spring</h3>
+
+              <div className="sm:flex gap-8 mb-4">
+                <div className="flex-1">
+                  Srping season is characterized by cool colors that are high in
+                  value (bright) and high in chroma (high saturation).
+                  <div className="flex flex-wrap h-full ">
+                    {getSpringColors().map((g) => {
+                      return (
+                        <MunsellColorDiv
+                          color={g}
+                          large={true}
+                          key={g.file_order}
+                          singleLine
+                          height={"h-20 sm:h-full"}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+                <ColorAttributes warmHue highValue highChroma />
+              </div>
+            </div>
             <div className="pb-8">
               <h3 className="font-bold">Summer</h3>
 
-              <div className="flex gap-8 mb-4">
+              <div className="sm:flex gap-8 mb-4">
                 <div className="flex-1">
                   Summer season is characterized by cool colors that are high in
                   value (bright) and low in chroma (muted saturation).
@@ -127,6 +173,7 @@ function ColorAnalysisPage({
                           large={true}
                           key={g.file_order}
                           singleLine
+                          height={"h-20 sm:h-full"}
                         />
                       );
                     })}
@@ -138,32 +185,8 @@ function ColorAnalysisPage({
             </div>
 
             <div className="pb-8">
-              <h3 className="font-bold">Spring</h3>
-
-              <div className="flex gap-8 mb-4">
-                <div className="flex-1">
-                  Srping season is characterized by cool colors that are high in
-                  value (bright) and high in chroma (high saturation).
-                  <div className="flex w-full flex-wrap h-full">
-                    {getSpringColors().map((g) => {
-                      return (
-                        <MunsellColorDiv
-                          color={g}
-                          large={true}
-                          key={g.file_order}
-                          singleLine
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-                <ColorAttributes coolHue highValue highChroma />
-              </div>
-            </div>
-
-            <div className="pb-8">
               <h3 className="font-bold">Autumn</h3>
-              <div className="flex gap-8 mb-4">
+              <div className="sm:flex gap-8 mb-4">
                 <div className="flex-1">
                   Autumn season is characterized by warm colors that are low in
                   value (dark) and high in chroma (high saturation).
@@ -175,6 +198,7 @@ function ColorAnalysisPage({
                           large={true}
                           key={g.file_order}
                           singleLine
+                          height={"h-20 sm:h-full"}
                         />
                       );
                     })}
@@ -186,7 +210,7 @@ function ColorAnalysisPage({
 
             <div>
               <h3 className="font-bold">Winter</h3>
-              <div className="flex gap-8 mb-4">
+              <div className="sm:flex gap-8 mb-4">
                 <div className="flex-1">
                   Winter season is characterized by cool colors that are low in
                   value (dark) and high in chroma (high saturation).
@@ -198,6 +222,7 @@ function ColorAnalysisPage({
                           large={true}
                           key={g.file_order}
                           singleLine
+                          height={"h-20 sm:h-full"}
                         />
                       );
                     })}
@@ -210,12 +235,15 @@ function ColorAnalysisPage({
         </section>
 
         <section className="px-4 py-2 md:px-8 md:py-2">
-          <div className="p-6 rounded-lg bg-neutral-100 shadow-sm">
+          <div className="p-6 rounded-lg bg-neutral-100 shadow-sm text-center">
             <h2>Color Analysis App </h2>
-            <div>Ready to discover your personal colors?</div>
+            <div>
+              Ready to find out your season? Try our personal color anlaysis
+              quiz!
+            </div>
             <PrimaryButton
               fitContent={true}
-              styles="p-4"
+              styles="p-4 my-4"
               onClick={() => setLaunchColorAnalysisApp(true)}
             >
               Launch
@@ -226,12 +254,7 @@ function ColorAnalysisPage({
 
       <Footer />
       {launchColorAnalysisApp && (
-        <Modal
-          handleClose={() => {
-            setImageURL("");
-            setLaunchColorAnalysisApp(false);
-          }}
-        >
+        <Modal fullHeight={true} handleClose={handleClose}>
           {!imageURL ? (
             <div className="p-6 rounded-lg bg-neutral-100 shadow-sm ">
               <HeadShotForm
@@ -242,7 +265,31 @@ function ColorAnalysisPage({
             </div>
           ) : (
             <div className="p-6 rounded-lg bg-neutral-100 shadow-sm">
-              <ColorAnalysisForm imageURL={imageURL} />
+              {!analysisResults ? (
+                <ColorAnalysisQuiz
+                  imageURL={imageURL}
+                  setAnalysisResults={setAnalysisResults}
+                  setMostLikelySeason={setMostLikelySeasons}
+                />
+              ) : (
+                <div>
+                  <h2 className="py-4 text-center">
+                    You are most likely{" "}
+                    {mostLikelySeasons && mostLikelySeasons[0]}!
+                  </h2>
+                  <h3>Explanation:</h3>
+                  <div className="mb-4 font-bold">
+                    {explanation[mostLikelySeasons[0]]}
+                  </div>
+
+                  <div className="mb-4">
+                    Not convinced? Further explore your compatibility with the
+                    color seasons below! You can select any color from the
+                    palettes which will update the border around the image.
+                  </div>
+                  <ColorAnalysisForm imageURL={imageURL} />
+                </div>
+              )}
             </div>
           )}
         </Modal>
