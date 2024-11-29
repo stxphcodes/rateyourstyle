@@ -247,7 +247,7 @@ export function getSpringColors() {
   hues.forEach((hue) => {
    
     let hueColors = munselldata.filter( 
-      (data) =>  data.h === hue  && data.V === 7
+      (data) =>  data.h === hue  && data.V === 8
     );
 
     let maxChroma: any = null
@@ -277,7 +277,7 @@ export function getWinterColors() {
   hues.forEach((hue) => {
    
     let hueColors = munselldata.filter( 
-      (data) =>  data.h === hue  && data.V === 5
+      (data) =>  data.h === hue  && data.V === 4
     );
 
     let maxChroma: any = null
@@ -323,7 +323,7 @@ export function getAutumnColors() {
 
   hues.forEach((hue) => {
     let hueColors = munselldata.filter(
-      (data) => data.h === hue && data.V === 4
+      (data) => data.h === hue && data.V === 6
     );
 
     let maxChroma: any = null
