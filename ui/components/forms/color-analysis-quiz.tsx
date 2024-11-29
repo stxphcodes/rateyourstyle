@@ -151,7 +151,7 @@ export const ColorAnalysisQuiz = (props: {
           return (
             <div
               className="flex flex-wrap align-center sm:gap-4 gap-2"
-              key={key}
+              key={border}
             >
               <input
                 type="radio"
