@@ -64,17 +64,33 @@ export const ColorAnalysisForm = (props: { imageURL: string }) => {
     }
   };
 
+  const getSetBorderColor = (season: string) => {
+    switch (season) {
+      case "Spring":
+        return setSpringBorder;
+      case "Summer":
+        return setSummerBorder;
+      case "Autumn":
+        return setAutumnBorder;
+      case "Winter":
+        return setWinterBorder;
+    }
+  };
+
   return (
     <div>
-      <h3>Step 2. Compare the seasonal colors</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
         {seasons.map((season) => (
           <div className="flex-none">
             <div>{season.name}</div>
             <div className="flex w-full flex-wrap ">
               {season.colors.map((color) => (
                 <div className="flex">
-                  <MunsellColorDiv color={color} key={color.file_order} />
+                  <MunsellColorDiv
+                    color={color}
+                    key={color.file_order}
+                    setSelectedColor={getSetBorderColor(season.name)}
+                  />
                 </div>
               ))}
             </div>

@@ -11,11 +11,11 @@ export const HeadShotForm = (props: {
 
   return (
     <form className="">
-      <h3>Step 1. Upload a headshot</h3>
-      <div>
-        Follow these tips for the best results! Please upload a headshot that
-        is:
-        <ul>
+      <h1>Upload a headshot</h1>
+      <div className="my-4">
+        Follow these tips for the best results! <br />
+        Please upload a headshot that is:
+        <ul className="list-disc list-inside">
           <li>Front-facing</li>
           <li>Good quality</li>
           <li>Taken in natural lighting</li>
