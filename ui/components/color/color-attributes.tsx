@@ -54,8 +54,8 @@ export const ColorAttributes = (props: {
   highChroma?: boolean;
 }) => (
   <div className="">
-    <div className="mb-4 grid grid-cols-5 items-center ">
-      <div className="font-bold col-span-2">Hue</div>
+    <div className="mb-4 grid grid-cols-4 items-center">
+      <div className="font-bold col-span-1">Hue</div>
 
       <div className="flex  flex-wrap justify-between col-span-3">
         <div className="basis-full flex justify-between">
@@ -85,8 +85,8 @@ export const ColorAttributes = (props: {
         ></div>
       </div>
     </div>
-    <div className="mb-4 grid grid-cols-5 items-center">
-      <div className="font-bold col-span-2">Value</div>
+    <div className="mb-4 grid grid-cols-4 items-center">
+      <div className="font-bold col-span-1">Value</div>
       <div className="flex flex-wrap justify-between col-span-3">
         <div className="basis-full flex justify-between">
           <div className={`${props.lowValue ? "underline font-bold" : ""}`}>
@@ -99,8 +99,8 @@ export const ColorAttributes = (props: {
         <LowHighValue />
       </div>
     </div>
-    <div className="mb-4 grid grid-cols-5 items-center">
-      <div className="font-bold col-span-2">Chroma</div>
+    <div className="mb-4 grid grid-cols-4 items-center">
+      <div className="font-bold col-span-1">Chroma</div>
 
       <div className="flex flex-wrap justify-between col-span-3">
         <div className="basis-full flex justify-between">
