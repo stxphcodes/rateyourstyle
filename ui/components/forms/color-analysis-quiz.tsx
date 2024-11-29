@@ -4,7 +4,7 @@ import "react-image-crop/dist/ReactCrop.css";
 
 import { PrimaryButton } from "../base/buttons/primary";
 
-const seasons = [
+const seasons: any = [
   {
     name: "Spring",
     pink: "#fe8b83",
@@ -94,7 +94,7 @@ export const ColorAnalysisQuiz = (props: {
   const handleSubmit = (e: any) => {
     e.preventDefault();
 
-    let counts = {
+    let counts: any = {
       Spring: 0,
       Summer: 0,
       Winter: 0,
@@ -145,11 +145,14 @@ export const ColorAnalysisQuiz = (props: {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        {seasons.map((season) => {
+        {seasons.map((season: any) => {
           let key = questionAnswers[questionIndex].question;
           let border = season[`${key}`];
           return (
-            <div className="flex flex-wrap align-center sm:gap-4 gap-2">
+            <div
+              className="flex flex-wrap align-center sm:gap-4 gap-2"
+              key={key}
+            >
               <input
                 type="radio"
                 value={season.name}

@@ -60,7 +60,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return { props };
 };
 
-const explanation = {
+const explanation: any = {
   Spring:
     "Most of your color choices were high in value (light), high in chroma and cool toned.",
   Autumn:
@@ -80,7 +80,7 @@ function ColorAnalysisPage({
   const [imageURL, setImageURL] = useState("");
   const [launchColorAnalysisApp, setLaunchColorAnalysisApp] = useState(false);
   const [analysisResults, setAnalysisResults] = useState(null);
-  const [mostLikelySeasons, setMostLikelySeasons] = useState(null);
+  const [mostLikelySeasons, setMostLikelySeasons] = useState<any>(null);
 
   const handleClose = (e: any) => {
     setImageURL("");
@@ -102,29 +102,29 @@ function ColorAnalysisPage({
             <h2>Introduction</h2>
             <div>
               Personal color analysis is the process of finding the colors that
-              best compliment your natural features. If you've ever felt that
-              certain clothing or makeup "washes you out", it might be because
-              you were wearing colors outside of your "season". Likewise, if you
-              ever felt like certain colors "brightened" your look, you were
-              likely wearing colors within your seasonal palette.
+              best compliment your natural features. If you&apos;ve ever felt
+              that certain clothing or makeup washes you out, it might be
+              because you were wearing colors outside of your season. Likewise,
+              if you ever felt like certain colors brightened your look, you
+              were likely wearing colors within your seasonal palette.
               <br />
               <br />
               <span className="font-semibold">
-                What are "seasons" in personal color anlaysis?
+                What are seasons in personal color anlaysis?
               </span>
               <br />
-              The concept of seasonal colors was introduced in the 1940's by
-              Suzanne Caygill who combined color science with psychology. She
+              The concept of seasonal colors was introduced in the 1940&apos;s
+              by Suzanne Caygill who combined color science with psychology. She
               looked at color harmonies found in nature through the seasons, and
               associated them to personalities and fashion styles. Her theory
-              inspried Carole Jackson, author of the best-seller "Color Me
-              Beautiful", who matured the theory. Jackson believed that everyone
+              inspried Carole Jackson, author of the best-seller Color Me
+              Beautiful, who matured the theory. Jackson believed that everyone
               falls under a specific season according to their natural features:
               Spring, Summer, Autumn and Winter, and created color palettes that
               harmonized well for that season. <br /> <br />
-              While the process of finding one's seasonal/personal colors is
-              rooted in the general principles of color science, at the end of
-              the day, there are no rules or limitation in fashion! Wear any
+              While the process of finding one&apos;s seasonal/personal colors
+              is rooted in the general principles of color science, at the end
+              of the day, there are no rules or limitation in fashion! Wear any
               color that your heart desires ❤️
             </div>
           </div>

@@ -20,6 +20,8 @@ export function useDebounceEffect(
 ) {
   useEffect(() => {
     const t = setTimeout(() => {
+      // eslint-disable-next-line
+      // @ts-ignore
       fn.apply(undefined, deps);
     }, waitTime);
 

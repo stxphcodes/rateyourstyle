@@ -81,11 +81,11 @@ export const ColorAnalysisForm = (props: { imageURL: string }) => {
     <div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
         {seasons.map((season) => (
-          <div className="flex-none">
+          <div className="flex-none" key={season.name}>
             <div>{season.name}</div>
             <div className="flex w-full flex-wrap ">
               {season.colors.map((color) => (
-                <div className="flex">
+                <div className="flex" key={color.h}>
                   <MunsellColorDiv
                     color={color}
                     key={color.file_order}
