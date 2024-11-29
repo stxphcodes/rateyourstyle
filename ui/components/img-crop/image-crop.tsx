@@ -119,10 +119,10 @@ export default function ImageCrop(props: {
     // You might want { type: "image/jpeg", quality: <0 to 1> } to
     // reduce image size
     const blob = await offscreen.convertToBlob({
-      type: "image/png",
+      type: "image/jpeg",
     });
 
-    var file = new File([blob], "file.png");
+    var file = new File([blob], "file.jpeg");
     const formData = new FormData();
     formData.append("file", file);
 
@@ -182,7 +182,7 @@ export default function ImageCrop(props: {
           {/* <input type="file" accept="image/*" onChange={onSelectFile} /> */}
         </div>
       ) : (
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-wrap gap-4 items-center">
           <ReactCrop
             crop={crop}
             onChange={(_, percentCrop) => setCrop(percentCrop)}
