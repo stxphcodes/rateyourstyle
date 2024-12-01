@@ -120,9 +120,9 @@ export function getAdjacentMunsellColor(color: MunsellData) {
 
       let newHue = getMunsellHues()[hueInteger - 1];
       munselldata.forEach((data) => {
-        if (data.h === newHue &&  data.C  === color.C &&  data.V === color.V) {
+        if (data.h === newHue && data.C === color.C && data.V === color.V) {
           toReturn = data;
-          return
+          return;
         }
       });
       break;
@@ -132,9 +132,9 @@ export function getAdjacentMunsellColor(color: MunsellData) {
       hueInteger = getHueNumber(color.h);
       newHue = getMunsellHues()[hueInteger + 1];
       munselldata.forEach((data) => {
-        if (data.h === newHue &&  data.C  === color.C &&  data.V === color.V) {
-         toReturn = data;
-          return
+        if (data.h === newHue && data.C === color.C && data.V === color.V) {
+          toReturn = data;
+          return;
         }
       });
       break;
@@ -143,11 +143,9 @@ export function getAdjacentMunsellColor(color: MunsellData) {
     case 2:
       let newChroma = color.C - 1;
       munselldata.forEach((data) => {
-        if (color.h === data.h && 
-          newChroma  === data.C && 
-          color.V === data.V) {
+        if (color.h === data.h && newChroma === data.C && color.V === data.V) {
           toReturn = data;
-          return
+          return;
         }
       });
       break;
@@ -156,11 +154,9 @@ export function getAdjacentMunsellColor(color: MunsellData) {
     case 3:
       newChroma = color.C + 1;
       munselldata.forEach((data) => {
-        if (color.h === data.h && 
-          newChroma  === data.C && 
-          color.V === data.V) {
+        if (color.h === data.h && newChroma === data.C && color.V === data.V) {
           toReturn = data;
-          return
+          return;
         }
       });
       break;
@@ -169,25 +165,20 @@ export function getAdjacentMunsellColor(color: MunsellData) {
     case 4:
       let newValue = color.V - 1;
       munselldata.forEach((data) => {
-        if (color.h === data.h && 
-          color.C  === data.C && 
-          newValue === data.V) {
+        if (color.h === data.h && color.C === data.C && newValue === data.V) {
           toReturn = data;
-          return
+          return;
         }
       });
       break;
-      
 
     // value increase
     case 5:
       newValue = color.V + 1;
       munselldata.forEach((data) => {
-        if (color.h === data.h && 
-          color.C  === data.C && 
-          newValue === data.V) {
+        if (color.h === data.h && color.C === data.C && newValue === data.V) {
           toReturn = data;
-          return
+          return;
         }
       });
       break;
@@ -197,8 +188,7 @@ export function getAdjacentMunsellColor(color: MunsellData) {
     return getAdjacentMunsellColor(color);
   }
 
-
-  return {color: toReturn, difference: rand};
+  return { color: toReturn, difference: rand };
 }
 
 export function calcMunsellData(hue: number, value: number, chroma: number) {
@@ -213,7 +203,7 @@ export function calcMunsellData(hue: number, value: number, chroma: number) {
   return null;
 }
 
-export function groupColors(colors: MunsellData[]) {
+export function groupColors(colors: MunsellData[], sortChroma = false) {
   var groups: MunsellData[][] = [];
   var maxChroma = 0;
   var maxValue = 0;
@@ -235,19 +225,128 @@ export function groupColors(colors: MunsellData[]) {
       }
     });
 
-    groups.push(temp);
-  }
-
-  groups.forEach((g, i) =>
-    groups[i].sort((a, b) => {
+    temp.sort((a, b) => {
       if (a.V > b.V) {
         return -1;
       }
       return 1;
-    })
-  );
+    });
+
+    groups.push(temp);
+  }
 
   return groups;
 }
 
 export const MunsellHueData = getMunsellHueData();
+
+export function getSpringColors() {
+  const hues = getMunsellHues();
+  const colorsToReturn: MunsellData[] = [];
+
+  hues.forEach((hue) => {
+   
+    let hueColors = munselldata.filter( 
+      (data) =>  data.h === hue  && data.V === 8
+    );
+
+    let maxChroma: any = null
+    hueColors.forEach(c => {
+      if(!maxChroma) {
+        maxChroma = c
+        return 
+      }
+
+      if (c.C > maxChroma.C) {
+        maxChroma = c
+      }
+    })
+
+
+    colorsToReturn.push(maxChroma);
+  });
+
+return colorsToReturn
+}
+
+export function getWinterColors() {
+  const hues = getMunsellHues();
+
+  const colorsToReturn: MunsellData[] = [];
+
+  hues.forEach((hue) => {
+   
+    let hueColors = munselldata.filter( 
+      (data) =>  data.h === hue  && data.V === 4
+    );
+
+    let maxChroma: any = null
+    hueColors.forEach(c => {
+      if(!maxChroma) {
+        maxChroma = c
+        return 
+      }
+
+      if (c.C > maxChroma.C) {
+        maxChroma = c
+      }
+    })
+
+
+    colorsToReturn.push(maxChroma);
+  });
+
+  return colorsToReturn;
+}
+
+export function getSummerColors() {
+  const hues = getMunsellHues();
+
+  const colorsToReturn: MunsellData[] = [];
+
+  hues.forEach((hue) => {
+    let hueColors = munselldata.filter(
+      (data) => data.h === hue && data.V === 8 && data.C === 4
+    );
+
+    colorsToReturn.push(...hueColors);
+  });
+
+  return colorsToReturn;
+}
+
+
+export function getAutumnColors() {
+  const hues = getMunsellHues();
+
+  const colorsToReturn: MunsellData[] = [];
+
+  hues.forEach((hue) => {
+    let hueColors = munselldata.filter(
+      (data) => data.h === hue && data.V === 6
+    );
+
+    let maxChroma: any = null
+    hueColors.forEach(c => {
+      if(!maxChroma) {
+        maxChroma = c
+        return 
+      }
+
+      if (c.C > maxChroma.C) {
+        maxChroma = c
+      }
+    })
+
+    let filtered = hueColors.filter(c => c.C === maxChroma.C -2)
+
+    colorsToReturn.push(...filtered)
+  }
+  );
+  
+
+
+
+  return colorsToReturn;
+
+}

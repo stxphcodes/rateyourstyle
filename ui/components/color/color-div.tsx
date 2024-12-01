@@ -31,14 +31,22 @@ export const MunsellColorDiv = (props: {
   border?: boolean;
   large?: boolean;
   className?: string;
+  singleLine?: boolean;
+  setSelectedColor?: any;
+  height?: any;
 }) => {
   let rgb = `rgb(${props.color.dR.toString()},${props.color.dG.toString()},${props.color.dB.toString()})`;
   return (
     <div
+      onClick={() => props.setSelectedColor(rgb)}
       style={{ backgroundColor: rgb }}
-      className={`${props.className && props.className} aspect-square ${
-        props.large ? "w-16" : "w-8"
-      } ${props.border ? "border-2 border-black" : ""}`}
+      className={`${props.className && props.className} ${
+        !props.height ? "aspect-square" : props.height
+      } ${props.large ? "w-16" : "w-8"} ${
+        props.border ? "border-2 border-black" : ""
+      } ${props.singleLine ? "flex-1" : ""} ${
+        props.setSelectedColor ? "hover:cursor-pointer" : ""
+      }`}
     />
   );
 };

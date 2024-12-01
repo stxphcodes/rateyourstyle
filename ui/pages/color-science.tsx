@@ -10,6 +10,11 @@ import { ColorMatchingGame } from "../components/color/color-matching-game";
 import { Modal } from "../components/modals";
 import { ColorDifferenceGame } from "../components/color/color-difference-game";
 import { MunsellHueData } from "../apis/get_munselldata";
+import {
+  LowHighChroma,
+  LowHighValue,
+  RainbowHues,
+} from "../components/color/color-attributes";
 type Props = {
   clientServer: string;
   error: string | null;
@@ -85,30 +90,7 @@ function ColorSciencePage({ clientServer, error }: Props) {
                   <div className="underline mb-2">Example</div>
                   <div className="flex">
                     <div className="flex gap-2">
-                      <div
-                        className="w-8 h-8"
-                        style={{ backgroundColor: "rgb(255, 68, 85)" }}
-                      ></div>
-                      <div
-                        className="w-8 h-8"
-                        style={{ backgroundColor: "rgb(255, 139, 45)" }}
-                      ></div>
-                      <div
-                        className="w-8 h-8"
-                        style={{ backgroundColor: "rgb(251, 236, 93)" }}
-                      ></div>
-                      <div
-                        className="w-8 h-8"
-                        style={{ backgroundColor: "rgb(50, 202, 53)" }}
-                      ></div>
-                      <div
-                        className="w-8 h-8"
-                        style={{ backgroundColor: "rgb(67, 53, 255)" }}
-                      ></div>
-                      <div
-                        className="w-8 h-8"
-                        style={{ backgroundColor: "rgb(124, 23, 243)" }}
-                      ></div>
+                      <RainbowHues />
                     </div>
                   </div>
                 </div>
@@ -119,14 +101,7 @@ function ColorSciencePage({ clientServer, error }: Props) {
                 <div className="ml-4">
                   <div className="underline mb-2">Example</div>
                   <div className="flex gap-2">
-                    <div
-                      className="w-8 h-8"
-                      style={{ backgroundColor: "#2a4974" }}
-                    ></div>
-                    <div
-                      className="w-8 h-8"
-                      style={{ backgroundColor: "#51637e" }}
-                    ></div>
+                    <LowHighChroma />
                   </div>
                 </div>
               </li>
@@ -137,14 +112,7 @@ function ColorSciencePage({ clientServer, error }: Props) {
                 <div className="ml-4">
                   <div className="underline mb-2">Example</div>
                   <div className="flex gap-2">
-                    <div
-                      className="w-8 h-8"
-                      style={{ backgroundColor: "#b546dd" }}
-                    ></div>
-                    <div
-                      className="w-8 h-8"
-                      style={{ backgroundColor: "#481e57" }}
-                    ></div>
+                    <LowHighValue />
                   </div>
                 </div>
               </li>
@@ -152,8 +120,7 @@ function ColorSciencePage({ clientServer, error }: Props) {
             Over time, scientists and artists have developed color systems in
             order to quantify these properties of color, and to create a
             structured approach to color notation. The color system that our
-            tutorials and app are based is the Munsell color system, but other
-            color systems include ___, and ___.
+            tutorials and app are based is the Munsell color system.
           </div>
         </section>
         <section className="px-4 py-2 md:px-8 md:py-2">

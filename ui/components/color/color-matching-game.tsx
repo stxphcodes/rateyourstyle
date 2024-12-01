@@ -41,10 +41,16 @@ export const ColorMatchingGame = () => {
 
   useEffect(() => {
     if (!color) {
-      setColor(getRandomMunsellData());
+      const rcolor = getRandomMunsellData();
+      // const highestChroma = getHighestChroma(rcolor.h);
+      // const highestValue = getHighestValue(rcolor.h);
+      // setMaxChroma(highestChroma.C);
+      // setMaxValue(highestValue.V);
+      setColor(rcolor);
     }
 
     const calcColor = calcMunsellData(hue, value, chroma);
+
     setColorSelected(calcColor);
   });
 
@@ -113,9 +119,16 @@ export const ColorMatchingGame = () => {
                   <p>Match me!</p>
                 </div>
               )}
-              {colorSelected && (
+              {colorSelected ? (
                 <div>
                   <MunsellColorDiv border large color={colorSelected} />
+                </div>
+              ) : (
+                <div
+                  className="w-16 h-16 bg-black text-white  p-1"
+                  style={{ fontSize: "10px" }}
+                >
+                  color not found :( pls adjust scales
                 </div>
               )}
             </div>
