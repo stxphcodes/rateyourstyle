@@ -190,6 +190,14 @@ export function Navbar(props: {
             <Link href="/post-outfit" passHref={true}>
               Post Outfit
             </Link>
+            <span className="mx-1">|</span>
+            <Link href="/color-science" passHref={true}>
+              Color Science
+            </Link>
+            <span className="mx-1">|</span>
+            <Link href="/color-analysis" passHref={true}>
+              Color Analysis
+            </Link>
           </div>
         )}
       </nav>
@@ -208,6 +216,13 @@ export function Navbar(props: {
 
           <Link href="/post-outfit" passHref={true}>
             Post Outfit
+          </Link>
+          <Link href="/color-science" passHref={true}>
+            Color Science
+          </Link>
+
+          <Link href="/color-analysis" passHref={true}>
+            Color Analysis
           </Link>
         </div>
       )}
