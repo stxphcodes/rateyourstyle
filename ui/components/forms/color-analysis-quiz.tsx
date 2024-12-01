@@ -127,20 +127,23 @@ export const ColorAnalysisQuiz = (props: {
       <div>
         When observing the options, try to focus on your face instead of the
         color border surrounding your photo.
-        <div className="my-4">
-          Choose the option that:
-          <ul className="list-disc list-inside">
-            <li>Makes your skintone appear even</li>
-            <li>Contours/defines your facial features naturally </li>
-            <li>Gives your face a lift or natural glow</li>
-          </ul>
-        </div>
-        <div className="my-4">
-          Rule out the option that:
-          <ul className="list-disc list-inside">
-            <li>Makes you appear yellowish or orangeish</li>
-            <li>Empahsizes dark cicles</li>
-          </ul>
+        <div className="flex gap-8 my-4">
+          <div>
+            <div className="font-bold my-2">Choose the option that:</div>
+            <ul className="list-disc list-inside">
+              <li className="my-2">Makes your skintone appear even</li>
+              <li className="my-2">Contours your facial features naturally </li>
+              <li>Gives your face a lift or natural glow</li>
+            </ul>
+          </div>
+          <div>
+            <div className="font-bold my-2">Rule out the option that:</div>
+
+            <ul className="list-disc list-inside">
+              <li className="my-2">Makes you appear yellowish or orangeish</li>
+              <li className="my-2">Empahsizes dark cicles</li>
+            </ul>
+          </div>
         </div>
       </div>
 

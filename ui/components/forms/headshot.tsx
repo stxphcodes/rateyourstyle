@@ -13,13 +13,14 @@ export const HeadShotForm = (props: {
     <form className="">
       <h1>Upload a headshot</h1>
       <div className="my-4">
-        Follow these tips for the best results! <br />
         Please upload a headshot that is:
         <ul className="list-disc list-inside">
           <li>Front-facing</li>
           <li>Good quality</li>
           <li>Taken in natural lighting</li>
         </ul>
+        <br />
+        Please crop your image so that your face fills up most of the circle.
       </div>
       <ImageCrop
         imgServer={props.imageServer}

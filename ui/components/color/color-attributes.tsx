@@ -70,14 +70,11 @@ export const ColorAttributes = (props: {
           className="w-8 h-8"
           style={{ backgroundColor: "rgb(67, 53, 255)" }}
         ></div>
-        <div
-          className="w-8 h-8"
-          style={{ backgroundColor: "rgb(67, 53, 255)" }}
-        ></div>
+        <div className="w-8 h-8" style={{ backgroundColor: "#bc1754" }}></div>
 
         <div
           className="w-8 h-8"
-          style={{ backgroundColor: "rgb(251, 236, 93)" }}
+          style={{ backgroundColor: "rgb(148, 224, 63)" }}
         ></div>
         <div
           className="w-8 h-8"

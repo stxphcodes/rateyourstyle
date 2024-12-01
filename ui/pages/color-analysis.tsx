@@ -17,6 +17,7 @@ import { MunsellColorDiv } from "../components/color/color-div";
 import { ColorAnalysisForm } from "../components/forms/color-analysis";
 import { Modal } from "../components/modals";
 import { ColorAnalysisQuiz } from "../components/forms/color-analysis-quiz";
+import Link from "next/link";
 
 type Props = {
   clientServer: string;
@@ -123,8 +124,9 @@ function ColorAnalysisPage({
               Spring, Summer, Autumn and Winter, and created color palettes that
               harmonized well for that season. <br /> <br />
               While the process of finding one&apos;s seasonal/personal colors
-              is rooted in the general principles of color science, at the end
-              of the day, there are no rules or limitation in fashion! Wear any
+              is rooted in the general principles of{" "}
+              <Link href="/color-science">color science</Link>, at the end of
+              the day, there are no rules or limitation in fashion! Wear any
               color that your heart desires ❤️
             </div>
           </div>

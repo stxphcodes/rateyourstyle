@@ -120,8 +120,7 @@ function ColorSciencePage({ clientServer, error }: Props) {
             Over time, scientists and artists have developed color systems in
             order to quantify these properties of color, and to create a
             structured approach to color notation. The color system that our
-            tutorials and app are based is the Munsell color system, but other
-            color systems include ___, and ___.
+            tutorials and app are based is the Munsell color system.
           </div>
         </section>
         <section className="px-4 py-2 md:px-8 md:py-2">
