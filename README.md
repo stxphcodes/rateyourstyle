@@ -2,7 +2,7 @@
 
 A fashion community to help users discover their personal style.
 
-![view-homepage](/screenshares/1-homepage.mov)
+![view-homepage](/screenshares/1-homepage.gif)
 
 
 Dev notes:
