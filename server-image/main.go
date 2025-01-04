@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -79,6 +78,8 @@ func run() error {
 
 	server.POST("/api/image", PostImage(gcsClient, bucket, openAIKey))
 
+	server.POST("/api/color-analysis/image", PostColorAnalysisImage(gcsClient, bucket, openAIKey))
+
 	server.POST("/ai/outfit-description", HandlePostAIOutfit(bucket, openAIKey))
 
 	return server.Start(httpAddr)
@@ -148,10 +149,6 @@ func PostImage(gcs *gcs.Client, bucket *gcs.BucketHandle, openAIKey string) echo
 		}
 
 		url := "https://storage.googleapis.com/" + attr.Name + "/" + gcsFullPath
-		urlResized := "https://storage.googleapis.com/" + attr.Name + "/" + gcsResizedPath
-
-		fmt.Println(urlResized)
-
 		m := map[string]interface{}{
 			"url": url,
 		}
@@ -164,7 +161,63 @@ func PostImage(gcs *gcs.Client, bucket *gcs.BucketHandle, openAIKey string) echo
 
 		m["items"] = openAI.ClothingItems
 		return ctx.JSON(http.StatusOK, m)
-		//return ctx.String(http.StatusCreated, url)
+	}
+}
+
+func PostColorAnalysisImage(gcs *gcs.Client, bucket *gcs.BucketHandle, openAIKey string) echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		userId := ""
+		cookie, err := getCookie(ctx.Request())
+		if err == nil {
+			userId, err = getUserId(ctx.Request().Context(), bucket, cookie)
+			if err != nil {
+				return ctx.NoContent(http.StatusInternalServerError)
+			}
+		} else {
+			userId = uuid()
+		}
+
+		file, err := ctx.FormFile("file")
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		ext := strings.ToLower(filepath.Ext(file.Filename))
+		if ext != ".jpeg" && ext != ".jpg" && ext != ".png" {
+			return ctx.NoContent(http.StatusBadRequest)
+		}
+
+		filename := uuid()
+		tmpPath := "/tmp/" + filename + ext
+		gcsFullPath := filepath.Join("imgs", "color-analysis", userId, filename+ext)
+
+		if err := createTempImage(file, tmpPath); err != nil {
+			log.Println("error creating temp image", err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		if err := createImage(ctx.Request().Context(), bucket, tmpPath, gcsFullPath); err != nil {
+			log.Println("error creating image in gcp ", err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		// not returning any errors, just log if error occurs
+		cleanupTempImages(tmpPath)
+
+		attr, err := bucket.Attrs(ctx.Request().Context())
+		if err != nil {
+			log.Println(err.Error())
+			return ctx.NoContent(http.StatusInternalServerError)
+		}
+
+		url := "https://storage.googleapis.com/" + attr.Name + "/" + gcsFullPath
+
+		m := map[string]interface{}{
+			"url": url,
+		}
+
+		return ctx.JSON(http.StatusOK, m)
 	}
 }
 
