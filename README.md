@@ -1,8 +1,27 @@
 # RateYourStyle
 
-A fashion community to help users discover their personal style.
-
+### Home page 
 ![view-homepage](/screenshares/1-homepage.gif)
+
+### User's closet page
+
+![view-closet](/screenshares/2-closet.gif)
+
+### Discover page
+
+### Signin page
+
+![view-signin](/screenshares/3-signin.gif)
+
+### Outfit upload page
+
+### Color Science page
+
+### Color Analysis page
+
+
+
+
 
 
 Dev notes:
