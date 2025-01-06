@@ -11,7 +11,7 @@ RateYourStyle was an online fashion community to help users discover their perso
 - Sign up via Oauth with Gmail
 - Sign in via OTP or username/password combo
 
-After enrolling in Georgia Tech's OMSCS program, RYS was also used to complete a class project for CS-6460: Educational Technology. Two features were added as part of that project:
+After enrolling in Georgia Tech's OMSCS program, RYS was also used to complete a class project for CS-6460: Educational Technology ([final paper here](https://docs.google.com/document/d/11ttMS-oyOHvuVtpwAu6F555S5bqA0oe6H9TYv8izRP8/edit?usp=sharing)). Two features were added as part of that project:
 - Educational modules about color science
 - Personal color anlaysis web app 
 
