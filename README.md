@@ -1,7 +1,5 @@
 # RateYourStyle
-
-## About 
-
+ 
 RateYourStyle was an online fashion community to help users discover their personal style. Key features of RYS included:
 - User uploaded outfit pics
 - AI assisted outfit descriptions
@@ -13,35 +11,66 @@ RateYourStyle was an online fashion community to help users discover their perso
 - Sign up via Oauth with Gmail
 - Sign in via OTP or username/password combo
 
+After enrolling in Georgia Tech's OMSCS program, RYS was also used to complete a class project for CS-6460: Educational Technology. Two features were added as part of that project:
+- Educational modules about color science
+- Personal color anlaysis web app 
+
 ## Screenshares
 
-### Home page 
-![view-homepage](/screenshares/1-homepage.gif)
+### Home
+<img src="/screenshares/homepage.gif" width="600" />
 
-### User's closet page
 
-![view-closet](/screenshares/2-closet.gif)
+### Virtual closet and stats
 
-### Discover page
+<img src="/screenshares/closet.gif" width="600" />
 
-![view-discover](/screenshares/4-discover.gif)
 
-### Signin page
+### Outfit and reviews 
 
-![view-signin](/screenshares/3-signin.gif)
+<img src="/screenshares/outfit.gif" width="600" />
 
-### Outfit upload page
+### Outfit upload 
+
+<img src="/screenshares/outfit-upload.gif" width="600" />
+
+### Discover
+
+<img src="/screenshares/discover.gif" width="600" />
+
+### Signin
+
+<img src="/screenshares/signin.gif" width="600" />
+
 
 ### Color Science page
 
 ### Color Analysis page
 
+## Local Development 
+
+RYS was designed with microservice architecture in mind. The main components include:
+
+- server: handles outfit uploading 
+- server-auth: handles authentication and user sign up
+- server-search (not included): hanldes search on discover page 
+- server-image: hanldes uploading images to GCP
+- ui: creates the frontend for YoutubeBacklinks
+
+### Requirements
+To build and run RYS locally, you need the following:
+
+- Docker installed
+- Clone this repo and have docker installed
+- A GCP account and a GCP project created. See https://console.cloud.google.com
+- OpenAI dev account
+- Gmail SMTP
+- Under the secrets/ subdirectory, create the following files:
+   - localdev_sa.json
+
+### Running locally 
+
+1. Use `docker-compose up --build` to bring up the entire stack
 
 
 
-
-
-Dev notes:
-
-- For mac with apple chip, to build images use:
-  `docker buildx build --platform linux/amd64 -t `
