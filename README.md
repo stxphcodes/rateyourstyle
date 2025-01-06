@@ -45,28 +45,33 @@ After enrolling in Georgia Tech's OMSCS program, RYS was also used to complete a
 
 ### Color Science page
 
+<img src="/screenshares/color-science.gif" width="600" />
+
 ### Color Analysis page
+
+<img src="/screenshares/color-analysis.gif" width="600" />
+
 
 ## Local Development 
 
 RYS was designed with microservice architecture in mind. The main components include:
 
-- server: handles outfit uploading 
-- server-auth: handles authentication and user sign up
+- server: handles outfit uploading, getting user outfits, posting reviews
+- server-auth: handles user authentication and account sign up
 - server-search (not included): hanldes search on discover page 
-- server-image: hanldes uploading images to GCP
+- server-image: handles uploading images to GCP, and getting outfit descriptions from OpenAI
 - ui: creates the frontend for YoutubeBacklinks
 
 ### Requirements
 To build and run RYS locally, you need the following:
 
 - Docker installed
-- Clone this repo and have docker installed
 - A GCP account and a GCP project created. See https://console.cloud.google.com
 - OpenAI dev account
 - Gmail SMTP
 - Under the secrets/ subdirectory, create the following files:
-   - localdev_sa.json
+   - localdev_sa.json # service account key to GCP with GCS access
+   - openai.key
 
 ### Running locally 
 
