@@ -76,6 +76,3 @@ To build and run RYS locally, you need the following:
 ### Running locally 
 
 1. Use `docker-compose up --build` to bring up the entire stack
-
-
-
