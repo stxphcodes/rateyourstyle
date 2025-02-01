@@ -1,6 +1,8 @@
 # RateYourStyle
  
-RateYourStyle was an online fashion community to help users discover their personal style. Key features of RYS included:
+RateYourStyle was an online fashion community to help users discover their personal style. As of 1/31/2025, RYS is no longer active; this repo serves as an archive.
+
+Key features of RYS included:
 - User uploaded outfit pics
 - AI assisted outfit descriptions
 - Aggregating user clothes into a virtual closet
